@@ -1,0 +1,68 @@
+@using BatistaFloramar.Domain.Entities
+@model Ministerio
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewBag.Title = "Novo Ministério";
+    ViewBag.AdminSection = "ministerios";
+}
+
+@section TopbarActions {
+    <a href="@Url.Action("Index")" class="btn-admin-outline">
+        <i class="fas fa-arrow-left"></i> Voltar
+    </a>
+}
+
+<div class="admin-card" style="max-width: 720px;">
+    <form method="post" asp-action="Create" class="admin-form">
+        @Html.AntiForgeryToken()
+        <div class="row g-3">
+            <div class="col-md-8">
+                <label asp-for="Nome">Nome do Ministério</label>
+                <input asp-for="Nome" class="form-control" placeholder="Ex.: Louvor" />
+                <span asp-validation-for="Nome" class="field-validation-error"></span>
+            </div>
+            <div class="col-md-4">
+                <label asp-for="Ordem">Ordem</label>
+                <input asp-for="Ordem" type="number" class="form-control" min="0" />
+            </div>
+            <div class="col-12">
+                <label asp-for="Descricao">Descrição</label>
+                <textarea asp-for="Descricao" class="form-control" rows="3" placeholder="Descreva o ministério..."></textarea>
+                <span asp-validation-for="Descricao" class="field-validation-error"></span>
+            </div>
+            <div class="col-md-6">
+                <label asp-for="Lideranca">Liderança</label>
+                <input asp-for="Lideranca" class="form-control" placeholder="Ex.: Débora" />
+                <span asp-validation-for="Lideranca" class="field-validation-error"></span>
+            </div>
+            <div class="col-md-6">
+                <label asp-for="Icone">Ícone FontAwesome</label>
+                <input asp-for="Icone" class="form-control" placeholder="Ex.: fas fa-music" />
+                <span class="text-muted">Classe completa, ex.: <code style="color:var(--admin-accent)">fas fa-music</code></span>
+            </div>
+            <div class="col-12">
+                <label asp-for="FotoLider">Foto do Líder (caminho relativo)</label>
+                <input asp-for="FotoLider" class="form-control" placeholder="/images/ministerios/lideres/NomeDoLider.jpeg" />
+                <span class="text-muted" style="font-size:.8rem">Coloque o arquivo em <code>wwwroot/images/ministerios/lideres/</code> e informe o caminho aqui. Deixe em branco para usar o ícone padrão.</span>
+            </div>
+            <div class="col-12">
+                <label asp-for="Link">Link (opcional — para redirecionar a uma página)</label>
+                <input asp-for="Link" class="form-control" placeholder="Ex.: /Missao" />
+                <span class="text-muted">Deixe em branco se não houver link especial.</span>
+            </div>
+            <div class="col-12">
+                <div class="form-check">
+                    <input asp-for="Ativo" class="form-check-input" type="checkbox" checked />
+                    <label asp-for="Ativo" class="form-check-label" style="text-transform:none; font-size: 0.9rem; color: var(--admin-text);">
+                        Ministério ativo (visível no site)
+                    </label>
+                </div>
+            </div>
+            <div class="col-12 pt-2">
+                <button type="submit" class="btn-admin">
+                    <i class="fas fa-save"></i> Salvar Ministério
+                </button>
+            </div>
+        </div>
+    </form>
+</div>

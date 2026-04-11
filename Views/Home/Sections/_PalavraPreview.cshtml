@@ -1,0 +1,72 @@
+﻿@using BatistaFloramar.Domain.Entities
+@{
+    var palavras = ViewBag.UltimasPalavras as List<PalavraDoPastor>;
+    bool temPalavras = palavras != null && palavras.Count > 0;
+}
+<section class="page-section section-dark" id="palavra-preview">
+    <div class="container">
+        <div class="text-center mb-5 scroll-reveal">
+            <span class="section-eyebrow">Palavra do Pastor</span>
+            <h2 class="section-heading">Últimas Mensagens</h2>
+            <p class="text-muted-section mt-2">Reflexões, sermões e devocionais para nutrir sua fé.</p>
+        </div>
+
+        @if (temPalavras)
+        {
+            <div class="row g-4">
+                @for (int i = 0; i < palavras!.Count; i++)
+                {
+                    var p = palavras[i];
+                    var excerpt = System.Text.RegularExpressions.Regex.Replace(p.Conteudo, "<.*?>", "");
+                    excerpt = excerpt.Length > 90 ? excerpt.Substring(0, 90).TrimEnd() + "…" : excerpt;
+                    <div class="col-md-4 scroll-reveal delay-@(i + 1)">
+                        <a href="/PalavraDoPastor/Detalhe/@p.Id" class="palavra-preview-card">
+                            <div class="palavra-preview-img">
+                                @if (!string.IsNullOrEmpty(p.ImagemDestaque))
+                                {
+                                    <img src="@p.ImagemDestaque" alt="@p.Titulo" />
+                                }
+                                else
+                                {
+                                    <div class="palavra-preview-placeholder">
+                                        <i class="fas fa-bible"></i>
+                                    </div>
+                                }
+                                <span class="palavra-type-badge @(p.Tipo == TipoPalavra.Sermao ? "badge-sermao" : "badge-devocional")">
+                                    @(p.Tipo == TipoPalavra.Sermao ? "Sermão" : "Devocional")
+                                </span>
+                            </div>
+                            <div class="palavra-preview-body">
+                                <h5 class="palavra-preview-title">@p.Titulo</h5>
+                                @if (!string.IsNullOrWhiteSpace(excerpt))
+                                {
+                                    <p class="palavra-preview-excerpt">@excerpt</p>
+                                }
+                                <div class="palavra-preview-meta">
+                                    <span><i class="fas fa-user-tie me-1"></i>@p.AutorNome</span>
+                                    <span class="palavra-read-link">
+                                        Ler <i class="fas fa-arrow-right"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="text-center py-5 scroll-reveal">
+                <i class="fas fa-bible" style="font-size:3rem;color:#4a5a7a;margin-bottom:1rem;display:block;"></i>
+                <p class="text-muted-section">Novas mensagens em breve.</p>
+            </div>
+        }
+    </div>
+
+    <div class="palavra-cta-wrap">
+        <a href="/PalavraDoPastor" class="btn btn-outline-gold btn-lg">
+            <i class="fas fa-book-open me-2"></i> Ver todas as mensagens
+        </a>
+    </div>
+</section>
+

@@ -1,0 +1,67 @@
+@using BatistaFloramar.Domain.Entities
+@{
+    var ministerios = ViewBag.Ministerios as IEnumerable<Ministerio>;
+}
+<section class="page-section" id="ministerios">
+    <div class="container">
+        <div class="text-center mb-5">
+            <span class="section-eyebrow">Ministérios</span>
+            <h2 class="section-heading">Sirva com seus dons</h2>
+            <p class="text-secondary" style="max-width:560px;margin:0 auto;">Conheça cada ministério e descubra onde você pode servir.</p>
+        </div>
+        <div class="row g-4">
+            @if (ministerios != null)
+            {
+                @foreach (var m in ministerios.Take(8))
+                {
+                    <div class="col-md-6 col-lg-3">
+                        <a href="/Ministerios/Detalhes/@m.Slug" class="text-decoration-none">
+                            <div class="ministry-card h-100">
+                                <div class="ministry-icon"><i class="@m.Icone"></i></div>
+                                <h5>@m.Nome</h5>
+                                <p class="small">@(string.IsNullOrEmpty(m.ResumoBreve) ? m.Descricao.Substring(0, Math.Min(90, m.Descricao.Length)) + "…" : m.ResumoBreve)</p>
+                                <span class="text-gold small">Ver mais <i class="fas fa-arrow-right ms-1"></i></span>
+                            </div>
+                        </a>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="col-md-6 col-lg-3">
+                    <div class="ministry-card">
+                        <div class="ministry-icon"><i class="fas fa-bolt"></i></div>
+                        <h5>Jovens</h5>
+                        <p class="small">Culto de Jovens e ações de impacto para a juventude.</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="ministry-card">
+                        <div class="ministry-icon"><i class="fas fa-child"></i></div>
+                        <h5>Kids</h5>
+                        <p class="small">Cuidando das crianças com amor enquanto o culto acontece.</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="ministry-card">
+                        <div class="ministry-icon"><i class="fas fa-music"></i></div>
+                        <h5>Louvor</h5>
+                        <p class="small">Liderando a congregação na adoração através da música.</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="ministry-card">
+                        <div class="ministry-icon"><i class="fas fa-water"></i></div>
+                        <h5>Batismo</h5>
+                        <p class="small">Preparando e celebrando o passo público da fé.</p>
+                    </div>
+                </div>
+            }
+        </div>
+        <div class="text-center mt-4">
+            <a href="/Ministerios" class="btn btn-secondary">
+                Ver todos os ministérios <i class="fas fa-arrow-right ms-2"></i>
+            </a>
+        </div>
+    </div>
+</section>

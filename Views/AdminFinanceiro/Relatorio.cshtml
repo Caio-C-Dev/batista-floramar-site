@@ -1,0 +1,204 @@
+@using BatistaFloramar.Application.DTOs
+@using BatistaFloramar.Application.Services
+@using BatistaFloramar.Domain.Entities
+@model DashboardFinanceiroDto
+@{
+    ViewBag.AdminSection = "financeiro";
+    ViewBag.Title = "Relatório Mensal";
+    Layout = "_AdminLayout";
+    var meses = new[] { "","Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro" };
+    var mesSel = Model.MesReferencia;
+    var anoSel = Model.AnoReferencia;
+    var entradas = ViewBag.Entradas as List<EntradaFinanceira> ?? new();
+    var saidas   = ViewBag.Saidas   as List<SaidaFinanceira>   ?? new();
+    var saldoCor = Model.SaldoMes >= 0 ? "#25a25a" : "#e05252";
+}
+
+@section TopbarActions {
+    <form method="get" class="d-flex align-items-center gap-2">
+        <select name="mes" class="form-select form-select-sm" style="width:130px">
+            @for (int i = 1; i <= 12; i++)
+            {
+                if (mesSel == i) { <option value="@i" selected="selected">@meses[i]</option> }
+                else { <option value="@i">@meses[i]</option> }
+            }
+        </select>
+        <select name="ano" class="form-select form-select-sm" style="width:90px">
+            @foreach (var a in (List<int>)ViewBag.Anos)
+            {
+                if (anoSel == a) { <option value="@a" selected="selected">@a</option> }
+                else { <option value="@a">@a</option> }
+            }
+        </select>
+        <button type="submit" class="btn-admin btn-admin-sm"><i class="fas fa-filter me-1"></i>Filtrar</button>
+    </form>
+    <button onclick="window.print()" class="btn-admin btn-admin-sm">
+        <i class="fas fa-print me-1"></i> Imprimir
+    </button>
+    <a href="@Url.Action("Dashboard")" class="btn-admin btn-admin-sm">
+        <i class="fas fa-arrow-left me-1"></i> Dashboard
+    </a>
+}
+
+<style>
+    .rel-header { background:var(--admin-card-bg); border:1px solid var(--admin-border); border-radius:12px; padding:1.5rem 2rem; margin-bottom:1.5rem; }
+    .rel-kpi-row { display:flex; gap:1.5rem; flex-wrap:wrap; margin-bottom:1.5rem; }
+    .rel-kpi { background:var(--admin-card-bg); border:1px solid var(--admin-border); border-radius:10px; padding:1rem 1.5rem; flex:1; min-width:160px; text-align:center; }
+    .rel-kpi-label { font-size:.72rem; text-transform:uppercase; letter-spacing:.06em; color:var(--admin-text-muted); margin-bottom:.25rem; }
+    .rel-kpi-value { font-size:1.6rem; font-weight:700; }
+    .rel-section { background:var(--admin-card-bg); border:1px solid var(--admin-border); border-radius:12px; overflow:hidden; margin-bottom:1.25rem; }
+    .rel-section-head { padding:.75rem 1.25rem; border-bottom:1px solid var(--admin-border); font-size:.8rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em; display:flex; justify-content:space-between; align-items:center; }
+    .rel-table { width:100%; border-collapse:collapse; }
+    .rel-table th { font-size:.7rem; text-transform:uppercase; letter-spacing:.05em; color:var(--admin-text-muted); padding:.6rem 1rem; border-bottom:1px solid var(--admin-border); }
+    .rel-table td { padding:.6rem 1rem; border-bottom:1px solid rgba(255,255,255,.04); font-size:.87rem; }
+    .rel-table tr:last-child td { border-bottom:none; }
+    .rel-table tfoot td { font-weight:700; border-top:1px solid var(--admin-border); padding:.75rem 1rem; }
+    .badge-tipo { display:inline-block; padding:2px 10px; border-radius:20px; font-size:.7rem; font-weight:700; }
+    .badge-e { background:rgba(37,162,90,.18); color:#25a25a; }
+    .badge-s { background:rgba(192,57,43,.18); color:#e05252; }
+    .rel-saldo-box { background:var(--admin-card-bg); border:2px solid @saldoCor; border-radius:12px; padding:1.5rem; text-align:center; margin-bottom:1.5rem; }
+
+    @@media print {
+        .admin-sidebar, .admin-topbar, [class*="btn-admin"], form { display:none !important; }
+        .admin-content { margin:0 !important; padding:0 !important; }
+        body { background:#fff !important; color:#000 !important; }
+        .rel-section, .rel-kpi, .rel-saldo-box, .rel-header { border:1px solid #ccc !important; background:#fff !important; color:#000 !important; }
+        .rel-table th, .rel-table td { color:#000 !important; }
+    }
+</style>
+
+<div class="rel-header">
+    <div style="font-size:1.2rem; font-weight:700">Relatório Financeiro — @meses[mesSel] / @anoSel</div>
+    <div style="font-size:.82rem; color:var(--admin-text-muted); margin-top:.25rem">
+        Comunidade Batista Floramar · Gerado em @DateTime.Now.ToString("dd/MM/yyyy HH:mm")
+    </div>
+</div>
+
+<div class="rel-kpi-row">
+    <div class="rel-kpi">
+        <div class="rel-kpi-label"><i class="fas fa-arrow-up me-1" style="color:#25a25a"></i>Total Entradas</div>
+        <div class="rel-kpi-value" style="color:#25a25a">R$ @Model.TotalEntradasMes.ToString("N2")</div>
+    </div>
+    <div class="rel-kpi">
+        <div class="rel-kpi-label"><i class="fas fa-arrow-down me-1" style="color:#e05252"></i>Total Saídas</div>
+        <div class="rel-kpi-value" style="color:#e05252">R$ @Model.TotalSaidasMes.ToString("N2")</div>
+    </div>
+    <div class="rel-saldo-box" style="flex:1; min-width:160px; margin-bottom:0">
+        <div class="rel-kpi-label">Saldo do Mês</div>
+        <div class="rel-kpi-value" style="color:@saldoCor">R$ @Model.SaldoMes.ToString("N2")</div>
+        <div style="font-size:.8rem; color:var(--admin-text-muted); margin-top:.25rem">
+            @(Model.SaldoMes >= 0 ? "Superávit" : "Déficit")
+        </div>
+    </div>
+</div>
+
+@* Entradas por tipo *@
+@if (Model.EntradasPorTipo.Any())
+{
+    <div class="rel-section mb-3">
+        <div class="rel-section-head" style="color:#25a25a">
+            <span>Entradas por Tipo</span>
+        </div>
+        <div style="padding:.75rem 1.25rem; display:flex; flex-wrap:wrap; gap:1rem;">
+            @foreach (var kv in Model.EntradasPorTipo)
+            {
+                <div style="text-align:center; min-width:120px;">
+                    <div style="font-size:.75rem; color:var(--admin-text-muted)">@kv.Key</div>
+                    <div style="font-size:1.1rem; font-weight:700; color:#25a25a">R$ @kv.Value.ToString("N2")</div>
+                </div>
+            }
+        </div>
+    </div>
+}
+
+@* Tabela de Entradas *@
+<div class="rel-section">
+    <div class="rel-section-head" style="color:#25a25a">
+        <span><i class="fas fa-arrow-up me-1"></i>Entradas (@entradas.Count)</span>
+        <span>R$ @entradas.Sum(e => e.Valor).ToString("N2")</span>
+    </div>
+    @if (!entradas.Any())
+    {
+        <p class="text-muted text-center py-3" style="font-size:.85rem">Nenhuma entrada neste período.</p>
+    }
+    else
+    {
+        <table class="rel-table">
+            <thead><tr><th>Data</th><th>Tipo</th><th>Descrição</th><th>Origem</th><th>Ministério</th><th style="text-align:right">Valor</th></tr></thead>
+            <tbody>
+                @foreach (var e in entradas)
+                {
+                    <tr>
+                        <td>@e.Data.ToString("dd/MM/yyyy")</td>
+                        <td><span class="badge-tipo badge-e">@FinanceiroService.TipoEntradaLabel(e.Tipo.ToString())</span></td>
+                        <td>@e.Descricao</td>
+                        <td style="color:var(--admin-text-muted)">@(e.Origem ?? "—")</td>
+                        <td style="color:var(--admin-text-muted)">@(e.Ministerio?.Nome ?? "—")</td>
+                        <td style="text-align:right; color:#25a25a; font-weight:600">R$ @e.Valor.ToString("N2")</td>
+                    </tr>
+                }
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="5">Total de Entradas</td>
+                    <td style="text-align:right; color:#25a25a">R$ @entradas.Sum(e => e.Valor).ToString("N2")</td>
+                </tr>
+            </tfoot>
+        </table>
+    }
+</div>
+
+@* Saídas por tipo *@
+@if (Model.SaidasPorTipo.Any())
+{
+    <div class="rel-section mb-3 mt-3">
+        <div class="rel-section-head" style="color:#e05252">
+            <span>Saídas por Tipo</span>
+        </div>
+        <div style="padding:.75rem 1.25rem; display:flex; flex-wrap:wrap; gap:1rem;">
+            @foreach (var kv in Model.SaidasPorTipo)
+            {
+                <div style="text-align:center; min-width:120px;">
+                    <div style="font-size:.75rem; color:var(--admin-text-muted)">@kv.Key</div>
+                    <div style="font-size:1.1rem; font-weight:700; color:#e05252">R$ @kv.Value.ToString("N2")</div>
+                </div>
+            }
+        </div>
+    </div>
+}
+
+@* Tabela de Saídas *@
+<div class="rel-section mt-3">
+    <div class="rel-section-head" style="color:#e05252">
+        <span><i class="fas fa-arrow-down me-1"></i>Saídas (@saidas.Count)</span>
+        <span>R$ @saidas.Sum(s => s.Valor).ToString("N2")</span>
+    </div>
+    @if (!saidas.Any())
+    {
+        <p class="text-muted text-center py-3" style="font-size:.85rem">Nenhuma saída neste período.</p>
+    }
+    else
+    {
+        <table class="rel-table">
+            <thead><tr><th>Data</th><th>Tipo</th><th>Descrição</th><th>Registrado por</th><th style="text-align:right">Valor</th></tr></thead>
+            <tbody>
+                @foreach (var s in saidas)
+                {
+                    <tr>
+                        <td>@s.Data.ToString("dd/MM/yyyy")</td>
+                        <td><span class="badge-tipo badge-s">@FinanceiroService.TipoSaidaLabel(s.Tipo.ToString())</span></td>
+                        <td>@s.Descricao</td>
+                        <td style="color:var(--admin-text-muted)">@(s.RegistradoPor ?? "—")</td>
+                        <td style="text-align:right; color:#e05252; font-weight:600">R$ @s.Valor.ToString("N2")</td>
+                    </tr>
+                }
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="4">Total de Saídas</td>
+                    <td style="text-align:right; color:#e05252">R$ @saidas.Sum(s => s.Valor).ToString("N2")</td>
+                </tr>
+            </tfoot>
+        </table>
+    }
+</div>

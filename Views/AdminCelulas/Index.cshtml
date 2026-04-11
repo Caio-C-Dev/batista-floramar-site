@@ -1,0 +1,68 @@
+@using BatistaFloramar.Domain.Entities
+@model IEnumerable<Celula>
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewBag.Title = "Células";
+    ViewBag.AdminSection = "celulas";
+}
+
+@section TopbarActions {
+    <a href="@Url.Action("Create")" class="btn-admin">
+        <i class="fas fa-plus"></i> Nova Célula
+    </a>
+}
+
+<div class="admin-card p-0">
+    <div class="table-responsive">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Dia</th>
+                    <th>Lideres</th>
+                    <th>Horário</th>
+                    <th>Status</th>
+                    <th style="width:160px;">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var c in Model)
+                {
+                    <tr>
+                        <td><strong>@c.Nome</strong></td>
+                        <td>@c.DiaSemana</td>
+                        <td>@(c.Lideres ?? "—")</td>
+                        <td>@c.Horario</td>
+                        <td>
+                            @if (c.Ativo)
+                            {
+                                <span class="badge-ativo">Ativa</span>
+                            }
+                            else
+                            {
+                                <span class="badge-inativo">Inativa</span>
+                            }
+                        </td>
+                        <td>
+                            <div class="d-flex gap-1 flex-wrap">
+                                <a href="@Url.Action("Edit", new { id = c.Id })" class="btn-admin-outline" title="Editar">
+                                    <i class="fas fa-pen"></i>
+                                </a>
+                                <form method="post" asp-action="ToggleAtivo" asp-route-id="@c.Id" style="display:inline;">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="@(c.Ativo ? "btn-admin-danger" : "btn-admin-outline")" title="@(c.Ativo ? "Inativar" : "Ativar")">
+                                        <i class="fas @(c.Ativo ? "fa-toggle-off" : "fa-toggle-on")"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                }
+                @if (!Model.Any())
+                {
+                    <tr><td colspan="6" class="text-center" style="color: var(--admin-text-muted); padding: 32px;">Nenhuma célula cadastrada.</td></tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

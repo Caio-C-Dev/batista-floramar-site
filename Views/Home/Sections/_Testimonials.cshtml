@@ -1,0 +1,88 @@
+@{
+    var depoimentos = new[]
+    {
+        new {
+            Texto     = "Encontrei na Comunidade Batista Floramar não apenas uma igreja, mas uma família. Cada domingo é uma renovação de forças para encarar a semana com fé e propósito.",
+            Nome      = "Maria Fernanda S.",
+            Papel     = "Membro há 3 anos",
+            Iniciais  = "MF",
+            Cor       = "#7c5cbf"
+        },
+        new {
+            Texto     = "Participar de uma célula mudou minha perspectiva de fé. O cuidado genuíno das pessoas, a oração em comunidade e os estudos bíblicos me fizeram crescer como nunca.",
+            Nome      = "Carlos Eduardo M.",
+            Papel     = "Líder de Célula",
+            Iniciais  = "CE",
+            Cor       = "#2e7d9a"
+        },
+        new {
+            Texto     = "Quando cheguei pela primeira vez, fui recebido com um calor que não esperava. A Palavra pregada aqui é fiel, direta e transforma de verdade. Me sinto em casa.",
+            Nome      = "Ana Paula L.",
+            Papel     = "Membro há 1 ano",
+            Iniciais  = "AP",
+            Cor       = "#2e7d5a"
+        },
+        new {
+            Texto     = "O ministério de louvor me ensinou que adoração vai muito além da música — é um estilo de vida. Sou grato por cada ensaio, cada culto e cada pessoa que caminha comigo.",
+            Nome      = "João Marcos B.",
+            Papel     = "Ministério de Louvor",
+            Iniciais  = "JM",
+            Cor       = "#9a5a2e"
+        },
+        new {
+            Texto     = "São cinco anos de história com essa comunidade. Passei por momentos difíceis e sempre encontrei amparo, oração e fé real aqui. Não me imagino em outro lugar.",
+            Nome      = "Isabela C.",
+            Papel     = "Membro há 5 anos",
+            Iniciais  = "IC",
+            Cor       = "#7d2e5a"
+        },
+        new {
+            Texto     = "A transparência do ministério financeiro e o cuidado social da igreja me convencem todo dia de que estou contribuindo para algo que transforma vidas de verdade.",
+            Nome      = "Ricardo T.",
+            Papel     = "Voluntário — Ação Social",
+            Iniciais  = "RT",
+            Cor       = "#2e5a9a"
+        }
+    };
+}
+
+<section class="page-section testimonials-section" id="depoimentos">
+    <div class="container">
+        <div class="text-center mb-5 scroll-reveal">
+            <span class="section-eyebrow">Depoimentos</span>
+            <h2 class="section-heading">O que a comunidade diz</h2>
+            <p class="text-muted-section mt-2">Histórias reais de fé, crescimento e transformação.</p>
+        </div>
+
+        <div class="row g-4">
+            @for (int i = 0; i < depoimentos.Length; i++)
+            {
+                var d = depoimentos[i];
+                <div class="col-md-6 col-lg-4 scroll-reveal delay-@((i % 3) + 1)">
+                    <div class="testimonial-card">
+                        <div class="testimonial-quote-icon">
+                            <i class="fas fa-quote-left"></i>
+                        </div>
+                        <p class="testimonial-text">@d.Texto</p>
+                        <div class="testimonial-stars">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <div class="testimonial-author">
+                            <div class="testimonial-avatar" style="background-color: @d.Cor;">
+                                @d.Iniciais
+                            </div>
+                            <div class="testimonial-author-info">
+                                <span class="testimonial-name">@d.Nome</span>
+                                <span class="testimonial-role">@d.Papel</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</section>

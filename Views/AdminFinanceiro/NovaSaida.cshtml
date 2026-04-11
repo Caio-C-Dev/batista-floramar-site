@@ -1,0 +1,60 @@
+@using BatistaFloramar.Domain.Entities
+@model SaidaFinanceira
+@{
+    ViewBag.AdminSection = "financeiro";
+    ViewBag.Title = "Nova Saída";
+    Layout = "_AdminLayout";
+}
+
+@section TopbarActions {
+    <a href="@Url.Action("Saidas")" class="btn-admin btn-admin-sm">
+        <i class="fas fa-arrow-left me-1"></i> Voltar
+    </a>
+}
+
+<style>
+    .fin-form-card { background:var(--admin-card-bg); border:1px solid var(--admin-border); border-radius:12px; padding:2rem; max-width:560px; }
+    .fin-form-card .form-label { font-size:.8rem; text-transform:uppercase; letter-spacing:.05em; color:var(--admin-text-muted); margin-bottom:.3rem; }
+</style>
+
+<div class="fin-form-card">
+    <form method="post" asp-action="NovaSaida">
+        @Html.AntiForgeryToken()
+        <div class="row gy-3">
+            <div class="col-md-6">
+                <label class="form-label">Tipo *</label>
+                <select name="Tipo" class="form-select" required>
+                    <option value="Aluguel">Aluguel</option>
+                    <option value="Energia">Energia</option>
+                    <option value="Agua">Água</option>
+                    <option value="Manutencao">Manutenção</option>
+                    <option value="Missoes">Missões</option>
+                    <option value="Salario">Salário</option>
+                    <option value="Outros">Outros</option>
+                </select>
+                <span asp-validation-for="Tipo" class="text-danger small"></span>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Data *</label>
+                <input type="date" name="Data" class="form-control" value="@Model.Data.ToString("yyyy-MM-dd")" required />
+                <span asp-validation-for="Data" class="text-danger small"></span>
+            </div>
+            <div class="col-12">
+                <label class="form-label">Valor (R$) *</label>
+                <input type="number" name="Valor" class="form-control" step="0.01" min="0.01" placeholder="0,00" required />
+                <span asp-validation-for="Valor" class="text-danger small"></span>
+            </div>
+            <div class="col-12">
+                <label class="form-label">Descrição *</label>
+                <input type="text" name="Descricao" class="form-control" placeholder="Ex: Conta de energia — Abril/2026" maxlength="500" required />
+                <span asp-validation-for="Descricao" class="text-danger small"></span>
+            </div>
+        </div>
+        <div class="mt-4 d-flex gap-2">
+            <button type="submit" class="btn-admin" style="background:#c0392b; color:#fff">
+                <i class="fas fa-check me-1"></i> Salvar Saída
+            </button>
+            <a href="@Url.Action("Saidas")" class="btn-admin" style="background:transparent; border:1px solid var(--admin-border); color:var(--admin-text)">Cancelar</a>
+        </div>
+    </form>
+</div>

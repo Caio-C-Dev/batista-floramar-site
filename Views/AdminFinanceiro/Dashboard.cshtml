@@ -1,0 +1,270 @@
+@using BatistaFloramar.Application.DTOs
+@using BatistaFloramar.Application.Services
+@model DashboardFinanceiroDto
+@{
+    ViewBag.AdminSection = "financeiro";
+    ViewBag.Title = "Gestão Financeira";
+    Layout = "_AdminLayout";
+
+    var meses = new[] { "Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez" };
+    var saldoCorMes = Model.SaldoMes >= 0 ? "#25a25a" : "#e05252";
+    var saldoCorAno = Model.SaldoAno >= 0 ? "#25a25a" : "#e05252";
+
+    var graficoLabels  = System.Text.Json.JsonSerializer.Serialize(Model.UltimosSeisMeses.Select(g => g.Mes));
+    var graficoEntradas = System.Text.Json.JsonSerializer.Serialize(Model.UltimosSeisMeses.Select(g => g.Entradas));
+    var graficoSaidas   = System.Text.Json.JsonSerializer.Serialize(Model.UltimosSeisMeses.Select(g => g.Saidas));
+
+    var pizzaLabels  = System.Text.Json.JsonSerializer.Serialize(Model.EntradasPorTipo.Keys.ToList());
+    var pizzaValores = System.Text.Json.JsonSerializer.Serialize(Model.EntradasPorTipo.Values.ToList());
+
+    var pizzaSLabels  = System.Text.Json.JsonSerializer.Serialize(Model.SaidasPorTipo.Keys.ToList());
+    var pizzaSValores = System.Text.Json.JsonSerializer.Serialize(Model.SaidasPorTipo.Values.ToList());
+}
+
+@section TopbarActions {
+    <form method="get" class="d-flex align-items-center gap-2 flex-wrap">
+        <select name="mes" class="form-select form-select-sm" style="width:120px">
+            @for (int i = 1; i <= 12; i++)
+            {
+                if (Model.MesReferencia == i) { <option value="@i" selected="selected">@meses[i - 1]</option> }
+                else { <option value="@i">@meses[i - 1]</option> }
+            }
+        </select>
+        <select name="ano" class="form-select form-select-sm" style="width:90px">
+            @foreach (var a in (List<int>)ViewBag.Anos)
+            {
+                if (Model.AnoReferencia == a) { <option value="@a" selected="selected">@a</option> }
+                else { <option value="@a">@a</option> }
+            }
+        </select>
+        <button type="submit" class="btn-admin btn-admin-sm">
+            <i class="fas fa-filter me-1"></i> Filtrar
+        </button>
+    </form>
+    <a href="@Url.Action("NovaEntrada")" class="btn-admin btn-admin-sm" style="background:var(--admin-success); color:#fff">
+        <i class="fas fa-plus me-1"></i> Entrada
+    </a>
+    <a href="@Url.Action("NovaSaida")" class="btn-admin btn-admin-sm" style="background:#c0392b; color:#fff">
+        <i class="fas fa-minus me-1"></i> Saída
+    </a>
+}
+
+<style>
+    .fin-card { background:var(--admin-card-bg); border:1px solid var(--admin-border); border-radius:12px; padding:1.5rem; }
+    .fin-kpi  { text-align:center; }
+    .fin-kpi-label { font-size:.78rem; text-transform:uppercase; letter-spacing:.06em; color:var(--admin-text-muted); margin-bottom:.35rem; }
+    .fin-kpi-value { font-size:2rem; font-weight:700; }
+    .fin-kpi-sub   { font-size:.8rem; color:var(--admin-text-muted); margin-top:.2rem; }
+    .fin-section-title { font-size:.85rem; font-weight:700; text-transform:uppercase; letter-spacing:.07em; color:var(--admin-text-muted); margin-bottom:1rem; }
+    .fin-table { width:100%; border-collapse:collapse; }
+    .fin-table th { font-size:.72rem; text-transform:uppercase; letter-spacing:.05em; color:var(--admin-text-muted); padding:.5rem .75rem; border-bottom:1px solid var(--admin-border); }
+    .fin-table td { padding:.6rem .75rem; border-bottom:1px solid rgba(255,255,255,.04); font-size:.88rem; }
+    .fin-table tr:last-child td { border-bottom:none; }
+    .badge-tipo { display:inline-block; padding:2px 10px; border-radius:20px; font-size:.7rem; font-weight:700; }
+    .badge-dizimo  { background:rgba(212,175,55,.18); color:#d4af37; }
+    .badge-oferta  { background:rgba(37,162,90,.18); color:#25a25a; }
+    .badge-doacao  { background:rgba(52,152,219,.18); color:#3498db; }
+    .badge-especif { background:rgba(155,89,182,.18); color:#9b59b6; }
+    .badge-saida   { background:rgba(192,57,43,.18); color:#e05252; }
+    .chart-wrapper { position:relative; height:220px; }
+</style>
+
+<div class="row g-3 mb-4">
+    <div class="col-sm-6 col-lg-3">
+        <div class="fin-card fin-kpi">
+            <div class="fin-kpi-label"><i class="fas fa-arrow-up me-1" style="color:#25a25a"></i>Entradas — @meses[Model.MesReferencia-1]</div>
+            <div class="fin-kpi-value" style="color:#25a25a">R$ @Model.TotalEntradasMes.ToString("N2")</div>
+            <div class="fin-kpi-sub">Ano: R$ @Model.TotalEntradasAno.ToString("N2")</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+        <div class="fin-card fin-kpi">
+            <div class="fin-kpi-label"><i class="fas fa-arrow-down me-1" style="color:#e05252"></i>Saídas — @meses[Model.MesReferencia-1]</div>
+            <div class="fin-kpi-value" style="color:#e05252">R$ @Model.TotalSaidasMes.ToString("N2")</div>
+            <div class="fin-kpi-sub">Ano: R$ @Model.TotalSaidasAno.ToString("N2")</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+        <div class="fin-card fin-kpi">
+            <div class="fin-kpi-label"><i class="fas fa-balance-scale me-1"></i>Saldo — @meses[Model.MesReferencia-1]</div>
+            <div class="fin-kpi-value" style="color:@saldoCorMes">R$ @Model.SaldoMes.ToString("N2")</div>
+            <div class="fin-kpi-sub" style="color:@saldoCorAno">Ano: R$ @Model.SaldoAno.ToString("N2")</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+        <div class="fin-card d-flex flex-column gap-2 justify-content-center h-100">
+            <a href="@Url.Action("Entradas")" class="btn-admin w-100 text-center" style="background:var(--admin-success)">
+                <i class="fas fa-list me-1"></i> Ver Entradas
+            </a>
+            <a href="@Url.Action("Saidas")" class="btn-admin w-100 text-center" style="background:#c0392b">
+                <i class="fas fa-list me-1"></i> Ver Saídas
+            </a>
+            <a href="@Url.Action("Relatorio")?mes=@Model.MesReferencia&ano=@Model.AnoReferencia" class="btn-admin w-100 text-center">
+                <i class="fas fa-file-alt me-1"></i> Relatório
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-lg-7">
+        <div class="fin-card">
+            <div class="fin-section-title"><i class="fas fa-chart-bar me-2"></i>Entradas x Saídas — Últimos 6 Meses</div>
+            <div class="chart-wrapper">
+                <canvas id="chartBarras"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-5">
+        <div class="row g-3 h-100">
+            <div class="col-12">
+                <div class="fin-card">
+                    <div class="fin-section-title"><i class="fas fa-chart-pie me-2"></i>Entradas por Tipo — @meses[Model.MesReferencia-1]</div>
+                    <div class="chart-wrapper" style="height:160px">
+                        <canvas id="chartPizzaE"></canvas>
+                    </div>
+                    @if (!Model.EntradasPorTipo.Any())
+                    {
+                        <p class="text-center text-muted mt-2" style="font-size:.82rem">Nenhuma entrada neste mês.</p>
+                    }
+                </div>
+            </div>
+            <div class="col-12">
+                <div class="fin-card">
+                    <div class="fin-section-title"><i class="fas fa-chart-pie me-2"></i>Saídas por Tipo — @meses[Model.MesReferencia-1]</div>
+                    <div class="chart-wrapper" style="height:160px">
+                        <canvas id="chartPizzaS"></canvas>
+                    </div>
+                    @if (!Model.SaidasPorTipo.Any())
+                    {
+                        <p class="text-center text-muted mt-2" style="font-size:.82rem">Nenhuma saída neste mês.</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-lg-6">
+        <div class="fin-card">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <div class="fin-section-title mb-0"><i class="fas fa-arrow-up me-1" style="color:#25a25a"></i>Últimas Entradas</div>
+                <a href="@Url.Action("Entradas")" style="font-size:.78rem; color:var(--admin-accent)">Ver todas →</a>
+            </div>
+            @if (!Model.UltimasEntradas.Any())
+            {
+                <p class="text-muted" style="font-size:.85rem">Nenhuma entrada registrada.</p>
+            }
+            else
+            {
+                <table class="fin-table">
+                    <thead><tr><th>Data</th><th>Tipo</th><th>Descrição</th><th>Valor</th></tr></thead>
+                    <tbody>
+                        @foreach (var e in Model.UltimasEntradas)
+                        {
+                            var badgeCls = e.Tipo.ToString() switch {
+                                "Dizimo" => "badge-dizimo",
+                                "Oferta" => "badge-oferta",
+                                "Doacao" => "badge-doacao",
+                                _ => "badge-especif"
+                            };
+                            <tr>
+                                <td>@e.Data.ToString("dd/MM")</td>
+                                <td><span class="badge-tipo @badgeCls">@FinanceiroService.TipoEntradaLabel(e.Tipo.ToString())</span></td>
+                                <td>@e.Descricao</td>
+                                <td style="color:#25a25a; font-weight:600">R$ @e.Valor.ToString("N2")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="fin-card">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <div class="fin-section-title mb-0"><i class="fas fa-arrow-down me-1" style="color:#e05252"></i>Últimas Saídas</div>
+                <a href="@Url.Action("Saidas")" style="font-size:.78rem; color:var(--admin-accent)">Ver todas →</a>
+            </div>
+            @if (!Model.UltimasSaidas.Any())
+            {
+                <p class="text-muted" style="font-size:.85rem">Nenhuma saída registrada.</p>
+            }
+            else
+            {
+                <table class="fin-table">
+                    <thead><tr><th>Data</th><th>Tipo</th><th>Descrição</th><th>Valor</th></tr></thead>
+                    <tbody>
+                        @foreach (var s in Model.UltimasSaidas)
+                        {
+                            <tr>
+                                <td>@s.Data.ToString("dd/MM")</td>
+                                <td><span class="badge-tipo badge-saida">@FinanceiroService.TipoSaidaLabel(s.Tipo.ToString())</span></td>
+                                <td>@s.Descricao</td>
+                                <td style="color:#e05252; font-weight:600">R$ @s.Valor.ToString("N2")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+    Chart.defaults.color = '#aaa';
+    Chart.defaults.borderColor = 'rgba(255,255,255,0.07)';
+
+    // Gráfico de barras
+    new Chart(document.getElementById('chartBarras'), {
+        type: 'bar',
+        data: {
+            labels: @Html.Raw(graficoLabels),
+            datasets: [
+                {
+                    label: 'Entradas',
+                    data: @Html.Raw(graficoEntradas),
+                    backgroundColor: 'rgba(37,162,90,0.7)',
+                    borderRadius: 6
+                },
+                {
+                    label: 'Saídas',
+                    data: @Html.Raw(graficoSaidas),
+                    backgroundColor: 'rgba(192,57,43,0.7)',
+                    borderRadius: 6
+                }
+            ]
+        },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top' } }, scales: { x: { grid: { display:false } } } }
+    });
+
+    // Pizza Entradas
+    const pizzaELabels = @Html.Raw(pizzaLabels);
+    if (pizzaELabels.length > 0) {
+        new Chart(document.getElementById('chartPizzaE'), {
+            type: 'doughnut',
+            data: {
+                labels: pizzaELabels,
+                datasets: [{ data: @Html.Raw(pizzaValores), backgroundColor: ['#d4af37','#25a25a','#3498db','#9b59b6'], borderWidth: 0 }]
+            },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { boxWidth: 12 } } } }
+        });
+    }
+
+    // Pizza Saídas
+    const pizzaSLabels = @Html.Raw(pizzaSLabels);
+    if (pizzaSLabels.length > 0) {
+        new Chart(document.getElementById('chartPizzaS'), {
+            type: 'doughnut',
+            data: {
+                labels: pizzaSLabels,
+                datasets: [{ data: @Html.Raw(pizzaSValores), backgroundColor: ['#e74c3c','#c0392b','#e67e22','#8e44ad','#2c3e50','#95a5a6','#e05252'], borderWidth: 0 }]
+            },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { boxWidth: 12 } } } }
+        });
+    }
+</script>
+}

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Logo Comunidade Batista Floramar">
+  <rect width="512" height="512" rx="24" fill="#000000"/>
+  <g fill="none" stroke="#f4f4f4" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M88 120 L128 92 L128 388 L88 396 Z" stroke-width="20"/>
+    <path d="M160 96 L200 68 L200 360 C238 370 270 384 320 396 L160 388 Z" stroke-width="20"/>
+    <path d="M424 120 L384 92 L384 388 L424 396 Z" stroke-width="20"/>
+    <path d="M352 96 L312 68 L312 360 C274 370 242 384 192 396 L352 388 Z" stroke-width="20"/>
+    <path d="M180 206 H242" stroke-width="18"/>
+    <path d="M211 146 V238" stroke-width="18"/>
+  </g>
+  <path d="M234 178 H332 V238 C286 238 258 257 258 300 V366 H212 V218 C212 196 221 186 234 178 Z" fill="#f4f4f4"/>
+</svg>

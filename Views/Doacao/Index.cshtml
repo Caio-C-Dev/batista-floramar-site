@@ -1,0 +1,369 @@
+﻿@{
+    ViewBag.Title = "Doações";
+    Layout = "_Layout";
+}
+
+<div class="page-card">
+    <div class="page-header">
+        <span class="section-eyebrow">Contribua com Alegria</span>
+        <h1 class="page-title">Doações</h1>
+        <p class="page-subtitle">
+            Sua oferta é um ato de adoração. Contribua com a Comunidade Batista Floramar de forma rápida e segura.
+            — <em>2 Coríntios 9:7</em>
+        </p>
+    </div>
+
+    <div class="row row-cols-1 row-cols-md-3 g-4 mt-2">
+        <div class="col">
+            <div class="section-card h-100 text-center">
+                <div class="about-pillar-icon-lg"><i class="fas fa-heart"></i></div>
+                <h3>Doação</h3>
+                <p class="text-secondary">Oferta geral para ajudar a comunidade a manter seus projetos e ministérios.</p>
+                <button class="btn btn-primary w-100 mt-3" onclick="openDoacaoModal('Doação')" data-bs-toggle="modal" data-bs-target="#pagamentoModal">
+                    <i class="fas fa-hand-holding-heart me-2"></i> Contribuir
+                </button>
+            </div>
+        </div>
+        <div class="col">
+            <div class="section-card h-100 text-center">
+                <div class="about-pillar-icon-lg"><i class="fas fa-percentage"></i></div>
+                <h3>Dízimo</h3>
+                <p class="text-secondary">Contribuição mensal para sustentar o ministério e o trabalho da igreja.</p>
+                <button class="btn btn-primary w-100 mt-3" onclick="openDoacaoModal('Dízimo')" data-bs-toggle="modal" data-bs-target="#pagamentoModal">
+                    <i class="fas fa-hand-holding-heart me-2"></i> Contribuir
+                </button>
+            </div>
+        </div>
+        <div class="col">
+            <div class="section-card h-100 text-center">
+                <div class="about-pillar-icon-lg"><i class="fas fa-gift"></i></div>
+                <h3>Oferta</h3>
+                <p class="text-secondary">Oferta especial de gratidão para momentos de bênção e celebração.</p>
+                <button class="btn btn-primary w-100 mt-3" onclick="openDoacaoModal('Oferta')" data-bs-toggle="modal" data-bs-target="#pagamentoModal">
+                    <i class="fas fa-hand-holding-heart me-2"></i> Contribuir
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mt-2">
+        <div class="col-md-6">
+            <div class="section-card h-100 text-center">
+                <h3><i class="fas fa-qrcode me-2 text-gold"></i>PIX</h3>
+                <p class="text-secondary mb-3">Escaneie o QR Code ou copie a chave CNPJ abaixo para contribuir instantaneamente.</p>
+                <img src="~/images/qr_code.png"
+                     alt="QR Code PIX Comunidade Batista Floramar"
+                     class="img-fluid pix-qr-img mb-3"
+                     onerror="this.style.display='none'" />
+                <div class="pix-key-box rounded-3 p-3 mb-3">
+                    <p class="mb-1 text-secondary small">Chave PIX (CNPJ)</p>
+                    <strong class="text-gold fs-5">44.457.832/0001-07</strong>
+                </div>
+                <button type="button" class="btn btn-primary" onclick="navigator.clipboard.writeText('44.457.832/0001-07');this.innerHTML='<i class=\'fas fa-check me-2\'></i> Copiado!'">
+                    <i class="fas fa-copy me-2"></i> Copiar chave
+                </button>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="section-card h-100">
+                <h3><i class="fas fa-info-circle me-2 text-gold"></i>Por que contribuir?</h3>
+                <ul class="info-list mt-2">
+                    <li><i class="fas fa-check-circle"></i><span>Sustento do ministério e da equipe pastoral</span></li>
+                    <li><i class="fas fa-check-circle"></i><span>Projetos de ação social e missões</span></li>
+                    <li><i class="fas fa-check-circle"></i><span>Manutenção e crescimento da comunidade</span></li>
+                    <li><i class="fas fa-check-circle"></i><span>Apoio a famílias em necessidade</span></li>
+                    <li><i class="fas fa-check-circle"></i><span>Ministério com crianças e jovens</span></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Pagamento -->
+<div class="modal fade" id="pagamentoModal" tabindex="-1" aria-labelledby="pagamentoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content bg-secondary">
+            <div class="modal-header border-bottom border-secondary">
+                <div>
+                    <h5 class="modal-title text-gold" id="pagamentoModalLabel">
+                        <span id="tituloTipo">Contribuição</span>
+                    </h5>
+                    <p class="mb-0 text-secondary">Escolha a forma de pagamento: cartão de crédito ou PIX.</p>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Tabs: Cartão / PIX -->
+                <div class="d-flex gap-2 mb-4 flex-wrap">
+                    <button type="button" class="btn btn-secondary active" id="btnCartao" onclick="togglePaymentType('cartao')">
+                        <i class="fas fa-credit-card me-1"></i> Cartão de Crédito
+                    </button>
+                    <button type="button" class="btn btn-secondary-outline" id="btnPix" onclick="togglePaymentType('pix')">
+                        <i class="fas fa-qrcode me-1"></i> PIX
+                    </button>
+                </div>
+
+                <!-- Seção Cartão -->
+                <div id="paymentCartao">
+                    <!-- Step 1: Inserir valor -->
+                    <div id="stepValor">
+                        <div class="mb-3">
+                            <label class="form-label">Valor da contribuição (R$)</label>
+                            <input type="number" id="valorDoacao" class="form-control" min="1" step="0.01" value="50" placeholder="Ex: 100,00" />
+                        </div>
+                        <button type="button" class="btn btn-primary w-100" onclick="iniciarBrick()">
+                            <i class="fas fa-lock me-2"></i>Ir para pagamento seguro com cartão
+                        </button>
+                        <p class="text-secondary small mt-2 text-center">
+                            <i class="fas fa-shield-alt me-1"></i>Seus dados de cartão são protegidos pelo Mercado Pago
+                        </p>
+                    </div>
+
+                    <!-- Step 2: MP Payment Brick -->
+                    <div id="stepBrick" class="d-none">
+                        <button type="button" class="btn btn-outline-secondary btn-sm mb-3" onclick="voltarParaValor()">
+                            <i class="fas fa-arrow-left me-1"></i> Alterar valor
+                        </button>
+                        <div id="cardPaymentBrick_container"></div>
+                        <div id="paymentResult" class="mt-3 d-none"></div>
+                    </div>
+                </div>
+
+                <!-- Seção PIX -->
+                <div id="paymentPix" class="d-none">
+                    <div class="section-card bg-primary-soft border-0 text-center p-4">
+                        <img src="~/images/qr_code.png"
+                             alt="QR Code PIX"
+                             class="img-fluid pix-qr-img mb-3"
+                             onerror="this.style.display='none'" />
+                        <div class="rounded-3 bg-dark p-3 mb-3">
+                            <p class="mb-1 text-secondary small">Chave PIX (CNPJ)</p>
+                            <strong class="text-gold fs-5">44.457.832/0001-07</strong>
+                        </div>
+                        <button type="button" class="btn btn-primary" onclick="navigator.clipboard.writeText('44.457.832/0001-07');this.innerHTML='<i class=\'fas fa-check me-2\'></i> Copiado!'">
+                            <i class="fas fa-copy me-2"></i> Copiar chave PIX
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-top border-secondary">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script src="https://sdk.mercadopago.com/js/v2"></script>
+<script>
+    const mpPublicKey = '@ViewBag.MpPublicKey';
+    let mp = null;
+    let brickController = null;
+    let selectedTipo = 'Doação';
+
+    // Inicializa MP SDK apenas uma vez
+    if (mpPublicKey && mpPublicKey !== 'TEST-COLOQUE-SUA-CHAVE-PUBLICA') {
+        mp = new MercadoPago(mpPublicKey, { locale: 'pt-BR' });
+    }
+
+    function openDoacaoModal(tipo) {
+        selectedTipo = tipo;
+        document.getElementById('tituloTipo').textContent = tipo;
+        resetModal();
+    }
+
+    function resetModal() {
+        showStep(1);
+        togglePaymentType('cartao', false);
+        if (brickController) {
+            brickController.unmount();
+            brickController = null;
+        }
+        const resultDiv = document.getElementById('paymentResult');
+        resultDiv.classList.add('d-none');
+        resultDiv.innerHTML = '';
+        document.getElementById('valorDoacao').value = '50';
+    }
+
+    function togglePaymentType(type, destroyBrick = true) {
+        const cartaoDiv = document.getElementById('paymentCartao');
+        const pixDiv = document.getElementById('paymentPix');
+        const btnCartao = document.getElementById('btnCartao');
+        const btnPix = document.getElementById('btnPix');
+
+        if (type === 'cartao') {
+            cartaoDiv.classList.remove('d-none');
+            pixDiv.classList.add('d-none');
+            btnCartao.classList.add('active');
+            btnCartao.className = 'btn btn-secondary active';
+            btnPix.className = 'btn btn-secondary-outline';
+        } else {
+            pixDiv.classList.remove('d-none');
+            cartaoDiv.classList.add('d-none');
+            btnPix.className = 'btn btn-secondary active';
+            btnCartao.className = 'btn btn-secondary-outline';
+            if (destroyBrick && brickController) {
+                brickController.unmount();
+                brickController = null;
+            }
+        }
+    }
+
+    function showStep(step) {
+        const s1 = document.getElementById('stepValor');
+        const s2 = document.getElementById('stepBrick');
+        if (step === 1) {
+            s1.classList.remove('d-none');
+            s2.classList.add('d-none');
+        } else {
+            s1.classList.add('d-none');
+            s2.classList.remove('d-none');
+        }
+    }
+
+    async function iniciarBrick() {
+        const valor = parseFloat(document.getElementById('valorDoacao').value);
+        if (!valor || valor < 1) {
+            alert('Por favor, informe um valor válido (mínimo R$1,00).');
+            return;
+        }
+
+        if (!mp) {
+            alert('O sistema de pagamento não está configurado. Entre em contato com a secretaria.');
+            return;
+        }
+
+        showStep(2);
+
+        if (brickController) {
+            brickController.unmount();
+            brickController = null;
+        }
+
+        const settings = {
+            initialization: {
+                amount: valor
+            },
+            customization: {
+                visual: {
+                    style: { theme: 'dark' }
+                },
+                paymentMethods: {
+                    maxInstallments: 1
+                }
+            },
+            callbacks: {
+                onReady: () => {},
+                onSubmit: (formData) => {
+                    return new Promise(async (resolve, reject) => {
+                        try {
+                            mostrarCarregando(true);
+                            const payload = { ...formData, tipo: selectedTipo };
+                            const response = await fetch('/Doacao/CriarPagamento', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify(payload)
+                            });
+                            const result = await response.json();
+                            mostrarCarregando(false);
+                            if (result.sucesso) {
+                                resolve();
+                                mostrarResultado(true, result.mensagem);
+                            } else {
+                                reject();
+                                mostrarResultado(false, result.mensagem);
+                            }
+                        } catch (e) {
+                            mostrarCarregando(false);
+                            reject();
+                            mostrarResultado(false, 'Erro ao processar pagamento. Tente novamente.');
+                        }
+                    });
+                },
+                onError: (error) => {
+                    console.error('MP Brick error:', error);
+                }
+            }
+        };
+
+        try {
+            brickController = await mp.bricks().create('cardPayment', 'cardPaymentBrick_container', settings);
+        } catch (e) {
+            showStep(1);
+            alert('Não foi possível carregar o formulário de cartão. Verifique sua conexão.');
+        }
+    }
+
+    function voltarParaValor() {
+        if (brickController) {
+            brickController.unmount();
+            brickController = null;
+        }
+        const resultDiv = document.getElementById('paymentResult');
+        resultDiv.classList.add('d-none');
+        resultDiv.innerHTML = '';
+        showStep(1);
+    }
+
+    function mostrarCarregando(ativo) {
+        const resultDiv = document.getElementById('paymentResult');
+        if (ativo) {
+            resultDiv.innerHTML = '<div class="text-center text-secondary py-2"><span class="spinner-border spinner-border-sm me-2"></span>Processando pagamento...</div>';
+            resultDiv.classList.remove('d-none');
+        }
+    }
+
+    function mostrarResultado(sucesso, mensagem) {
+        const resultDiv = document.getElementById('paymentResult');
+        const icon = sucesso ? 'check-circle text-success' : 'exclamation-circle text-danger';
+        const cls = sucesso ? 'alert-success' : 'alert-danger';
+        resultDiv.innerHTML = `<div class="alert ${cls}"><i class="fas fa-${icon} me-2"></i>${mensagem}</div>`;
+        resultDiv.classList.remove('d-none');
+    }
+
+    // Limpa brick ao fechar modal
+    document.getElementById('pagamentoModal').addEventListener('hidden.bs.modal', () => {
+        if (brickController) {
+            brickController.unmount();
+            brickController = null;
+        }
+    });
+</script>
+
+<div class="heart-overlay" aria-hidden="true">
+    <div class="heart-shape">&#9829;</div>
+</div>
+}
+
+<script>
+        document.getElementById('btnConcluido').addEventListener('click', function () {
+            var overlay = document.querySelector('.heart-overlay');
+            overlay.classList.add('heart-active');
+            setTimeout(function () { overlay.classList.remove('heart-active'); }, 2200);
+        });
+
+        function openDoacaoModal(tipo) {
+            document.getElementById('pagamentoModalLabel').innerText = tipo;
+            togglePaymentType('cartao');
+        }
+
+        function togglePaymentType(type) {
+            var cartao = document.getElementById('paymentCartao');
+            var pix = document.getElementById('paymentPix');
+            var btnCartao = document.getElementById('btnCartao');
+            var btnPix = document.getElementById('btnPix');
+
+            if (type === 'pix') {
+                cartao.classList.add('d-none');
+                pix.classList.remove('d-none');
+                btnCartao.classList.remove('active');
+                btnPix.classList.add('active');
+            } else {
+                pix.classList.add('d-none');
+                cartao.classList.remove('d-none');
+                btnPix.classList.remove('active');
+                btnCartao.classList.add('active');
+            }
+        }
+    </script>
+}

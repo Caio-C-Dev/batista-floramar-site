@@ -1,0 +1,71 @@
+@model List<BatistaFloramar.Domain.Entities.SerieMensagem>
+@{
+    ViewBag.Title = "Séries de Mensagens";
+    Layout = "_Layout";
+}
+
+<div class="page-card">
+    <div class="page-header">
+        <span class="section-eyebrow">Ensino Expositivo</span>
+        <h1 class="page-title">Séries de Mensagens</h1>
+        <p class="page-subtitle">
+            Explore as séries de mensagens pregadas na Comunidade Batista Floramar. Clique em uma série para assistir no YouTube.
+        </p>
+    </div>
+
+    @if (Model == null || !Model.Any())
+    {
+        <div class="section-card mt-4 text-center py-5">
+            <i class="fab fa-youtube text-gold" style="font-size:2.5rem;margin-bottom:1rem;display:block;"></i>
+            <p class="text-secondary">Nenhuma série disponível ainda. Volte em breve!</p>
+        </div>
+    }
+    else
+    {
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mt-2">
+            @foreach (var s in Model)
+            {
+                <div class="col">
+                    <a href="@Url.Action("Detalhe", "Series", new { id = s.Id })"
+                       class="text-decoration-none">
+                        <div class="section-card h-100 p-0 overflow-hidden"
+                             style="transition:transform .25s,box-shadow .25s;cursor:pointer;"
+                             onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 12px 30px rgba(0,0,0,.5)'"
+                             onmouseout="this.style.transform='';this.style.boxShadow=''">
+                            <div style="position:relative;height:190px;overflow:hidden;background:#0d1b3e;">
+                                @if (!string.IsNullOrEmpty(s.ImagemCapa))
+                                {
+                                    <img src="@s.ImagemCapa" alt="@s.Nome"
+                                         style="width:100%;height:100%;object-fit:cover;display:block;transition:transform .35s;"
+                                         onmouseover="this.style.transform='scale(1.04)'"
+                                         onmouseout="this.style.transform=''" />
+                                }
+                                else
+                                {
+                                    <div style="height:100%;display:flex;align-items:center;justify-content:center;">
+                                        <i class="fab fa-youtube" style="font-size:4rem;color:#ff4444;opacity:.7;"></i>
+                                    </div>
+                                }
+                                <div style="position:absolute;bottom:0;left:0;right:0;padding:.5rem .75rem;background:linear-gradient(transparent,rgba(0,0,0,.75));">
+                                    <span style="background:#ff0000;color:#fff;font-size:.7rem;font-weight:700;padding:.15rem .45rem;border-radius:3px;">
+                                        <i class="fab fa-youtube me-1"></i>YouTube
+                                    </span>
+                                </div>
+                            </div>
+                            <div style="padding:1rem 1.1rem 1.2rem;">
+                                <h3 style="color:#fff;font-size:1rem;font-weight:700;margin:0 0 .5rem;line-height:1.3;">@s.Nome</h3>
+                                @if (!string.IsNullOrEmpty(s.Descricao))
+                                {
+                                    <p style="color:#a0b0c8;font-size:.85rem;margin:0;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">@s.Descricao</p>
+                                }
+                                <p style="color:#d4af37;font-size:.8rem;margin:.6rem 0 0;">
+                                    <i class="fas fa-external-link-alt me-1"></i> Ver série completa no YouTube
+                                </p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            }
+        </div>
+    }
+</div>

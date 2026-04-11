@@ -1,0 +1,97 @@
+@model BatistaFloramar.Domain.Entities.SerieMensagem
+@{
+    Layout = "_AdminLayout";
+    bool isEdit = Model.Id > 0;
+    ViewBag.Title = isEdit ? "Editar Série" : "Nova Série";
+    ViewBag.AdminSection = "series";
+    string action = isEdit ? "Editar" : "Nova";
+}
+
+<div class="admin-card" style="max-width:680px;">
+    <div class="form-text mb-4" style="color:var(--admin-text-muted);background:#0d1a30;padding:.75rem 1rem;border-radius:8px;border-left:3px solid #4a8af4;">
+        <i class="fab fa-youtube me-1" style="color:#ff4444;"></i>
+        <strong style="color:#c0d0e8;">Como encontrar o ID da playlist:</strong><br>
+        Abra a playlist no YouTube. A URL será assim:<br>
+        <code style="color:#8af;">https://www.youtube.com/playlist?list=<strong>PLxxxxxxxxxxxxxxxxxx</strong></code><br>
+        Copie apenas o trecho após <code style="color:#8af;">list=</code>
+    </div>
+
+    <form method="post" enctype="multipart/form-data" action="@Url.Action(action, new { id = Model.Id })">
+        @Html.AntiForgeryToken()
+
+        <div class="mb-3">
+            <label class="form-label">Nome da Série *</label>
+            <input type="text" name="Nome" value="@Model.Nome" class="form-control"
+                   placeholder="Ex: Fundamentos da Fé" required />
+            @if (ViewData.ModelState["Nome"]?.Errors.Count > 0)
+            {
+                <div class="text-danger small mt-1">@ViewData.ModelState["Nome"]!.Errors[0].ErrorMessage</div>
+            }
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">ID da Playlist do YouTube *</label>
+            <input type="text" name="PlaylistId" value="@Model.PlaylistId" class="form-control"
+                   placeholder="PLxxxxxxxxxxxxxxxxxxxxxxxxxx" />
+            @if (ViewData.ModelState["PlaylistId"]?.Errors.Count > 0)
+            {
+                <div class="text-danger small mt-1">@ViewData.ModelState["PlaylistId"]!.Errors[0].ErrorMessage</div>
+            }
+            @if (!string.IsNullOrEmpty(Model.PlaylistId))
+            {
+                <div class="mt-1">
+                    <a href="https://www.youtube.com/playlist?list=@Model.PlaylistId" target="_blank"
+                       style="color:#4a8af4;font-size:.82rem;">
+                        <i class="fas fa-external-link-alt me-1"></i> Abrir playlist no YouTube
+                    </a>
+                </div>
+            }
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Resumo da série</label>
+            <textarea name="Descricao" rows="3" class="form-control"
+                      placeholder="Breve descrição sobre o tema desta série...">@Model.Descricao</textarea>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Capa da série</label>
+            @if (!string.IsNullOrEmpty(Model.ImagemCapa))
+            {
+                <div class="mb-2">
+                    <img src="@Model.ImagemCapa" style="max-height:160px;border-radius:8px;object-fit:cover;" />
+                    <div class="form-text" style="color:var(--admin-text-muted);">Capa atual. Faça upload para substituir.</div>
+                </div>
+            }
+            <input type="file" name="capa" accept="image/*" class="form-control" />
+            <div class="form-text" style="color:var(--admin-text-muted);">Recomendado: proporção 16:9, mínimo 800×450 px.</div>
+        </div>
+
+        <div class="row g-3 mb-4">
+            <div class="col-md-4">
+                <label class="form-label">Ordem de exibição</label>
+                <input type="number" name="Ordem" value="@Model.Ordem" class="form-control" min="0" />
+            </div>
+            <div class="col-md-8 d-flex align-items-end pb-1">
+                <div class="form-check">
+                    @if (Model.Ativo)
+                    {
+                        <input type="checkbox" name="Ativo" value="true" class="form-check-input" id="chkAtivo" checked="checked" />
+                    }
+                    else
+                    {
+                        <input type="checkbox" name="Ativo" value="true" class="form-check-input" id="chkAtivo" />
+                    }
+                    <label class="form-check-label" for="chkAtivo" style="color:var(--admin-text);">Série ativa (visível no site)</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="d-flex gap-3">
+            <button type="submit" class="btn-admin btn-admin-success">
+                <i class="fas fa-save me-1"></i> @(isEdit ? "Salvar Alterações" : "Criar Série")
+            </button>
+            <a href="@Url.Action("Index")" class="btn-admin btn-admin-outline" style="color:var(--admin-text);">Cancelar</a>
+        </div>
+    </form>
+</div>

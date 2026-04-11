@@ -1,0 +1,230 @@
+@{
+    ViewBag.Title = "Início";
+    Layout = "_Layout";
+    ViewBag.FullWidth = true;
+}
+
+@await Html.PartialAsync("Sections/_Hero")
+@await Html.PartialAsync("Sections/_About")
+@await Html.PartialAsync("Sections/_Services")
+@await Html.PartialAsync("Sections/_Verse")
+@await Html.PartialAsync("Sections/_Ministries")
+@await Html.PartialAsync("Sections/_PalavraPreview")
+@await Html.PartialAsync("Sections/_Podcasts")
+@await Html.PartialAsync("Sections/_Cells")
+@await Html.PartialAsync("Sections/_Sermons")
+@await Html.PartialAsync("Sections/_Testimonials")
+@await Html.PartialAsync("Sections/_Donation")
+@await Html.PartialAsync("Sections/_Contact")
+
+@* Modal de Doação *@
+<div class="modal fade" id="doacaoModal" tabindex="-1" aria-labelledby="doacaoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content bg-secondary">
+            <div class="modal-header border-bottom border-secondary">
+                <div>
+                    <h5 class="modal-title text-gold" id="doacaoModalLabel">Contribuição</h5>
+                    <p class="mb-0 text-secondary">Escolha a forma de pagamento: cartão de crédito ou PIX.</p>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <div class="modal-body">
+                <div class="d-flex gap-2 mb-4 flex-wrap">
+                    <button type="button" class="btn btn-secondary active" id="doacaoCartaoBtn" onclick="toggleDoacaoOption('cartao')">
+                        <i class="fas fa-credit-card me-1"></i> Cartão de Crédito
+                    </button>
+                    <button type="button" class="btn btn-secondary-outline" id="doacaoPixBtn" onclick="toggleDoacaoOption('pix')">
+                        <i class="fas fa-qrcode me-1"></i> PIX
+                    </button>
+                </div>
+
+                <!-- Seção Cartão -->
+                <div id="doacaoCartao" class="doacao-option">
+                    <!-- Step 1: Valor -->
+                    <div id="homeStepValor">
+                        <div class="mb-3">
+                            <label class="form-label">Valor da contribuição (R$)</label>
+                            <input type="number" id="homeValorDoacao" class="form-control" min="1" step="0.01" value="50" placeholder="Ex: 100,00" />
+                        </div>
+                        <button type="button" class="btn btn-primary w-100" onclick="homeIniciarBrick()">
+                            <i class="fas fa-lock me-2"></i>Ir para pagamento seguro com cartão
+                        </button>
+                        <p class="text-secondary small mt-2 text-center">
+                            <i class="fas fa-shield-alt me-1"></i>Seus dados de cartão são protegidos pelo Mercado Pago
+                        </p>
+                    </div>
+                    <!-- Step 2: Brick -->
+                    <div id="homeStepBrick" class="d-none">
+                        <button type="button" class="btn btn-outline-secondary btn-sm mb-3" onclick="homeVoltarParaValor()">
+                            <i class="fas fa-arrow-left me-1"></i> Alterar valor
+                        </button>
+                        <div id="homeBrick_container"></div>
+                        <div id="homePaymentResult" class="mt-3 d-none"></div>
+                    </div>
+                </div>
+
+                <!-- Seção PIX -->
+                <div id="doacaoPix" class="doacao-option d-none">
+                    <div class="card p-4 bg-primary-soft border-0">
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <div>
+                                <h6 class="mb-1">PIX de Doação</h6>
+                                <p class="mb-0 text-secondary">Escaneie o QR Code ou copie a chave.</p>
+                            </div>
+                            <span class="badge bg-gold text-dark">Pagamento instantâneo</span>
+                        </div>
+                        <div class="d-flex justify-content-center mb-3">
+                            <img src="~/images/qr_code.png"
+                                 alt="QR Code PIX Comunidade Batista Floramar"
+                                 class="img-fluid d-block mx-auto"
+                                 style="max-width:200px; border-radius:8px;"
+                                 onerror="this.style.display='none'" />
+                        </div>
+                        <div class="d-flex flex-column gap-2">
+                            <div class="rounded-3 bg-dark p-3">
+                                <p class="mb-1 text-secondary small">Chave PIX (CNPJ)</p>
+                                <strong class="text-gold">44.457.832/0001-07</strong>
+                            </div>
+                            <button type="button" class="btn btn-primary" onclick="navigator.clipboard.writeText('44.457.832/0001-07');this.innerHTML='<i class=\'fas fa-check me-2\'></i> Copiado!'">Copiar chave PIX</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-top border-secondary">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script src="https://sdk.mercadopago.com/js/v2"></script>
+<script>
+    const homeMpPublicKey = '@ViewBag.MpPublicKey';
+    let homeMp = null;
+    let homeBrickController = null;
+
+    if (homeMpPublicKey && homeMpPublicKey !== 'TEST-COLOQUE-SUA-CHAVE-PUBLICA') {
+        homeMp = new MercadoPago(homeMpPublicKey, { locale: 'pt-BR' });
+    }
+
+    function toggleDoacaoOption(option) {
+        const cartao = document.getElementById('doacaoCartao');
+        const pix = document.getElementById('doacaoPix');
+        const cartaoBtn = document.getElementById('doacaoCartaoBtn');
+        const pixBtn = document.getElementById('doacaoPixBtn');
+
+        if (option === 'pix') {
+            cartao.classList.add('d-none');
+            pix.classList.remove('d-none');
+            cartaoBtn.className = 'btn btn-secondary-outline';
+            pixBtn.className = 'btn btn-secondary active';
+            if (homeBrickController) {
+                homeBrickController.unmount();
+                homeBrickController = null;
+            }
+        } else {
+            pix.classList.add('d-none');
+            cartao.classList.remove('d-none');
+            pixBtn.className = 'btn btn-secondary-outline';
+            cartaoBtn.className = 'btn btn-secondary active';
+        }
+    }
+
+    async function homeIniciarBrick() {
+        const valor = parseFloat(document.getElementById('homeValorDoacao').value);
+        if (!valor || valor < 1) {
+            alert('Por favor, informe um valor válido (mínimo R$1,00).');
+            return;
+        }
+        if (!homeMp) {
+            alert('O sistema de pagamento não está configurado. Entre em contato com a secretaria.');
+            return;
+        }
+
+        document.getElementById('homeStepValor').classList.add('d-none');
+        document.getElementById('homeStepBrick').classList.remove('d-none');
+
+        if (homeBrickController) { homeBrickController.unmount(); homeBrickController = null; }
+
+        const settings = {
+            initialization: { amount: valor },
+            customization: {
+                visual: { style: { theme: 'dark' } },
+                paymentMethods: { maxInstallments: 1 }
+            },
+            callbacks: {
+                onReady: () => {},
+                onSubmit: (formData) => {
+                    return new Promise(async (resolve, reject) => {
+                        try {
+                            homeMostrarCarregando(true);
+                            const payload = { ...formData, tipo: 'Doação' };
+                            const response = await fetch('/Doacao/CriarPagamento', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify(payload)
+                            });
+                            const result = await response.json();
+                            homeMostrarCarregando(false);
+                            if (result.sucesso) {
+                                resolve();
+                                homeMostrarResultado(true, result.mensagem);
+                            } else {
+                                reject();
+                                homeMostrarResultado(false, result.mensagem);
+                            }
+                        } catch (e) {
+                            homeMostrarCarregando(false);
+                            reject();
+                            homeMostrarResultado(false, 'Erro ao processar pagamento. Tente novamente.');
+                        }
+                    });
+                },
+                onError: (error) => { console.error('MP Brick error:', error); }
+            }
+        };
+
+        try {
+            homeBrickController = await homeMp.bricks().create('cardPayment', 'homeBrick_container', settings);
+        } catch (e) {
+            homeVoltarParaValor();
+            alert('Não foi possível carregar o formulário de cartão. Verifique sua conexão.');
+        }
+    }
+
+    function homeVoltarParaValor() {
+        if (homeBrickController) { homeBrickController.unmount(); homeBrickController = null; }
+        const resultDiv = document.getElementById('homePaymentResult');
+        resultDiv.classList.add('d-none');
+        resultDiv.innerHTML = '';
+        document.getElementById('homeStepValor').classList.remove('d-none');
+        document.getElementById('homeStepBrick').classList.add('d-none');
+    }
+
+    function homeMostrarCarregando(ativo) {
+        const r = document.getElementById('homePaymentResult');
+        if (ativo) {
+            r.innerHTML = '<div class="text-center text-secondary py-2"><span class="spinner-border spinner-border-sm me-2"></span>Processando...</div>';
+            r.classList.remove('d-none');
+        }
+    }
+
+    function homeMostrarResultado(sucesso, mensagem) {
+        const r = document.getElementById('homePaymentResult');
+        const icon = sucesso ? 'check-circle text-success' : 'exclamation-circle text-danger';
+        const cls = sucesso ? 'alert-success' : 'alert-danger';
+        r.innerHTML = `<div class="alert ${cls}"><i class="fas fa-${icon} me-2"></i>${mensagem}</div>`;
+        r.classList.remove('d-none');
+    }
+
+    document.getElementById('doacaoModal').addEventListener('hidden.bs.modal', () => {
+        if (homeBrickController) { homeBrickController.unmount(); homeBrickController = null; }
+        homeVoltarParaValor();
+        document.getElementById('homeValorDoacao').value = '50';
+    });
+</script>
+<div class="heart-overlay" aria-hidden="true">
+    <div class="heart-shape">&#9829;</div>
+</div>
+}

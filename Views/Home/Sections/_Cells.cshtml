@@ -1,0 +1,104 @@
+@using BatistaFloramar.Domain.Entities
+@{
+    var celulas = ViewBag.Celulas as List<Celula>;
+    var celulasComMapa = celulas?.Where(c => c.Latitude.HasValue && c.Longitude.HasValue).ToList() ?? new List<Celula>();
+    bool temMapa = celulasComMapa.Count > 0;
+}
+<section class="cells-section" id="celulas">
+    <div class="container">
+        <div class="cells-content">
+            <div class="cells-icon">
+                <i class="fas fa-home"></i>
+            </div>
+            <div class="cells-body">
+                <span class="section-eyebrow">Igreja nos Lares</span>
+                <h2 class="section-heading">Células — Fé em comunidade</h2>
+                <p class="cells-text">
+                    A Comunidade Batista Floramar acredita que a igreja não acontece apenas nos templos. Nossas células são pequenos grupos
+                    que se reúnem nos lares para orar, estudar a Bíblia, compartilhar a vida e crescer juntos em comunidade
+                    como a família de Deus.
+                </p>
+                <a href="/Celula" class="btn btn-primary btn-lg mt-3">
+                    <i class="fas fa-map-marker-alt me-2"></i> Conheça uma célula
+                </a>
+            </div>
+        </div>
+
+        @if (temMapa)
+        {
+            <div class="cells-mini-map-wrap scroll-reveal">
+                <div class="cells-mini-map-header">
+                    <span class="section-eyebrow mb-0">Onde estamos</span>
+                    <h4>Nossas células no mapa</h4>
+                    <p class="text-muted-section">Clique em um marcador para ver os detalhes da célula.</p>
+                </div>
+                <div id="miniMapaCelulas" class="cells-mini-map"></div>
+            </div>
+
+            <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+            <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+            <script>
+            (function () {
+                var celulasData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(celulasComMapa.Select(c => new {
+                    nome = c.Nome,
+                    lideres = c.Lideres ?? "",
+                    endereco = c.Endereco ?? "",
+                    horario = c.Horario,
+                    diaSemana = c.DiaSemana,
+                    lat = c.Latitude!.Value,
+                    lng = c.Longitude!.Value
+                })));
+
+                function initMiniMapa() {
+                    if (!document.getElementById('miniMapaCelulas') || typeof L === 'undefined') {
+                        setTimeout(initMiniMapa, 200);
+                        return;
+                    }
+
+                    var mapa = L.map('miniMapaCelulas', { scrollWheelZoom: false });
+
+                    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                        attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> © <a href="https://carto.com/">CARTO</a>',
+                        subdomains: 'abcd',
+                        maxZoom: 19
+                    }).addTo(mapa);
+
+                    var icone = L.divIcon({
+                        html: '<div style="background:#E6C15A;width:28px;height:28px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:3px solid rgba(255,255,255,0.9);box-shadow:0 3px 10px rgba(0,0,0,0.5);"></div>',
+                        iconSize: [28, 28],
+                        iconAnchor: [14, 28],
+                        popupAnchor: [0, -30],
+                        className: ''
+                    });
+
+                    var bounds = [];
+                    celulasData.forEach(function (c) {
+                        bounds.push([c.lat, c.lng]);
+                        var popup = '<div style="min-width:180px;font-family:inherit;">'
+                            + '<strong style="font-size:0.95rem;color:#1a1a1a;">' + c.nome + '</strong><br>'
+                            + (c.lideres ? '<span style="color:#666;font-size:0.82rem;">Líder: ' + c.lideres + '</span><br>' : '')
+                            + (c.endereco ? '<span style="color:#555;font-size:0.82rem;">📍 ' + c.endereco + '</span><br>' : '')
+                            + '<span style="color:#555;font-size:0.82rem;">🗓 ' + c.diaSemana + ' · ' + c.horario + '</span><br>'
+                            + '<a href="/Celula" style="color:#c9a227;font-size:0.82rem;font-weight:600;">Ver detalhes →</a>'
+                            + '</div>';
+                        L.marker([c.lat, c.lng], { icon: icone }).addTo(mapa).bindPopup(popup);
+                    });
+
+                    if (bounds.length === 1) {
+                        mapa.setView(bounds[0], 15);
+                    } else {
+                        mapa.fitBounds(bounds, { padding: [40, 40] });
+                    }
+                }
+
+                if (document.readyState === 'loading') {
+                    document.addEventListener('DOMContentLoaded', initMiniMapa);
+                } else {
+                    initMiniMapa();
+                }
+            })();
+            </script>
+        }
+    </div>
+</section>
+

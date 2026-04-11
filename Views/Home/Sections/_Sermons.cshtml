@@ -1,0 +1,166 @@
+@using BatistaFloramar.Domain.Entities
+@{
+    var eventos = ViewBag.ProximosEventos as List<Evento>;
+    bool temEventos = eventos != null && eventos.Count > 0;
+}
+<section class="page-section section-dark" id="eventos">
+    <div class="container">
+        <div class="text-center mb-5">
+            <span class="section-eyebrow">Agenda</span>
+            <h2 class="section-heading">Próximos Eventos</h2>
+        </div>
+
+        @if (temEventos)
+        {
+            <div class="eventos-grid">
+                @foreach (var ev in eventos!)
+                {
+                    <div class="evento-card">
+                        <div class="evento-banner">
+                            @if (!string.IsNullOrEmpty(ev.ImagemBanner))
+                            {
+                                <img src="@ev.ImagemBanner" alt="@ev.Titulo" class="evento-banner-img" />
+                            }
+                            else
+                            {
+                                <div class="evento-banner-placeholder">
+                                    <i class="fas fa-calendar-alt"></i>
+                                </div>
+                            }
+                            <div class="evento-date-badge">
+                                <span class="evento-date-day">@ev.DataEvento.ToString("dd")</span>
+                                <span class="evento-date-month">@ev.DataEvento.ToString("MMM", new System.Globalization.CultureInfo("pt-BR")).ToUpper()</span>
+                            </div>
+                        </div>
+                        <div class="evento-body">
+                            <h4 class="evento-titulo">@ev.Titulo</h4>
+                            @if (!string.IsNullOrEmpty(ev.Local))
+                            {
+                                <p class="evento-local">
+                                    <i class="fas fa-map-marker-alt me-1"></i>@ev.Local
+                                </p>
+                            }
+                            @if (!string.IsNullOrEmpty(ev.Descricao))
+                            {
+                                <p class="evento-desc">@ev.Descricao</p>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="text-center py-5">
+                <i class="fas fa-calendar-alt" style="font-size:3rem;color:#4a5a7a;margin-bottom:1rem;display:block;"></i>
+                <p style="color:var(--text-muted-section);">Nenhum evento programado no momento.<br>Fique atento às próximas novidades!</p>
+            </div>
+        }
+    </div>
+</section>
+
+<style>
+    .eventos-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .evento-card {
+        background: var(--card-bg);
+        border: 1px solid var(--card-border);
+        border-radius: 14px;
+        overflow: hidden;
+        transition: transform .25s, box-shadow .25s;
+    }
+
+    .evento-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 32px rgba(0,0,0,.4);
+    }
+
+    .evento-banner {
+        position: relative;
+        height: 200px;
+        overflow: hidden;
+    }
+
+    .evento-banner-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        transition: transform .35s;
+    }
+
+    .evento-card:hover .evento-banner-img {
+        transform: scale(1.04);
+    }
+
+    .evento-banner-placeholder {
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, #0d1b3e 0%, #1a2f5e 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3rem;
+        color: #3a5080;
+    }
+
+    .evento-date-badge {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        background: var(--accent-gold, #d4af37);
+        color: #0a1628;
+        border-radius: 8px;
+        padding: .35rem .6rem;
+        text-align: center;
+        min-width: 52px;
+        font-weight: 700;
+        line-height: 1.1;
+        box-shadow: 0 2px 8px rgba(0,0,0,.4);
+    }
+
+    .evento-date-day {
+        display: block;
+        font-size: 1.5rem;
+        line-height: 1;
+    }
+
+    .evento-date-month {
+        display: block;
+        font-size: .65rem;
+        letter-spacing: .05em;
+    }
+
+    .evento-body {
+        padding: 1.2rem 1.4rem 1.4rem;
+    }
+
+    .evento-titulo {
+        color: #fff;
+        font-size: 1.1rem;
+        font-weight: 700;
+        margin: 0 0 .5rem;
+        line-height: 1.3;
+    }
+
+    .evento-local {
+        color: var(--accent-gold, #d4af37);
+        font-size: .85rem;
+        margin: 0 0 .5rem;
+    }
+
+    .evento-desc {
+        color: var(--text-muted-section, #a0b0c8);
+        font-size: .88rem;
+        margin: 0;
+        line-height: 1.5;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+</style>

@@ -1,0 +1,68 @@
+﻿@using BatistaFloramar.Domain.Entities
+@{
+    var podcasts = ViewBag.UltimosPodcasts as List<PodcastVideo>;
+    bool temPodcasts = podcasts != null && podcasts.Count > 0;
+}
+<section class="page-section" id="podcast-preview" style="background-color:var(--bg-secondary);">
+    <div class="container">
+        <div class="text-center mb-5 scroll-reveal">
+            <span class="section-eyebrow">Podcast</span>
+            <h2 class="section-heading">Ouça nossos episódios</h2>
+            <p class="text-muted-section mt-2">Mensagens e ensinamentos onde você estiver.</p>
+        </div>
+
+        @if (temPodcasts)
+        {
+            <div class="row g-4">
+                @for (int i = 0; i < podcasts!.Count; i++)
+                {
+                    var v = podcasts[i];
+                    var thumbUrl = $"https://img.youtube.com/vi/{v.YoutubeVideoId}/mqdefault.jpg";
+                    var desc = v.Descricao.Length > 90 ? v.Descricao.Substring(0, 90).TrimEnd() + "…" : v.Descricao;
+                    <div class="col-md-4 scroll-reveal delay-@(i + 1)">
+                        <div class="podcast-card">
+                            <a href="@v.WatchUrl" target="_blank" rel="noopener noreferrer" class="podcast-thumb-wrap">
+                                <img src="@thumbUrl" alt="@v.Titulo" class="podcast-thumb" loading="lazy" />
+                                <div class="podcast-play-overlay">
+                                    <div class="podcast-play-btn">
+                                        <i class="fab fa-youtube"></i>
+                                    </div>
+                                </div>
+                            </a>
+                            <div class="podcast-card-body">
+                                <h5 class="podcast-card-title">@v.Titulo</h5>
+                                @if (!string.IsNullOrWhiteSpace(v.Descricao))
+                                {
+                                    <p class="podcast-card-desc">@desc</p>
+                                }
+                                <div class="podcast-card-meta">
+                                    <span><i class="fas fa-calendar me-1"></i>@v.DataPublicacao.ToString("dd/MM/yyyy")</span>
+                                    <a href="@v.WatchUrl" target="_blank" rel="noopener noreferrer" class="podcast-watch-pill">
+                                        <i class="fab fa-youtube me-1"></i> Assistir
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+            <div class="row mt-5">
+                <div class="col-12 text-center">
+                    <a href="/Podcast" class="btn btn-outline-gold btn-lg">
+                        <i class="fas fa-headphones me-2"></i> Ver todos os episódios
+                    </a>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="text-center py-5 scroll-reveal">
+                <i class="fab fa-youtube" style="font-size:3rem;color:#4a5a7a;margin-bottom:1rem;display:block;"></i>
+                <p class="text-muted-section">Novos episódios em breve.</p>
+                <a href="/Podcast" class="btn btn-outline-gold mt-3">
+                    <i class="fas fa-headphones me-2"></i> Acessar podcast
+                </a>
+            </div>
+        }
+    </div>
+</section>

@@ -1,0 +1,271 @@
+﻿@using BatistaFloramar.Domain.Entities
+@model IEnumerable<Celula>
+@{
+    ViewBag.Title = "Células";
+    Layout = "_Layout";
+
+    var grupos = Model.GroupBy(c => c.DiaSemana).ToList();
+    var celulasComMapa = Model.Where(c => c.Latitude.HasValue && c.Longitude.HasValue).ToList();
+}
+
+<div class="page-card">
+    <div class="page-header">
+        <span class="section-eyebrow">Igreja nos Lares</span>
+        <h1 class="page-title">Células</h1>
+        <p class="page-subtitle">
+            Confira as células em cada dia e participe das reuniões presenciais ou online. Pequenos grupos que crescem juntos.
+        </p>
+    </div>
+
+    @if (celulasComMapa.Any())
+    {
+        <div class="section-card mt-4">
+            <h2 class="text-gold mb-3"><i class="fas fa-map-marked-alt me-2"></i>Células no mapa</h2>
+            <p class="text-secondary mb-3">Clique em um marcador para ver os detalhes da célula.</p>
+            <div class="mb-3">
+                <button class="btn btn-primary" id="btnMinhaLocalizacao" onclick="usarMinhaLocalizacao()">
+                    <i class="fas fa-location-arrow me-2"></i>Ver célula mais próxima de mim
+                </button>
+                <span id="localizacaoStatus" class="text-secondary small ms-2"></span>
+            </div>
+            <div id="mapaCelulas" style="height: 420px; border-radius: 12px; z-index: 0;"></div>
+        </div>
+    }
+
+    @foreach (var grupo in grupos)
+    {
+        <div class="section-card mt-4">
+            <h2 class="text-gold">@grupo.Key</h2>
+
+            <div class="row row-cols-1 row-cols-md-3 g-4 mt-1">
+                @foreach (var c in grupo)
+                {
+                    <div class="col">
+                        <div class="section-card h-100">
+                            <img src="~/images/@c.ImagemUrl" alt="Célula @c.Nome" class="img-fluid rounded mb-3" />
+                            <h3>@c.Nome</h3>
+                            @if (!string.IsNullOrEmpty(c.Lideres))
+                            {
+                                <p class="text-secondary mb-1"><strong>Líder:</strong> @c.Lideres</p>
+                            }
+                            @if (!string.IsNullOrEmpty(c.Endereco))
+                            {
+                                <p class="text-secondary mb-1">
+                                    <strong>Endereço:</strong> @c.Endereco
+                                    @if (c.Latitude.HasValue && c.Longitude.HasValue)
+                                    {
+                                        <a href="https://www.google.com/maps/search/?api=1&query=@c.Latitude,@c.Longitude"
+                                           target="_blank" class="ms-1 text-gold" title="Ver no Google Maps">
+                                            <i class="fas fa-map-marker-alt"></i>
+                                        </a>
+                                    }
+                                </p>
+                            }
+                            @if (!string.IsNullOrEmpty(c.Contato))
+                            {
+                                <p class="text-secondary mb-1"><strong>Contato:</strong> @c.Contato</p>
+                            }
+                            @if (!string.IsNullOrEmpty(c.Descricao))
+                            {
+                                <p class="text-secondary mb-1">@c.Descricao</p>
+                            }
+                            <p class="text-secondary"><strong>Horário:</strong> @c.Horario</p>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+
+    @if (!grupos.Any())
+    {
+        <div class="section-card mt-4 text-center py-5">
+            <p class="text-secondary">Nenhuma célula disponível no momento.</p>
+        </div>
+    }
+</div>
+
+@if (celulasComMapa.Any())
+{
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+    @section Scripts {
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        const celulas = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(celulasComMapa.Select(c => new {
+            nome = c.Nome,
+            lideres = c.Lideres ?? "",
+            endereco = c.Endereco ?? "",
+            horario = c.Horario,
+            diaSemana = c.DiaSemana,
+            contato = c.Contato ?? "",
+            lat = c.Latitude!.Value,
+            lng = c.Longitude!.Value
+        })));
+
+        const mapa = L.map('mapaCelulas');
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+        }).addTo(mapa);
+
+        const icone = L.divIcon({
+            html: '<div style="background:#c9a227;width:32px;height:32px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:3px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,0.4);"></div>',
+            iconSize: [32, 32],
+            iconAnchor: [16, 32],
+            popupAnchor: [0, -34],
+            className: ''
+        });
+
+        const iconeProxima = L.divIcon({
+            html: '<div style="background:#27c9a2;width:38px;height:38px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:3px solid #fff;box-shadow:0 2px 12px rgba(0,0,0,0.5);"></div>',
+            iconSize: [38, 38],
+            iconAnchor: [19, 38],
+            popupAnchor: [0, -40],
+            className: ''
+        });
+
+        const iconeUsuario = L.divIcon({
+            html: '<div style="background:#4a90e2;width:18px;height:18px;border-radius:50%;border:3px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,0.4);"></div>',
+            iconSize: [18, 18],
+            iconAnchor: [9, 9],
+            className: ''
+        });
+
+        const bounds = [];
+        const marcadores = [];
+
+        celulas.forEach((c, i) => {
+            bounds.push([c.lat, c.lng]);
+            const popup = `
+                <div style="min-width:190px;">
+                    <strong style="font-size:1rem;">${c.nome}</strong><br>
+                    ${c.lideres ? `<span style="color:#888;">Líder: ${c.lideres}</span><br>` : ''}
+                    ${c.endereco ? `<i class="fas fa-map-marker-alt"></i> ${c.endereco}<br>` : ''}
+                    <i class="fas fa-clock"></i> ${c.diaSemana} · ${c.horario}<br>
+                    ${c.contato ? `<i class="   fas fa-phone"></i> ${c.contato}<br>` : ''}
+                    <a href="https://www.google.com/maps/search/?api=1&query=${c.lat},${c.lng}" target="_blank" style="color:#c9a227;">
+                        <i class="fas fa-directions"></i> Como chegar
+                    </a>
+                </div>`;
+            const m = L.marker([c.lat, c.lng], { icon: icone })
+                .addTo(mapa)
+                .bindPopup(popup);
+            marcadores.push(m);
+        });
+
+        if (bounds.length === 1) {
+            mapa.setView(bounds[0], 15);
+        } else {
+            mapa.fitBounds(bounds, { padding: [40, 40] });
+        }
+
+        // ─── Geolocalização ───────────────────────────────────────────────────────
+        let marcadorUsuario = null;
+        let circuloUsuario = null;
+        let marcadorProxima = null;
+        let linhaProxima = null;
+
+        function calcularDistanciaKm(lat1, lng1, lat2, lng2) {
+            const R = 6371;
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLng = (lng2 - lng1) * Math.PI / 180;
+            const a = Math.sin(dLat / 2) ** 2 +
+                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                Math.sin(dLng / 2) ** 2;
+            return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        }
+
+        function usarMinhaLocalizacao() {
+            if (!navigator.geolocation) {
+                document.getElementById('localizacaoStatus').textContent = 'Geolocalização não suportada pelo navegador.';
+                return;
+            }
+            const btn = document.getElementById('btnMinhaLocalizacao');
+            const status = document.getElementById('localizacaoStatus');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Buscando...';
+            status.textContent = '';
+
+            navigator.geolocation.getCurrentPosition(
+                (pos) => {
+                    const userLat = pos.coords.latitude;
+                    const userLng = pos.coords.longitude;
+
+                    // Remove camadas anteriores
+                    if (marcadorUsuario) mapa.removeLayer(marcadorUsuario);
+                    if (circuloUsuario) mapa.removeLayer(circuloUsuario);
+                    if (marcadorProxima) {
+                        marcadorProxima.setIcon(icone);
+                        marcadorProxima = null;
+                    }
+                    if (linhaProxima) { mapa.removeLayer(linhaProxima); linhaProxima = null; }
+
+                    // Marcador do usuário
+                    marcadorUsuario = L.marker([userLat, userLng], { icon: iconeUsuario })
+                        .addTo(mapa)
+                        .bindPopup('<strong>Você está aqui</strong>')
+                        .openPopup();
+
+                    circuloUsuario = L.circle([userLat, userLng], {
+                        radius: 300,
+                        color: '#4a90e2',
+                        fillColor: '#4a90e2',
+                        fillOpacity: 0.1,
+                        weight: 1
+                    }).addTo(mapa);
+
+                    // Encontra a célula mais próxima
+                    let menorDist = Infinity;
+                    let proxima = null;
+                    let proximaIdx = -1;
+                    celulas.forEach((c, i) => {
+                        const dist = calcularDistanciaKm(userLat, userLng, c.lat, c.lng);
+                        if (dist < menorDist) { menorDist = dist; proxima = c; proximaIdx = i; }
+                    });
+
+                    if (proxima) {
+                        // Destaca a mais próxima com ícone verde
+                        marcadores[proximaIdx].setIcon(iconeProxima);
+                        marcadorProxima = marcadores[proximaIdx];
+
+                        // Linha pontilhada do usuário até a célula
+                        linhaProxima = L.polyline(
+                            [[userLat, userLng], [proxima.lat, proxima.lng]],
+                            { color: '#27c9a2', weight: 2, dashArray: '6,8', opacity: 0.7 }
+                        ).addTo(mapa);
+
+                        marcadores[proximaIdx].openPopup();
+
+                        const distTexto = menorDist < 1
+                            ? `${Math.round(menorDist * 1000)} m`
+                            : `${menorDist.toFixed(1)} km`;
+
+                        status.innerHTML = `<i class="fas fa-check-circle text-success me-1"></i>Célula mais próxima: <strong>${proxima.nome}</strong> — ${distTexto} de você`;
+
+                        mapa.fitBounds([
+                            [userLat, userLng],
+                            [proxima.lat, proxima.lng]
+                        ], { padding: [60, 60] });
+                    }
+
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-location-arrow me-2"></i>Atualizar minha localização';
+                },
+                (err) => {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-location-arrow me-2"></i>Ver célula mais próxima de mim';
+                    const msgs = {
+                        1: 'Permissão de localização negada. Permita o acesso nas configurações do navegador.',
+                        2: 'Não foi possível obter sua localização.',
+                        3: 'Tempo esgotado ao buscar localização.'
+                    };
+                    status.textContent = msgs[err.code] || 'Erro ao obter localização.';
+                },
+                { timeout: 10000, maximumAge: 60000 }
+            );
+        }
+    </script>
+    }
+}
+

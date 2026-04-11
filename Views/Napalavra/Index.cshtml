@@ -1,0 +1,88 @@
+@model BatistaFloramar.Models.PerguntaPastorViewModel
+@{
+    ViewBag.Title = "Mensagens";
+    Layout = "_Layout";
+}
+
+<div class="page-card">
+    <div class="page-header">
+        <span class="section-eyebrow">Fale com a Church</span>
+        <h1 class="page-title">Mensagens ao Pastor</h1>
+        <p class="page-subtitle">
+            Envie sua pergunta, pedido de oração ou mensagem ao pastor. Nossa equipe fará o encaminhamento com cuidado.
+        </p>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success mt-4 rounded-3" role="alert">
+            <i class="fas fa-check-circle me-2"></i> @TempData["SuccessMessage"]
+        </div>
+    }
+
+    <div class="row g-4 mt-2">
+        <div class="col-md-5">
+            <div class="section-card h-100">
+                <h3><i class="fas fa-address-book me-2 text-gold"></i>Contatos</h3>
+                <ul class="info-list mt-3">
+                    <li><i class="fas fa-phone"></i><span>(31) 99289-8901</span></li>
+                    <li><i class="fas fa-envelope"></i><span>c.batistafloramar&#64;gmail.com</span></li>
+                    <li><i class="fas fa-map-marker-alt"></i><span>R. José Lima de Almeida, 59 — Jardim Guanabara, BH/MG, 31742-033</span></li>
+                    <li><i class="fas fa-clock"></i><span>Dom: 10h (ao vivo) &nbsp;|&nbsp; Dom: 18h (presencial) &nbsp;|&nbsp; Qua: 20h (ao vivo)</span></li>
+                </ul>
+                <div class="mt-4">
+                    <a href="https://wa.me/5531988880000" target="_blank" rel="noopener noreferrer" class="btn btn-secondary w-100">
+                        <i class="fab fa-whatsapp me-2"></i> WhatsApp
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-7">
+            <div class="section-card h-100">
+                <h3><i class="fas fa-comment-dots me-2 text-gold"></i>Deixe sua mensagem</h3>
+
+                @if (!ViewData.ModelState.IsValid)
+                {
+                    <div class="alert alert-warning mt-3 rounded-3" role="alert">
+                        <i class="fas fa-exclamation-triangle me-2"></i> Confira os campos obrigatórios antes de enviar.
+                    </div>
+                }
+
+                <form method="post" action="/Napalavra/Index" class="mt-3">
+                    @Html.AntiForgeryToken()
+                    <div class="mb-3">
+                        <label class="form-label">Nome completo</label>
+                        @Html.TextBoxFor(m => m.Nome, new { @class = "form-control", placeholder = "Seu nome completo" })
+                        @Html.ValidationMessageFor(m => m.Nome, "", new { @class = "text-danger small" })
+                    </div>
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Email</label>
+                            @Html.TextBoxFor(m => m.Email, new { @class = "form-control", type = "email", placeholder = "seu@email.com" })
+                            @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger small" })
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Telefone</label>
+                            @Html.TextBoxFor(m => m.Telefone, new { @class = "form-control", placeholder = "(31) 99999-9999" })
+                            @Html.ValidationMessageFor(m => m.Telefone, "", new { @class = "text-danger small" })
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Assunto</label>
+                        @Html.TextBoxFor(m => m.Assunto, new { @class = "form-control", placeholder = "Ex.: Família, fé, oração..." })
+                        @Html.ValidationMessageFor(m => m.Assunto, "", new { @class = "text-danger small" })
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Mensagem</label>
+                        @Html.TextAreaFor(m => m.Pergunta, new { @class = "form-control", rows = 5, placeholder = "Escreva aqui sua mensagem ou pergunta ao pastor..." })
+                        @Html.ValidationMessageFor(m => m.Pergunta, "", new { @class = "text-danger small" })
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-paper-plane me-2"></i> Enviar mensagem
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+

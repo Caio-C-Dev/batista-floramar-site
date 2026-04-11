@@ -1,0 +1,51 @@
+@using BatistaFloramar.Domain.Entities
+@model IEnumerable<PodcastVideo>
+@{
+    ViewBag.Title = "Podcast";
+    Layout = "_Layout";
+}
+
+<div class="page-card">
+    <div class="page-header">
+        <span class="section-eyebrow">Mensagens em Áudio e Vídeo</span>
+        <h1 class="page-title">Podcast</h1>
+        <p class="page-subtitle">
+            Assista e ouça os podcasts com mensagens inspiradoras e reflexões bíblicas dos pastores Rodrigo N. Ferreira e Delmo Gonçalves da Comunidade Batista Floramar.
+        </p>
+    </div>
+
+    <div class="row row-cols-1 row-cols-md-2 g-4 mt-2">
+        @foreach (var video in Model)
+        {
+            <div class="col">
+                <div class="video-card h-100">
+                    <div class="ratio ratio-16x9 mb-3 rounded overflow-hidden">
+                        <iframe src="@video.EmbedUrl"
+                                title="@video.Titulo"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                allowfullscreen></iframe>
+                    </div>
+                    <h3>@video.Titulo</h3>
+                    @if (!string.IsNullOrEmpty(video.Descricao))
+                    {
+                        <p class="text-secondary">@video.Descricao</p>
+                    }
+                    <a class="btn btn-secondary" href="@video.WatchUrl" target="_blank">Assistir no YouTube</a>
+                </div>
+            </div>
+        }
+        @if (!Model.Any())
+        {
+            <div class="col-12 text-center py-5">
+                <p class="text-secondary">Nenhum vídeo disponível no momento.</p>
+            </div>
+        }
+    </div>
+
+    <div class="text-center mt-5">
+        <a class="btn btn-primary btn-lg" href="/Napalavra">
+            <i class="fas fa-comment-dots me-2"></i> Envie uma mensagem ao Pastor
+        </a>
+    </div>
+</div>
+

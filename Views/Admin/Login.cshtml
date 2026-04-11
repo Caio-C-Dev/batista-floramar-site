@@ -1,0 +1,244 @@
+@model BatistaFloramar.Models.LoginViewModel
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login — Admin | Comunidade Batista Floramar</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link rel="stylesheet" href="~/css/admin.css" asp-append-version="true" />
+</head>
+<body class="admin-body">
+<div class="admin-login-page">
+    <div class="admin-login-box">
+        <a href="/" style="color: var(--admin-text-muted); font-size: 0.8rem; text-decoration: none; display: block; margin-bottom: 12px;">
+            <i class="fas fa-arrow-left me-1"></i> Voltar ao site
+        </a>
+        <h1>Área do Pastor</h1>
+        <p>Comunidade Batista Floramar</p>
+
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert-admin-error mb-3">
+                <i class="fas fa-exclamation-circle me-1"></i>@TempData["ErrorMessage"]
+            </div>
+        }
+
+        <form method="post" asp-action="Login" asp-controller="Admin" class="admin-form text-start">
+            @Html.AntiForgeryToken()
+            @if (ViewBag.ErroLogin != null)
+            {
+                <div class="alert-admin-error mb-3">
+                    <i class="fas fa-exclamation-circle me-1"></i> @ViewBag.ErroLogin
+                </div>
+            }
+            @{
+                var hasFieldErrors = ViewContext.ViewData.ModelState
+                    .Any(kvp => kvp.Value?.Errors.Count > 0);
+            }
+            @if (hasFieldErrors && ViewBag.ErroLogin == null)
+            {
+                <div class="alert-admin-error mb-3">
+                    <i class="fas fa-exclamation-circle me-1"></i> Preencha todos os campos corretamente.
+                </div>
+            }
+            <div class="mb-3">
+                <label asp-for="Usuario">Usuário</label>
+                <div class="input-group">
+                    <input asp-for="Usuario" type="text" class="form-control" placeholder="Usuário..." autofocus autocomplete="username" />
+                    <span class="input-group-text" style="background: var(--admin-input-bg); border-color: var(--admin-border); color: var(--admin-text-muted);">
+                        <i class="fas fa-user"></i>
+                    </span>
+                </div>
+                <span asp-validation-for="Usuario" class="field-validation-error"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Senha">Senha</label>
+                <div class="input-group">
+                    <input asp-for="Senha" type="password" class="form-control" placeholder="Senha..." autocomplete="current-password" />
+                    <button type="button" id="toggleSenha" class="btn-toggle-senha" tabindex="-1" title="Mostrar/ocultar senha">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
+                <span asp-validation-for="Senha" class="field-validation-error"></span>
+            </div>
+            <button type="submit" class="btn-admin w-100 justify-content-center" style="padding: 10px;">
+                <i class="fas fa-sign-in-alt"></i> Entrar
+            </button>
+        </form>
+    </div>
+</div>
+<canvas id="beam-canvas"></canvas>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+(function () {
+    var btn    = document.getElementById('toggleSenha');
+    var input  = document.getElementById('Senha');
+    var canvas   = document.getElementById('beam-canvas');
+    var ctx      = canvas.getContext('2d');
+    var loginBox = document.querySelector('.admin-login-box');
+
+    canvas.width  = window.innerWidth;
+    canvas.height = window.innerHeight;
+    window.addEventListener('resize', function () {
+        canvas.width  = window.innerWidth;
+        canvas.height = window.innerHeight;
+    });
+
+    var active = false;
+    var alpha  = 0;
+    var time   = 0;
+    var animId = null;
+
+    function toRad(d) { return d * Math.PI / 180; }
+
+    btn.addEventListener('click', function () {
+        var show   = input.type === 'password';
+        input.type = show ? 'text' : 'password';
+        btn.querySelector('i').className = show ? 'fas fa-eye-slash' : 'fas fa-eye';
+        active = show;
+        if (show) loginBox.classList.add('rays-active');
+        else      loginBox.classList.remove('rays-active');
+        if (active && !animId) animId = requestAnimationFrame(loop);
+    });
+
+    function loop() {
+        time += 0.018;
+        alpha = active
+            ? Math.min(1, alpha + 0.04)
+            : Math.max(0, alpha - 0.025);
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        if (alpha > 0.002) drawScene();
+
+        if (alpha > 0 || active) {
+            animId = requestAnimationFrame(loop);
+        } else {
+            animId = null;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+    }
+
+    function drawScene() {
+        /* origem: canto superior direito */
+        var ox = canvas.width;
+        var oy = 0;
+
+        /* posição real do login box */
+        var rect = loginBox.getBoundingClientRect();
+
+        /* direção ao centro do box */
+        var cx = rect.left + rect.width  / 2;
+        var cy = rect.top  + rect.height / 2;
+        var center = Math.atan2(cy - oy, cx - ox);
+        var dist   = Math.sqrt((cx - ox) * (cx - ox) + (cy - oy) * (cy - oy));
+        var perp   = center + Math.PI / 2;
+
+        /* arco da face direita × 0.75 para os feixes originais */
+        var angTop  = Math.atan2(rect.top               - oy, rect.left + rect.width - ox);
+        var angBot  = Math.atan2(rect.top + rect.height  - oy, rect.left + rect.width - ox);
+        var halfSpan = (angTop - angBot) / 2 * 0.75;
+        var minA    = center - halfSpan;
+        /* extend maxA com 2 feixes extras abaixo */
+        var rayStep  = (halfSpan * 2) / 8;   /* passo angular entre feixes */
+        var maxA    = center + halfSpan + rayStep * 2;
+
+        /* ── Halo na origem: sem clip horizontal (nasce no canto) ── */
+        ctx.save();
+        ctx.globalCompositeOperation = 'lighter';
+        var pulse = 1 + Math.sin(time * 1.8) * 0.10;
+        var hGrd  = ctx.createRadialGradient(ox, oy, 0, ox, oy, 90 * pulse);
+        hGrd.addColorStop(0,    'rgba(255,250,220,' + (alpha * 0.40) + ')');
+        hGrd.addColorStop(0.40, 'rgba(240,210,120,' + (alpha * 0.16) + ')');
+        hGrd.addColorStop(1,    'rgba(210,170,60,0)');
+        ctx.beginPath();
+        ctx.arc(ox, oy, 90 * pulse, 0, Math.PI * 2);
+        ctx.fillStyle = hGrd;
+        ctx.fill();
+        ctx.restore();
+
+        /* ── Feixes: clip triângulo origem → face esquerda do box ── */
+        /* As diagonais passam pela origem, sem borda horizontal visível   */
+        /* clip triângulo: origem → topo-esquerdo → ponto abaixo do box (cobre feixes extras) */
+        var clipBot = rect.top + rect.height + rayStep * 2 * dist / (rect.left + rect.width / 2 - ox) * (rect.left - ox);
+        ctx.save();
+        ctx.beginPath();
+        ctx.moveTo(ox, oy);
+        ctx.lineTo(rect.left, rect.top);
+        ctx.lineTo(rect.left, rect.top + rect.height + (rect.height * 0.55));
+        ctx.closePath();
+        ctx.clip();
+        ctx.globalCompositeOperation = 'lighter';
+
+        /* ── 1. Cone de fundo (dourado suave) ── */
+        var coneHalf = Math.tan(halfSpan) * dist * 1.3;
+        var coneEx   = ox + Math.cos(center) * dist;
+        var coneEy   = oy + Math.sin(center) * dist;
+        var coneGrd  = ctx.createLinearGradient(ox, oy, coneEx, coneEy);
+        coneGrd.addColorStop(0,    'rgba(255,252,210,' + (alpha * 0.15) + ')');
+        coneGrd.addColorStop(0.50, 'rgba(240,205,100,' + (alpha * 0.08) + ')');
+        coneGrd.addColorStop(1,    'rgba(210,170,55,'  + (alpha * 0.03) + ')');
+        ctx.beginPath();
+        ctx.moveTo(ox, oy);
+        ctx.lineTo(coneEx + Math.cos(perp) * coneHalf, coneEy + Math.sin(perp) * coneHalf);
+        ctx.lineTo(coneEx - Math.cos(perp) * coneHalf, coneEy - Math.sin(perp) * coneHalf);
+        ctx.closePath();
+        ctx.fillStyle = coneGrd;
+        ctx.fill();
+
+        /* ── 2. Feixes individuais (branco-dourado) ── */
+        var numRays = 11;
+        var brights = [0.05, 0.08, 0.14, 0.22, 0.30, 0.22, 0.14, 0.08, 0.05, 0.07, 0.04];
+        var widths  = [0.025, 0.030, 0.038, 0.030, 0.024, 0.030, 0.038, 0.030, 0.025, 0.028, 0.020];
+
+        for (var i = 0; i < numRays; i++) {
+            var t   = i / (numRays - 1);
+            var ang = minA + (maxA - minA) * t + Math.sin(time * 0.4 + i) * 0.003;
+            var ex  = ox + Math.cos(ang) * dist * 1.05;
+            var ey  = oy + Math.sin(ang) * dist * 1.05;
+            var hw  = dist * widths[i];
+            var rp  = ang + Math.PI / 2;
+            var br  = alpha * brights[i];
+
+            var grd = ctx.createLinearGradient(ox, oy, ex, ey);
+            grd.addColorStop(0,    'rgba(255,255,240,' + (br * 0.92) + ')');
+            grd.addColorStop(0.30, 'rgba(255,248,200,' + (br * 0.72) + ')');
+            grd.addColorStop(0.65, 'rgba(240,205,110,' + (br * 0.46) + ')');
+            grd.addColorStop(1,    'rgba(215,172,55,'  + (br * 0.22) + ')');
+
+            ctx.beginPath();
+            ctx.moveTo(ox, oy);
+            ctx.lineTo(ex + Math.cos(rp) * hw, ey + Math.sin(rp) * hw);
+            ctx.lineTo(ex - Math.cos(rp) * hw, ey - Math.sin(rp) * hw);
+            ctx.closePath();
+            ctx.fillStyle = grd;
+            ctx.fill();
+        }
+
+        /* ── 3. Núcleo central (quase branco) ── */
+        var coreEx  = ox + Math.cos(center) * dist * 1.05;
+        var coreEy  = oy + Math.sin(center) * dist * 1.05;
+        var coreHw  = dist * 0.007;
+        var coreGrd = ctx.createLinearGradient(ox, oy, coreEx, coreEy);
+        coreGrd.addColorStop(0,   'rgba(255,255,255,' + (alpha * 0.85) + ')');
+        coreGrd.addColorStop(0.5, 'rgba(255,255,245,' + (alpha * 0.55) + ')');
+        coreGrd.addColorStop(1,   'rgba(255,248,215,' + (alpha * 0.24) + ')');
+        ctx.beginPath();
+        ctx.moveTo(ox, oy);
+        ctx.lineTo(coreEx + Math.cos(perp) * coreHw, coreEy + Math.sin(perp) * coreHw);
+        ctx.lineTo(coreEx - Math.cos(perp) * coreHw, coreEy - Math.sin(perp) * coreHw);
+        ctx.closePath();
+        ctx.fillStyle = coreGrd;
+        ctx.fill();
+
+        ctx.restore();
+    }
+})();
+</script>
+</body>
+</html>

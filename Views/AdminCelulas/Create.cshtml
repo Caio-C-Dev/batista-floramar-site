@@ -1,0 +1,177 @@
+@using BatistaFloramar.Domain.Entities
+@model Celula
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewBag.Title = "Nova Célula";
+    ViewBag.AdminSection = "celulas";
+}
+
+@section TopbarActions {
+    <a href="@Url.Action("Index")" class="btn-admin-outline">
+        <i class="fas fa-arrow-left"></i> Voltar
+    </a>
+}
+
+<div class="admin-card" style="max-width: 720px;">
+    <form method="post" asp-action="Create" class="admin-form" enctype="multipart/form-data">
+        @Html.AntiForgeryToken()
+        <div class="row g-3">
+            <div class="col-12">
+                <label asp-for="Nome">Nome da Célula</label>
+                <input asp-for="Nome" class="form-control" placeholder="Ex.: Peregrinos" />
+                <span asp-validation-for="Nome" class="field-validation-error"></span>
+            </div>
+            <div class="col-md-6">
+                <label asp-for="DiaSemana">Dia da Semana</label>
+                <select asp-for="DiaSemana" class="form-select">
+                    <option value="">— Selecione —</option>
+                    <option value="Segunda">Segunda</option>
+                    <option value="Terça">Terça</option>
+                    <option value="Quarta">Quarta</option>
+                    <option value="Quinta">Quinta</option>
+                    <option value="Sexta">Sexta</option>
+                    <option value="Sábado">Sábado</option>
+                    <option value="Domingo">Domingo</option>
+                    <option value="Quinta Terça">Quinta Terça</option>
+                </select>
+                <span asp-validation-for="DiaSemana" class="field-validation-error"></span>
+            </div>
+            <div class="col-md-6">
+                <label asp-for="Horario">Horário</label>
+                <input asp-for="Horario" class="form-control" placeholder="Ex.: 20h" />
+                <span asp-validation-for="Horario" class="field-validation-error"></span>
+            </div>
+            <div class="col-md-6">
+                <label asp-for="Lideres">Líder(es)</label>
+                <input asp-for="Lideres" class="form-control" placeholder="Ex.: João e Maria" />
+            </div>
+            <div class="col-md-6">
+                <label asp-for="Contato">Contato</label>
+                <input asp-for="Contato" class="form-control" placeholder="Ex.: (31) 99999-9999" />
+            </div>
+            <div class="col-12">
+                <label asp-for="Endereco">Endereço</label>
+                <div class="input-group">
+                    <input asp-for="Endereco" class="form-control" id="enderecoInput" placeholder="Ex.: Rua... Bairro" />
+                    <button type="button" class="btn btn-outline-secondary" onclick="geocodificarEndereco()" title="Buscar coordenadas automaticamente">
+                        <i class="fas fa-map-marker-alt"></i> Localizar
+                    </button>
+                </div>
+                <div class="form-text" style="color:var(--admin-text-muted);">Clique em "Localizar" para preencher as coordenadas automaticamente pelo endereço.</div>
+            </div>
+            <div class="col-md-6">
+                <label asp-for="Latitude">Latitude</label>
+                <input asp-for="Latitude" type="number" step="any" class="form-control" id="latInput" placeholder="Ex: -19.9208" />
+            </div>
+            <div class="col-md-6">
+                <label asp-for="Longitude">Longitude</label>
+                <input asp-for="Longitude" type="number" step="any" class="form-control" id="lngInput" placeholder="Ex: -43.9378" />
+            </div>
+            <div class="col-12" id="mapaPreview" style="display:none;">
+                <div class="form-text mb-1" style="color:var(--admin-text-muted);">
+                    <i class="fas fa-info-circle me-1"></i>
+                    <strong>Clique no mapa</strong> para mover o marcador. Você também pode arrastar o pin.
+                    <button type="button" class="btn btn-sm btn-outline-danger ms-2" onclick="limparCoordenadas()">
+                        <i class="fas fa-times"></i> Remover ponto
+                    </button>
+                </div>
+                <div id="miniMapa" style="height:280px;border-radius:8px;cursor:crosshair;"></div>
+            </div>
+            <div class="col-12">
+                <label asp-for="Descricao">Descrição (opcional)</label>
+                <textarea asp-for="Descricao" class="form-control" rows="3" placeholder="Breve descrição da célula..."></textarea>
+            </div>
+            <div class="col-12">
+                <label class="form-label">Imagem da Célula</label>
+                <input type="file" name="imagem" accept="image/*" class="form-control" />
+                <div class="form-text" style="color:var(--admin-text-muted);">A imagem será salva automaticamente em /images/Celulas/</div>
+            </div>
+            <div class="col-md-4">
+                <label asp-for="Ordem">Ordem de exibição</label>
+                <input asp-for="Ordem" type="number" class="form-control" min="0" />
+            </div>
+            <div class="col-12">
+                <div class="form-check">
+                    <input asp-for="Ativo" class="form-check-input" type="checkbox" />
+                    <label asp-for="Ativo" class="form-check-label" style="text-transform:none; font-size: 0.9rem; color: var(--admin-text);">
+                        Célula ativa (visível no site)
+                    </label>
+                </div>
+            </div>
+            <div class="col-12 pt-2">
+                <button type="submit" class="btn-admin">
+                    <i class="fas fa-save"></i> Salvar Célula
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+    let miniMap = null;
+    let miniMarker = null;
+
+    const latInput = document.getElementById('latInput');
+    const lngInput = document.getElementById('lngInput');
+
+    function atualizarMiniMapa(lat, lng) {
+        const preview = document.getElementById('mapaPreview');
+        preview.style.display = 'block';
+        if (!miniMap) {
+            miniMap = L.map('miniMapa').setView([lat, lng], 16);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap'
+            }).addTo(miniMap);
+            miniMap.on('click', function(e) {
+                moverMarcador(e.latlng.lat, e.latlng.lng);
+            });
+        } else {
+            miniMap.setView([lat, lng], 16);
+        }
+        if (miniMarker) miniMap.removeLayer(miniMarker);
+        miniMarker = L.marker([lat, lng], { draggable: true }).addTo(miniMap);
+        miniMarker.on('dragend', function(e) {
+            const pos = e.target.getLatLng();
+            latInput.value = pos.lat.toFixed(6);
+            lngInput.value = pos.lng.toFixed(6);
+        });
+        setTimeout(() => miniMap.invalidateSize(), 100);
+    }
+
+    function moverMarcador(lat, lng) {
+        latInput.value = lat.toFixed(6);
+        lngInput.value = lng.toFixed(6);
+        if (miniMarker) miniMap.removeLayer(miniMarker);
+        miniMarker = L.marker([lat, lng], { draggable: true }).addTo(miniMap);
+        miniMarker.on('dragend', function(e) {
+            const pos = e.target.getLatLng();
+            latInput.value = pos.lat.toFixed(6);
+            lngInput.value = pos.lng.toFixed(6);
+        });
+    }
+
+    function limparCoordenadas() {
+        latInput.value = '';
+        lngInput.value = '';
+        if (miniMarker) { miniMap.removeLayer(miniMarker); miniMarker = null; }
+        document.getElementById('mapaPreview').style.display = 'none';
+    }
+
+    async function geocodificarEndereco() {
+        const endereco = document.getElementById('enderecoInput').value;
+        if (!endereco) { alert('Digite o endereço primeiro.'); return; }
+        try {
+            const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(endereco + ', Belo Horizonte, Brasil')}&limit=1`;
+            const res = await fetch(url, { headers: { 'Accept-Language': 'pt-BR' } });
+            const data = await res.json();
+            if (data.length === 0) { alert('Endereço não encontrado. Tente ser mais específico.'); return; }
+            const lat = parseFloat(data[0].lat);
+            const lng = parseFloat(data[0].lon);
+            latInput.value = lat.toFixed(6);
+            lngInput.value = lng.toFixed(6);
+            atualizarMiniMapa(lat, lng);
+        } catch { alert('Erro ao buscar localização. Verifique sua conexão.'); }
+    }
+</script>

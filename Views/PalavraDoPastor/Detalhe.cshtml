@@ -1,0 +1,43 @@
+@model BatistaFloramar.Domain.Entities.PalavraDoPastor
+@{
+    ViewBag.Title = Model.Titulo;
+    Layout = "_Layout";
+}
+
+<div class="page-card" style="max-width:820px;margin:0 auto;">
+    <a href="/PalavraDoPastor" class="text-secondary small d-inline-flex align-items-center gap-1 mb-4 text-decoration-none"
+       style="opacity:.7;">
+        <i class="fas fa-arrow-left"></i> Voltar
+    </a>
+
+    @if (!string.IsNullOrEmpty(Model.ImagemDestaque))
+    {
+        <img src="@Model.ImagemDestaque" alt="@Model.Titulo"
+             style="width:100%;max-height:340px;object-fit:cover;border-radius:14px;margin-bottom:1.5rem;" />
+    }
+
+    <div class="d-flex align-items-center gap-2 mb-2">
+        @if (Model.Tipo == BatistaFloramar.Domain.Entities.TipoPalavra.Sermao)
+        {
+            <span style="background:#1a3a6a;color:#8af;font-size:.75rem;font-weight:700;padding:.25rem .7rem;border-radius:5px;">SERMÃO</span>
+        }
+        else
+        {
+            <span style="background:#3a2505;color:#f4a;font-size:.75rem;font-weight:700;padding:.25rem .7rem;border-radius:5px;">DEVOCIONAL</span>
+        }
+        <span class="text-secondary small">@Model.DataPublicacao.ToString("dd 'de' MMMM 'de' yyyy", new System.Globalization.CultureInfo("pt-BR"))</span>
+    </div>
+
+    <h1 style="color:#fff;font-size:1.9rem;font-weight:800;line-height:1.25;margin:.5rem 0 .75rem;">@Model.Titulo</h1>
+    <p class="text-secondary mb-4"><i class="fas fa-user me-1 text-gold"></i>@Model.AutorNome</p>
+
+    <div class="section-card" style="font-size:1.05rem;line-height:1.85;color:#c8d8e8;">
+        @Html.Raw(Model.Conteudo)
+    </div>
+
+    <div class="mt-4 pt-2" style="border-top:1px solid #1e2e4e;">
+        <a href="/PalavraDoPastor" class="btn btn-secondary">
+            <i class="fas fa-arrow-left me-2"></i> Ver todas as palavras
+        </a>
+    </div>
+</div>

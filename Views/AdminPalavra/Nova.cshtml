@@ -1,0 +1,138 @@
+@model BatistaFloramar.Domain.Entities.PalavraDoPastor
+@{
+    Layout = "_AdminLayout";
+    ViewBag.Title = "Nova Palavra";
+    ViewBag.AdminSection = "palavra";
+    bool isEdit = Model.Id > 0;
+    string action = isEdit ? "Editar" : "Nova";
+}
+
+<div class="admin-card" style="max-width:860px;">
+    <form method="post" enctype="multipart/form-data" action="@Url.Action(action, new { id = Model.Id })">
+        @Html.AntiForgeryToken()
+
+        <div class="row g-3 mb-3">
+            <div class="col-md-8">
+                <label class="form-label">Título *</label>
+                <input type="text" name="Titulo" value="@Model.Titulo" class="form-control"
+                       placeholder="Ex: A Fé que Move Montanhas" required />
+                @if (ViewData.ModelState["Titulo"]?.Errors.Count > 0)
+                {
+                    <div class="text-danger small mt-1">@ViewData.ModelState["Titulo"]!.Errors[0].ErrorMessage</div>
+                }
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Tipo</label>
+                <select name="Tipo" class="form-select">
+                    @if (Model.Tipo == BatistaFloramar.Domain.Entities.TipoPalavra.Devocional)
+                    {
+                        <option value="1" selected="selected">Devocional</option>
+                        <option value="0">Sermão</option>
+                    }
+                    else
+                    {
+                        <option value="0" selected="selected">Sermão</option>
+                        <option value="1">Devocional</option>
+                    }
+                </select>
+            </div>
+        </div>
+
+        <div class="row g-3 mb-3">
+            <div class="col-md-6">
+                <label class="form-label">Autor</label>
+                <input type="text" name="AutorNome" value="@Model.AutorNome" class="form-control"
+                       placeholder="Pr. Rodrigo N. Ferreira" />
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Data</label>
+                <input type="date" name="DataPublicacao"
+                       value="@Model.DataPublicacao.ToString("yyyy-MM-dd")"
+                       class="form-control" />
+            </div>
+            <div class="col-md-3 d-flex align-items-end">
+                <div class="form-check pb-2">
+                    @if (Model.Publicado)
+                    {
+                        <input type="checkbox" name="Publicado" value="true" class="form-check-input" id="chkPub" checked="checked" />
+                    }
+                    else
+                    {
+                        <input type="checkbox" name="Publicado" value="true" class="form-check-input" id="chkPub" />
+                    }
+                    <label class="form-check-label" for="chkPub" style="color:var(--admin-text);">Publicar no site</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Imagem de destaque</label>
+            @if (!string.IsNullOrEmpty(Model.ImagemDestaque))
+            {
+                <div class="mb-2">
+                    <img src="@Model.ImagemDestaque" style="max-height:160px;border-radius:8px;object-fit:cover;" />
+                    <div class="form-text" style="color:var(--admin-text-muted);">Imagem atual. Faça upload para substituir.</div>
+                </div>
+            }
+            <input type="file" name="imagem" accept="image/*" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Conteúdo *</label>
+            <div id="editor" style="min-height:320px;background:#0f1e3a;border:1px solid #3a4a6a;border-radius:8px;color:#e0e0e0;font-size:.95rem;"></div>
+            <input type="hidden" name="Conteudo" id="hiddenConteudo" value="@Model.Conteudo" />
+            @if (ViewData.ModelState["Conteudo"]?.Errors.Count > 0)
+            {
+                <div class="text-danger small mt-1">@ViewData.ModelState["Conteudo"]!.Errors[0].ErrorMessage</div>
+            }
+        </div>
+
+        <div class="d-flex gap-3">
+            <button type="submit" class="btn-admin btn-admin-success">
+                <i class="fas fa-save me-1"></i> @(isEdit ? "Salvar Alterações" : "Salvar")
+            </button>
+            <a href="@Url.Action("Index")" class="btn-admin btn-admin-outline" style="color:var(--admin-text);">Cancelar</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet" />
+    <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
+    <style>
+        .ql-toolbar { background:#1a2844; border-color:#3a4a6a !important; border-radius:8px 8px 0 0; }
+        .ql-toolbar .ql-stroke { stroke:#c0d0e8; }
+        .ql-toolbar .ql-fill { fill:#c0d0e8; }
+        .ql-toolbar .ql-picker { color:#c0d0e8; }
+        .ql-toolbar .ql-picker-options { background:#1a2844; border-color:#3a4a6a; }
+        .ql-container { border-color:#3a4a6a !important; border-radius:0 0 8px 8px; font-size:.95rem; }
+        .ql-editor { color:#e0e0e0; min-height:300px; }
+        .ql-editor.ql-blank::before { color:#5a7aaa; }
+    </style>
+    <script>
+        var quill = new Quill('#editor', {
+            theme: 'snow',
+            placeholder: 'Escreva o sermão ou devocional aqui...',
+            modules: {
+                toolbar: [
+                    [{ 'header': [1, 2, 3, false] }],
+                    ['bold', 'italic', 'underline'],
+                    [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                    ['blockquote'],
+                    ['clean']
+                ]
+            }
+        });
+
+        // Carregar conteúdo existente ao editar
+        var existingContent = document.getElementById('hiddenConteudo').value;
+        if (existingContent && existingContent.trim() !== '') {
+            quill.root.innerHTML = existingContent;
+        }
+
+        // Sincronizar com o hidden input antes do submit
+        document.querySelector('form').addEventListener('submit', function () {
+            document.getElementById('hiddenConteudo').value = quill.root.innerHTML;
+        });
+    </script>
+}

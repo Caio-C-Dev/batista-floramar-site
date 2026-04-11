@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewBag.Title - Comunidade Batista Floramar</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="~/css/theme.css" asp-append-version="true" />
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark main-navbar shadow-sm">
+            <div class="container">
+                <a class="navbar-brand d-flex align-items-center gap-2" href="/">
+                    <img src="~/images/church-logo.png" alt="Logo" class="navbar-logo" />
+                    <span class="fw-bold">Comunidade Batista Floramar</span>
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Alternar navegação">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto align-items-lg-center">
+                        <li class="nav-item"><a class="nav-link" href="/">Início</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/Sobre">Sobre</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/Cultos">Cultos</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/Celula">Células</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/Ministerios">Ministérios</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/Aovivo">Ao Vivo</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/Podcast">Podcast</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/PalavraDoPastor">Palavra do Pastor</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/Series">Séries</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/Doacao">Doações</a></li>
+                        <li class="nav-item ms-lg-2"><a class="nav-link btn-nav-contact" href="/Napalavra">Contato</a></li>
+                        <li class="nav-item ms-lg-2"><a class="nav-link btn-nav-pastor" href="/Admin/Login"><i class="fas fa-cross me-1"></i>Área do Pastor</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main role="main" class="flex-fill">
+        @if (ViewBag.FullWidth == true)
+        {
+            @RenderBody()
+        }
+        else
+        {
+            <div class="container py-5">
+                @RenderBody()
+            </div>
+        }
+    </main>
+
+    <footer class="site-footer mt-auto">
+        <div class="container">
+            <div class="footer-shell">
+                <div class="row g-4 align-items-start">
+                    <div class="col-lg-4">
+                        <div class="footer-brand-block">
+                            <img src="~/images/church-logo.png" alt="Logo da Comunidade Batista Floramar" class="footer-logo-image" />
+                            <div>
+                                <h5 class="mb-2">Comunidade Batista Floramar</h5>
+                                <p class="mb-0 text-secondary">Uma igreja de fé, comunhão e esperança em Belo Horizonte.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="footer-links">
+                            <h6>Links rápidos</h6>
+                            <ul>
+                                <li><a href="/">Início</a></li>
+                                <li><a href="/Sobre">Sobre</a></li>
+                                <li><a href="/Cultos">Cultos</a></li>
+                                <li><a href="/Celula">Células</a></li>
+                                <li><a href="/Ministerios">Ministérios</a></li>
+                                <li><a href="/Aovivo">Ao Vivo</a></li>
+                                <li><a href="/Podcast">Podcast</a></li>
+                                <li><a href="/PalavraDoPastor">Palavra do Pastor</a></li>
+                                <li><a href="/Series">Séries</a></li>
+                                <li><a href="/Doacao">Doações</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="footer-social-block">
+                            <h5>Redes sociais</h5>
+                            <div class="social-links">
+                                <a href="https://www.facebook.com/batistafloramar/" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                                <a href="https://www.instagram.com/batistafloramar/" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                                <a href="https://www.youtube.com/@@comunidadebatistafloramar" target="_blank" rel="noopener noreferrer" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="footer-copy text-center mt-4">
+                    <p class="mb-0 text-secondary">&copy; @DateTime.Now.Year Comunidade Batista Floramar. Todos os direitos reservados.</p>
+                    <p class="mb-0 mt-2" style="font-size:0.8rem;color:#888;">
+                        Desenvolvido por
+                        <span class="dev-credit">Caio Felipe V. Carvalho</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Botão flutuante: menu rápido + voltar ao topo -->
+    <div id="floatNav" class="float-nav d-none">
+        <button class="float-nav-btn" id="floatMenuBtn" title="Menu" onclick="toggleFloatMenu()" aria-label="Abrir menu">
+            <i class="fas fa-bars" id="floatMenuIcon"></i>
+        </button>
+        <div class="float-nav-menu" id="floatMenu">
+            <a href="/" class="float-nav-link"><i class="fas fa-home"></i><span>Início</span></a>
+            <a href="/Sobre" class="float-nav-link"><i class="fas fa-church"></i><span>Sobre</span></a>
+            <a href="/Cultos" class="float-nav-link"><i class="fas fa-praying-hands"></i><span>Cultos</span></a>
+            <a href="/Celula" class="float-nav-link"><i class="fas fa-home"></i><span>Células</span></a>
+            <a href="/Ministerios" class="float-nav-link"><i class="fas fa-hands-helping"></i><span>Ministérios</span></a>
+            <a href="/Aovivo" class="float-nav-link"><i class="fas fa-video"></i><span>Ao Vivo</span></a>
+            <a href="/Podcast" class="float-nav-link"><i class="fas fa-podcast"></i><span>Podcast</span></a>
+            <a href="/PalavraDoPastor" class="float-nav-link"><i class="fas fa-bible"></i><span>Palavra</span></a>
+            <a href="/Series" class="float-nav-link"><i class="fas fa-film"></i><span>Séries</span></a>
+            <a href="/Doacao" class="float-nav-link"><i class="fas fa-heart"></i><span>Doações</span></a>
+            <a href="/Napalavra" class="float-nav-link"><i class="fas fa-envelope"></i><span>Contato</span></a>
+            <button class="float-nav-link float-nav-top" onclick="scrollToTop()" title="Voltar ao topo">
+                <i class="fas fa-arrow-up"></i><span>Topo</span>
+            </button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Mostrar/ocultar botão flutuante ao rolar
+        const floatNav = document.getElementById('floatNav');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 300) floatNav.classList.remove('d-none');
+            else { floatNav.classList.remove('d-none'); floatNav.classList.add('d-none'); }
+            // fecha menu se rolar
+            document.getElementById('floatMenu').classList.remove('open');
+            document.getElementById('floatMenuIcon').className = 'fas fa-bars';
+        }, { passive: true });
+
+        function toggleFloatMenu() {
+            const menu = document.getElementById('floatMenu');
+            const icon = document.getElementById('floatMenuIcon');
+            const open = menu.classList.toggle('open');
+            icon.className = open ? 'fas fa-times' : 'fas fa-bars';
+        }
+
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            document.getElementById('floatMenu').classList.remove('open');
+            document.getElementById('floatMenuIcon').className = 'fas fa-bars';
+        }
+
+        // Fecha ao clicar fora
+        document.addEventListener('click', (e) => {
+            if (!document.getElementById('floatNav').contains(e.target)) {
+                document.getElementById('floatMenu').classList.remove('open');
+                document.getElementById('floatMenuIcon').className = 'fas fa-bars';
+            }
+        });
+
+        // Scroll-reveal: observa elementos com classe .scroll-reveal
+        (function () {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.12 });
+            document.querySelectorAll('.scroll-reveal').forEach(el => observer.observe(el));
+        })();
+    </script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
+

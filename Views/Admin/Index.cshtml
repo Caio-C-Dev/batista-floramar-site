@@ -1,0 +1,101 @@
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewBag.Title = "Dashboard";
+    ViewBag.AdminSection = "dashboard";
+}
+
+<div class="row g-3 mb-4">
+    <div class="col-sm-6 col-xl-3">
+        <a href="@Url.Action("Index","AdminCelulas")" class="text-decoration-none">
+            <div class="admin-stat-card">
+                <div class="admin-stat-icon"><i class="fas fa-users"></i></div>
+                <div class="admin-stat-info">
+                    <h2>@ViewBag.TotalCelulas</h2>
+                    <p>Células</p>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <a href="@Url.Action("Index","AdminMinisterios")" class="text-decoration-none">
+            <div class="admin-stat-card">
+                <div class="admin-stat-icon"><i class="fas fa-church"></i></div>
+                <div class="admin-stat-info">
+                    <h2>@ViewBag.TotalMinisterios</h2>
+                    <p>Ministérios</p>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <a href="@Url.Action("Index","AdminPodcasts")" class="text-decoration-none">
+            <div class="admin-stat-card">
+                <div class="admin-stat-icon"><i class="fab fa-youtube"></i></div>
+                <div class="admin-stat-info">
+                    <h2>@ViewBag.TotalPodcasts</h2>
+                    <p>Podcasts</p>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <a href="@Url.Action("Index","AdminMensagens")" class="text-decoration-none">
+            <div class="admin-stat-card">
+                <div class="admin-stat-icon"><i class="fas fa-envelope"></i></div>
+                <div class="admin-stat-info">
+                    <h2>@ViewBag.TotalMensagens</h2>
+                    <p>Mensagens</p>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <a href="@Url.Action("Index","AdminSeries")" class="text-decoration-none">
+            <div class="admin-stat-card">
+                <div class="admin-stat-icon"><i class="fab fa-youtube"></i></div>
+                <div class="admin-stat-info">
+                    <h2>@ViewBag.TotalSeries</h2>
+                    <p>Séries</p>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <a href="@Url.Action("Index","AdminPalavra")" class="text-decoration-none">
+            <div class="admin-stat-card">
+                <div class="admin-stat-icon"><i class="fas fa-bible"></i></div>
+                <div class="admin-stat-info">
+                    <h2>@ViewBag.TotalPalavras</h2>
+                    <p>Palavras publicadas</p>
+                </div>
+            </div>
+        </a>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-md-6">
+        <div class="admin-card">
+            <h5 class="mb-3" style="color: var(--admin-accent);"><i class="fas fa-bolt me-2"></i>Ações Rápidas</h5>
+            <div class="d-flex flex-column gap-2">
+                <a href="@Url.Action("Create","AdminCelulas")" class="btn-admin"><i class="fas fa-plus"></i> Nova Célula</a>
+                <a href="@Url.Action("Create","AdminMinisterios")" class="btn-admin"><i class="fas fa-plus"></i> Novo Ministério</a>
+                <a href="@Url.Action("Create","AdminPodcasts")" class="btn-admin"><i class="fas fa-plus"></i> Novo Podcast</a>
+                <a href="@Url.Action("Nova","AdminSeries")" class="btn-admin"><i class="fas fa-plus"></i> Nova Série</a>
+                <a href="@Url.Action("Nova","AdminPalavra")" class="btn-admin"><i class="fas fa-plus"></i> Nova Palavra do Pastor</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="admin-card">
+            <h5 class="mb-3" style="color: var(--admin-accent);"><i class="fas fa-info-circle me-2"></i>Sobre</h5>
+            <p style="color: var(--admin-text-muted); font-size: 0.9rem;">
+                Área administrativa da Comunidade Batista Floramar.<br />
+                Gerencie células, ministérios, podcast e visualize mensagens do pastor.
+            </p>
+            <a href="/" target="_blank" class="btn-admin-outline">
+                <i class="fas fa-external-link-alt"></i> Abrir Site
+            </a>
+        </div>
+    </div>
+</div>

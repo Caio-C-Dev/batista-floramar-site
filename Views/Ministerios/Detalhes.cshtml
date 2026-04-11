@@ -1,0 +1,271 @@
+@using BatistaFloramar.Domain.Entities
+@model Ministerio
+@{
+    ViewBag.Title = Model.Nome;
+    Layout = "_Layout";
+    var waMsg = Uri.EscapeDataString($"Olá! Tenho interesse em participar do Ministério {Model.Nome} da Comunidade Batista Floramar.");
+    var waLink = !string.IsNullOrEmpty(Model.WhatsApp)
+        ? $"https://wa.me/{Model.WhatsApp}?text={waMsg}"
+        : null;
+}
+
+<div class="page-card p-0 overflow-hidden">
+
+    
+    <div class="min-hero" style="background: linear-gradient(135deg,var(--bg-secondary),var(--bg-tertiary)); padding: 3rem 2.5rem 2rem; border-bottom: 1px solid rgba(255,255,255,.06);">
+        <div class="d-flex flex-wrap align-items-center gap-4">
+            <div class="min-hero-icon">
+                <i class="@Model.Icone"></i>
+            </div>
+            <div class="flex-grow-1">
+                <a href="/Ministerios" class="section-eyebrow text-decoration-none" style="opacity:.7">
+                    <i class="fas fa-arrow-left me-1" style="font-size:.7rem"></i> Ministérios
+                </a>
+                <h1 class="page-title mb-1 mt-1">@Model.Nome</h1>
+                <p class="text-secondary mb-0" style="font-size:1.05rem">@Model.ResumoBreve</p>
+            </div>
+            @if (waLink != null)
+            {
+                <a href="@waLink" target="_blank" rel="noopener"
+                   class="btn-participe d-flex align-items-center gap-2">
+                    <i class="fab fa-whatsapp" style="font-size:1.3rem"></i>
+                    <span>Participe</span>
+                </a>
+            }
+        </div>
+    </div>
+
+    <div class="p-4 p-md-5">
+
+        
+        <div class="row g-4 mb-5">
+            <div class="col-md-4">
+                <div class="min-leader-card">
+                    <p class="section-eyebrow mb-2">Liderança</p>
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="min-leader-avatar">
+                            @if (!string.IsNullOrEmpty(Model.FotoLider))
+                            {
+                                <img src="@Model.FotoLider" alt="@Model.Lideranca" class="min-leader-photo" />
+                            }
+                            else
+                            {
+                                <i class="fas fa-user"></i>
+                            }
+                        </div>
+                        <div>
+                            <p class="mb-0 fw-semibold" style="color:var(--text-primary); font-size:1.05rem">@Model.Lideranca</p>
+                            <p class="mb-0 text-secondary small">@Model.Nome</p>
+                        </div>
+                    </div>
+                    @if (waLink != null)
+                    {
+                        <a href="@waLink" target="_blank" rel="noopener"
+                           class="btn-wa-small mt-3 d-flex align-items-center justify-content-center gap-2">
+                            <i class="fab fa-whatsapp"></i> Falar com o líder
+                        </a>
+                    }
+                </div>
+            </div>
+
+            <div class="col-md-8">
+                <div class="section-card h-100">
+                    <h4 class="text-gold mb-3">
+                        <i class="fas fa-lightbulb me-2"></i>Por que existimos?
+                    </h4>
+                    <p class="section-text" style="white-space:pre-line">@Model.Descricao</p>
+                    @if (!string.IsNullOrEmpty(Model.Link) && Model.Link != "#")
+                    {
+                        <a href="@Model.Link" class="btn btn-secondary mt-3">
+                            <i class="fas fa-external-link-alt me-2"></i>Saiba mais
+                        </a>
+                    }
+                </div>
+            </div>
+        </div>
+
+        
+        <div class="mb-5">
+            <h3 class="section-heading mb-4">
+                <i class="fas fa-images text-gold me-2"></i>Galeria
+            </h3>
+            @if (Model.Fotos.Any())
+            {
+                <div class="row g-3">
+                    @foreach (var foto in Model.Fotos.OrderByDescending(f => f.DataUpload))
+                    {
+                        <div class="col-6 col-md-4 col-lg-3">
+                            <div class="min-foto-thumb" data-bs-toggle="modal" data-bs-target="#fotoModal"
+                                 data-src="@foto.CaminhoArquivo" data-legenda="@foto.Legenda">
+                                <img src="@foto.CaminhoArquivo" alt="@foto.Legenda" />
+                                @if (!string.IsNullOrEmpty(foto.Legenda))
+                                {
+                                    <div class="min-foto-label">@foto.Legenda</div>
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="section-card text-center py-5 text-secondary">
+                    <i class="fas fa-camera fa-2x mb-3 opacity-40"></i>
+                    <p class="mb-0">Fotos em breve!</p>
+                </div>
+            }
+        </div>
+
+        
+        <div class="min-cta-card text-center">
+            <div class="min-hero-icon mb-3" style="margin:0 auto 1rem;">
+                <i class="@Model.Icone"></i>
+            </div>
+            <h3 class="text-gold mb-1">Quer fazer parte?</h3>
+            <p class="text-secondary mb-4" style="max-width:480px;margin:0 auto .75rem;">
+                Cada pessoa tem um dom. Se você sente o chamado para servir no Ministério @Model.Nome, entre em contato!
+            </p>
+            <div class="d-flex gap-3 justify-content-center flex-wrap">
+                @if (waLink != null)
+                {
+                    <a href="@waLink" target="_blank" rel="noopener" class="btn-participe">
+                        <i class="fab fa-whatsapp me-2" style="font-size:1.2rem"></i> Participe pelo WhatsApp
+                    </a>
+                }
+                <a href="/Napalavra" class="btn btn-secondary">
+                    <i class="fas fa-envelope me-2"></i> Enviar mensagem
+                </a>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+<div class="modal fade" id="fotoModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content bg-dark border-0">
+            <div class="modal-body p-2 text-center">
+                <button type="button" class="btn-close btn-close-white float-end m-2" data-bs-dismiss="modal"></button>
+                <img id="fotoModalImg" src="" alt="" class="img-fluid rounded-3" style="max-height:80vh;" />
+                <p id="fotoModalLegenda" class="text-secondary mt-2 mb-1"></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.querySelectorAll('.min-foto-thumb').forEach(el => {
+        el.addEventListener('click', () => {
+            document.getElementById('fotoModalImg').src = el.dataset.src;
+            document.getElementById('fotoModalLegenda').textContent = el.dataset.legenda || '';
+        });
+    });
+</script>
+
+<style>
+.min-hero-icon {
+    width: 80px;
+    height: 80px;
+    background: rgba(212,175,55,.12);
+    border: 1px solid rgba(212,175,55,.28);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    color: var(--brand-gold);
+    flex-shrink: 0;
+}
+.btn-participe {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    background: #25d366;
+    color: #fff !important;
+    font-weight: 700;
+    padding: .7rem 1.6rem;
+    border-radius: 999px;
+    font-size: .95rem;
+    text-decoration: none;
+    transition: background .2s ease, transform .15s ease;
+    white-space: nowrap;
+}
+.btn-participe:hover {
+    background: #1aae52;
+    transform: translateY(-2px);
+}
+.btn-wa-small {
+    display: flex;
+    background: rgba(37,211,102,.12);
+    color: #25d366 !important;
+    border: 1px solid rgba(37,211,102,.3);
+    border-radius: 999px;
+    font-size: .85rem;
+    font-weight: 600;
+    padding: .45rem 1rem;
+    text-decoration: none;
+    transition: background .2s ease;
+}
+.btn-wa-small:hover { background: rgba(37,211,102,.22); }
+.min-leader-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-secondary);
+    border-radius: calc(var(--radius) * 1.4);
+    padding: 1.5rem;
+    height: 100%;
+}
+.min-leader-avatar {
+    width: 52px;
+    height: 52px;
+    background: rgba(230, 193, 90, 0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    color: var(--brand-gold);
+    flex-shrink: 0;
+    overflow: hidden;
+    border: 2px solid rgba(230, 193, 90, 0.3);
+}
+.min-leader-photo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    border-radius: 50%;
+}
+.min-foto-thumb {
+    position: relative;
+    border-radius: var(--radius);
+    overflow: hidden;
+    cursor: pointer;
+    aspect-ratio: 1;
+    background: var(--bg-secondary);
+    transition: transform .2s ease, box-shadow .2s ease;
+}
+.min-foto-thumb:hover { transform: scale(1.04); box-shadow: 0 8px 24px rgba(0,0,0,.4); }
+.min-foto-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+.min-foto-label {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    background: linear-gradient(transparent, rgba(0,0,0,.75));
+    color: #fff;
+    font-size: .75rem;
+    padding: .75rem .5rem .4rem;
+    text-align: center;
+}
+.min-cta-card {
+    background: linear-gradient(135deg, rgba(212,175,55,.06), rgba(48,76,137,.1));
+    border: 1px solid rgba(212,175,55,.18);
+    border-radius: calc(var(--radius) * 1.8);
+    padding: 3rem 2rem;
+}
+</style>
+

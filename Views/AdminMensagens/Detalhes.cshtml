@@ -1,0 +1,44 @@
+@using BatistaFloramar.Domain.Entities
+@model PerguntaPastor
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewBag.Title = "Detalhe da Mensagem";
+    ViewBag.AdminSection = "mensagens";
+}
+
+@section TopbarActions {
+    <a href="@Url.Action("Index")" class="btn-admin-outline">
+        <i class="fas fa-arrow-left"></i> Voltar
+    </a>
+}
+
+<div class="admin-card" style="max-width: 680px;">
+    <div class="mb-3">
+        <span style="font-size:0.8rem; color: var(--admin-text-muted);">Recebida em</span>
+        <div style="font-weight:600;">@Model.DataEnvio.ToString("dd/MM/yyyy 'às' HH:mm")</div>
+    </div>
+    <hr style="border-color: var(--admin-border);" />
+    <div class="row g-3 mb-3">
+        <div class="col-sm-6">
+            <span style="font-size:0.8rem; color: var(--admin-text-muted);">Nome</span>
+            <div style="font-weight:600;">@Model.Nome</div>
+        </div>
+        <div class="col-sm-6">
+            <span style="font-size:0.8rem; color: var(--admin-text-muted);">Assunto</span>
+            <div style="font-weight:600;">@Model.Assunto</div>
+        </div>
+        <div class="col-sm-6">
+            <span style="font-size:0.8rem; color: var(--admin-text-muted);">E-mail</span>
+            <div><a href="mailto:@Model.Email" style="color: var(--admin-accent);">@Model.Email</a></div>
+        </div>
+        <div class="col-sm-6">
+            <span style="font-size:0.8rem; color: var(--admin-text-muted);">Telefone</span>
+            <div>@(string.IsNullOrEmpty(Model.Telefone) ? "—" : Model.Telefone)</div>
+        </div>
+    </div>
+    <hr style="border-color: var(--admin-border);" />
+    <div>
+        <span style="font-size:0.8rem; color: var(--admin-text-muted);">Mensagem</span>
+        <div style="white-space: pre-wrap; line-height: 1.7; margin-top: 8px;">@Model.Pergunta</div>
+    </div>
+</div>

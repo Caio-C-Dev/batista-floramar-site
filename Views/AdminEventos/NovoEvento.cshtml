@@ -1,0 +1,59 @@
+@model BatistaFloramar.Domain.Entities.Evento
+@{
+    Layout = "_AdminLayout";
+    ViewBag.Title = "Novo Evento";
+    ViewBag.AdminSection = "eventos";
+}
+
+<div class="admin-card" style="max-width:700px;">
+    <form method="post" enctype="multipart/form-data" action="@Url.Action("NovoEvento")">
+        @Html.AntiForgeryToken()
+
+        <div class="mb-4">
+            <label class="form-label">Título do Evento *</label>
+            <input type="text" name="Titulo" value="@Model.Titulo"
+                   class="form-control" placeholder="Ex: Encontro de Casais" required />
+            @if (ViewData.ModelState["Titulo"]?.Errors.Count > 0)
+            {
+                <div class="text-danger small mt-1">@ViewData.ModelState["Titulo"]!.Errors[0].ErrorMessage</div>
+            }
+        </div>
+
+        <div class="row g-3 mb-4">
+            <div class="col-md-6">
+                <label class="form-label">Data do Evento *</label>
+                <input type="date" name="DataEvento"
+                       value="@Model.DataEvento.ToString("yyyy-MM-dd")"
+                       class="form-control" required />
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Local</label>
+                <input type="text" name="Local" value="@Model.Local"
+                       class="form-control" placeholder="Ex: Templo principal" />
+            </div>
+        </div>
+
+        <div class="mb-4">
+            <label class="form-label">Descrição</label>
+            <textarea name="Descricao" rows="3" class="form-control"
+                      placeholder="Breve descrição do evento...">@Model.Descricao</textarea>
+        </div>
+
+        <div class="mb-4">
+            <label class="form-label">Banner do Evento</label>
+            <input type="file" name="banner" accept="image/*" class="form-control" />
+            <div class="form-text" style="color:var(--admin-text-muted);">
+                Imagem que aparecerá como destaque do evento na página inicial. Recomendado: 1200×600 px.
+            </div>
+        </div>
+
+        <div class="d-flex gap-3 mt-2">
+            <button type="submit" class="btn-admin btn-admin-success">
+                <i class="fas fa-save me-1"></i> Salvar Evento
+            </button>
+            <a href="@Url.Action("Index")" class="btn-admin btn-admin-outline" style="color:var(--admin-text);">
+                Cancelar
+            </a>
+        </div>
+    </form>
+</div>

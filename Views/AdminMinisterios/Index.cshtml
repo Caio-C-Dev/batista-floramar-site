@@ -1,0 +1,77 @@
+@using BatistaFloramar.Domain.Entities
+@model IEnumerable<Ministerio>
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewBag.Title = "Ministérios";
+    ViewBag.AdminSection = "ministerios";
+}
+
+@section TopbarActions {
+    <a href="@Url.Action("Create")" class="btn-admin">
+        <i class="fas fa-plus"></i> Novo Ministério
+    </a>
+}
+
+<div class="admin-card p-0">
+    <div class="table-responsive">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Ícone</th>
+                    <th>Nome</th>
+                    <th>Liderança</th>
+                    <th>Ordem</th>
+                    <th>Status</th>
+                    <th style="width:140px;">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var m in Model)
+                {
+                    <tr>
+                        <td><i class="@m.Icone" style="font-size:1.2rem; color: var(--admin-accent);"></i></td>
+                        <td>
+                            <strong>@m.Nome</strong>
+                            @if (m.Link != null)
+                            {
+                                <small class="ms-1" style="color: var(--admin-text-muted);">(link: @m.Link)</small>
+                            }
+                        </td>
+                        <td>@m.Lideranca</td>
+                        <td>@m.Ordem</td>
+                        <td>
+                            @if (m.Ativo)
+                            {
+                                <span class="badge-ativo">Ativo</span>
+                            }
+                            else
+                            {
+                                <span class="badge-inativo">Inativo</span>
+                            }
+                        </td>
+                        <td>
+                            <div class="d-flex gap-1">
+                                <a href="@Url.Action("Fotos", new { id = m.Id })" class="btn-admin-outline" title="Fotos">
+                                    <i class="fas fa-images"></i>
+                                </a>
+                                <a href="@Url.Action("Edit", new { id = m.Id })" class="btn-admin-outline" title="Editar">
+                                    <i class="fas fa-pen"></i>
+                                </a>
+                                <form method="post" asp-action="ToggleAtivo" asp-route-id="@m.Id" style="display:inline;">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="@(m.Ativo ? "btn-admin-danger" : "btn-admin-outline")" title="@(m.Ativo ? "Inativar" : "Ativar")">
+                                        <i class="fas @(m.Ativo ? "fa-toggle-off" : "fa-toggle-on")"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                }
+                @if (!Model.Any())
+                {
+                    <tr><td colspan="6" class="text-center" style="color: var(--admin-text-muted); padding: 32px;">Nenhum ministério cadastrado.</td></tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

@@ -1,0 +1,99 @@
+@model List<BatistaFloramar.Domain.Entities.Evento>
+@{
+    Layout = "_AdminLayout";
+    ViewBag.Title = "Próximos Eventos";
+    ViewBag.AdminSection = "eventos";
+}
+
+@section TopbarActions {
+    <a href="@Url.Action("NovoEvento")" class="btn-admin btn-admin-success">
+        <i class="fas fa-plus"></i> Novo Evento
+    </a>
+}
+
+<div class="admin-card">
+    @if (!Model.Any())
+    {
+        <div class="empty-state">
+            <i class="fas fa-calendar-alt"></i>
+            <p>Nenhum evento cadastrado ainda.</p>
+            <a href="@Url.Action("NovoEvento")" class="btn-admin btn-admin-success">
+                <i class="fas fa-plus"></i> Criar primeiro evento
+            </a>
+        </div>
+    }
+    else
+    {
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Banner</th>
+                    <th>Título</th>
+                    <th>Data</th>
+                    <th>Local</th>
+                    <th>Status</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var ev in Model)
+                {
+                    <tr>
+                        <td>
+                            @if (!string.IsNullOrEmpty(ev.ImagemBanner))
+                            {
+                                <img src="@ev.ImagemBanner" alt="@ev.Titulo"
+                                     style="width:90px;height:55px;object-fit:cover;border-radius:6px;" />
+                            }
+                            else
+                            {
+                                <div style="width:90px;height:55px;border-radius:6px;background:#1a2844;display:flex;align-items:center;justify-content:center;">
+                                    <i class="fas fa-image" style="color:#4a5a7a;font-size:1.4rem;"></i>
+                                </div>
+                            }
+                        </td>
+                        <td><strong>@ev.Titulo</strong></td>
+                        <td>
+                            @{
+                                var passado = ev.DataEvento < DateTime.Today;
+                            }
+                            <span style="@(passado ? "color:#aaa" : "color:#d4af37")">
+                                @ev.DataEvento.ToString("dd/MM/yyyy")
+                            </span>
+                        </td>
+                        <td>@(ev.Local ?? "—")</td>
+                        <td>
+                            @if (!ev.Ativo)
+                            {
+                                <span class="badge-admin" style="background:#444;color:#aaa;">Inativo</span>
+                            }
+                            else if (ev.DataEvento < DateTime.Today)
+                            {
+                                <span class="badge-admin" style="background:#2a3a5a;color:#8aa;">Encerrado</span>
+                            }
+                            else
+                            {
+                                <span class="badge-admin" style="background:#1a4a2a;color:#5d8;">Ativo</span>
+                            }
+                        </td>
+                        <td>
+                            <div class="d-flex gap-2">
+                                <a href="@Url.Action("EditarEvento", new { id = ev.Id })"
+                                   class="btn-admin btn-admin-outline" style="font-size:.8rem;padding:.3rem .7rem;">
+                                    <i class="fas fa-edit"></i> Editar
+                                </a>
+                                <form method="post" action="@Url.Action("ExcluirEvento", new { id = ev.Id })"
+                                      onsubmit="return confirm('Excluir o evento \'@ev.Titulo\'?')">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn-admin btn-admin-danger" style="font-size:.8rem;padding:.3rem .7rem;">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>

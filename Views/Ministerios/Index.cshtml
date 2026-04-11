@@ -1,0 +1,55 @@
+﻿@using BatistaFloramar.Domain.Entities
+@model IEnumerable<Ministerio>
+@{
+    ViewBag.Title = "Ministérios";
+    Layout = "_Layout";
+}
+
+<div class="page-card">
+    <div class="page-header">
+        <span class="section-eyebrow">Sirva com seus dons</span>
+        <h1 class="page-title">Ministérios</h1>
+        <p class="page-subtitle">
+            Cada membro tem um dom. Conheça os ministérios da Comunidade Batista Floramar e descubra onde você pode servir.
+        </p>
+    </div>
+
+    <div class="row row-cols-1 row-cols-md-2 g-4 mt-2">
+        @foreach (var m in Model)
+        {
+            <div class="col">
+                <a href="/Ministerios/Detalhes/@m.Slug" class="text-decoration-none">
+                    <div class="section-card h-100" style="transition: transform .2s ease, border-color .2s ease;">
+                        <div class="d-flex align-items-center gap-3 mb-3">
+                            <div class="ministry-icon-page"><i class="@m.Icone"></i></div>
+                            <div>
+                                <h3 class="mb-0" style="color:var(--text-primary)">@m.Nome</h3>
+                                <p class="mb-0 small text-secondary"><i class="fas fa-user me-1 text-gold"></i>@m.Lideranca</p>
+                            </div>
+                        </div>
+                        <p class="text-secondary mb-3">@(string.IsNullOrEmpty(m.ResumoBreve) ? m.Descricao.Substring(0, Math.Min(120, m.Descricao.Length)) + "…" : m.ResumoBreve)</p>
+                        <span class="text-gold small fw-semibold">Conhecer ministério <i class="fas fa-arrow-right ms-1"></i></span>
+                    </div>
+                </a>
+            </div>
+        }
+        @if (!Model.Any())
+        {
+            <div class="col-12 text-center py-5">
+                <p class="text-secondary">Nenhum ministério disponível no momento.</p>
+            </div>
+        }
+    </div>
+
+    <div class="section-card mt-4 text-center">
+        <h3>Quero participar de um ministério</h3>
+        <p class="text-secondary">Entre em contato conosco e nossa equipe irá orientá-lo a encontrar o lugar certo para servir.</p>
+        <a href="/Napalavra" class="btn btn-primary btn-lg mt-2">
+            <i class="fas fa-envelope me-2"></i> Fale conosco
+        </a>
+    </div>
+</div>
+
+<style>
+.section-card:hover { transform: translateY(-3px); border-color: rgba(212,175,55,.4) !important; }
+</style>

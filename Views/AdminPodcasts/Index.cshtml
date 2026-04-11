@@ -1,0 +1,74 @@
+@using BatistaFloramar.Domain.Entities
+@model IEnumerable<PodcastVideo>
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewBag.Title = "Podcast";
+    ViewBag.AdminSection = "podcasts";
+}
+
+@section TopbarActions {
+    <a href="@Url.Action("Create")" class="btn-admin">
+        <i class="fas fa-plus"></i> Novo Vídeo
+    </a>
+}
+
+<div class="admin-card p-0">
+    <div class="table-responsive">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Título</th>
+                    <th>YouTube ID</th>
+                    <th>Início</th>
+                    <th>Data</th>
+                    <th>Ordem</th>
+                    <th>Status</th>
+                    <th style="width:140px;">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var v in Model)
+                {
+                    <tr>
+                        <td><strong>@v.Titulo</strong></td>
+                        <td>
+                            <a href="@v.WatchUrl" target="_blank" class="btn-admin-outline" style="padding:3px 8px; font-size:0.78rem;">
+                                @v.YoutubeVideoId <i class="fas fa-external-link-alt ms-1"></i>
+                            </a>
+                        </td>
+                        <td>@(v.StartSeconds.HasValue ? $"{v.StartSeconds}s" : "—")</td>
+                        <td style="white-space:nowrap;">@v.DataPublicacao.ToString("dd/MM/yyyy")</td>
+                        <td>@v.Ordem</td>
+                        <td>
+                            @if (v.Ativo)
+                            {
+                                <span class="badge-ativo">Ativo</span>
+                            }
+                            else
+                            {
+                                <span class="badge-inativo">Inativo</span>
+                            }
+                        </td>
+                        <td>
+                            <div class="d-flex gap-1">
+                                <a href="@Url.Action("Edit", new { id = v.Id })" class="btn-admin-outline" title="Editar">
+                                    <i class="fas fa-pen"></i>
+                                </a>
+                                <form method="post" asp-action="ToggleAtivo" asp-route-id="@v.Id" style="display:inline;">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="@(v.Ativo ? "btn-admin-danger" : "btn-admin-outline")" title="@(v.Ativo ? "Inativar" : "Ativar")">
+                                        <i class="fas @(v.Ativo ? "fa-toggle-off" : "fa-toggle-on")"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                }
+                @if (!Model.Any())
+                {
+                    <tr><td colspan="7" class="text-center" style="color: var(--admin-text-muted); padding: 32px;">Nenhum vídeo cadastrado.</td></tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

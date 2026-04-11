@@ -1,0 +1,98 @@
+@model List<BatistaFloramar.Domain.Entities.PalavraDoPastor>
+@{
+    Layout = "_AdminLayout";
+    ViewBag.Title = "Palavra do Pastor";
+    ViewBag.AdminSection = "palavra";
+}
+@section TopbarActions {
+    <a href="@Url.Action("Nova")" class="btn-admin btn-admin-success">
+        <i class="fas fa-plus"></i> Nova Palavra
+    </a>
+}
+<div class="admin-card">
+    @if (!Model.Any())
+    {
+        <div class="empty-state">
+            <i class="fas fa-pen-nib"></i>
+            <p>Nenhuma palavra publicada ainda.</p>
+            <a href="@Url.Action("Nova")" class="btn-admin btn-admin-success"><i class="fas fa-plus"></i> Escrever primeira palavra</a>
+        </div>
+    }
+    else
+    {
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Imagem</th>
+                    <th>Título</th>
+                    <th>Tipo</th>
+                    <th>Autor</th>
+                    <th>Data</th>
+                    <th>Status</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var p in Model)
+                {
+                    <tr>
+                        <td>
+                            @if (!string.IsNullOrEmpty(p.ImagemDestaque))
+                            {
+                                <img src="@p.ImagemDestaque" style="width:70px;height:45px;object-fit:cover;border-radius:6px;" />
+                            }
+                            else
+                            {
+                                <div style="width:70px;height:45px;border-radius:6px;background:#1a2844;display:flex;align-items:center;justify-content:center;">
+                                    <i class="fas fa-pen-nib" style="color:#4a5a7a;"></i>
+                                </div>
+                            }
+                        </td>
+                        <td><strong>@p.Titulo</strong></td>
+                        <td>
+                            @if (p.Tipo == BatistaFloramar.Domain.Entities.TipoPalavra.Sermao)
+                            {
+                                <span class="badge-admin" style="background:#1a3a6a;color:#8af;">Sermão</span>
+                            }
+                            else
+                            {
+                                <span class="badge-admin" style="background:#3a2a1a;color:#fa8;">Devocional</span>
+                            }
+                        </td>
+                        <td style="font-size:.85rem;">@p.AutorNome</td>
+                        <td style="font-size:.85rem;">@p.DataPublicacao.ToString("dd/MM/yyyy")</td>
+                        <td>
+                            <form method="post" action="@Url.Action("TogglePublicado", new { id = p.Id })">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" style="background:none;border:none;padding:0;cursor:pointer;">
+                                    @if (p.Publicado)
+                                    {
+                                        <span class="badge-admin" style="background:#1a4a2a;color:#5d8;cursor:pointer;" title="Clique para despublicar">● Publicado</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge-admin" style="background:#2a2a2a;color:#888;cursor:pointer;" title="Clique para publicar">○ Rascunho</span>
+                                    }
+                                </button>
+                            </form>
+                        </td>
+                        <td>
+                            <div class="d-flex gap-2">
+                                <a href="@Url.Action("Editar", new { id = p.Id })" class="btn-admin btn-admin-outline" style="font-size:.8rem;padding:.3rem .7rem;">
+                                    <i class="fas fa-edit"></i> Editar
+                                </a>
+                                <form method="post" action="@Url.Action("Excluir", new { id = p.Id })"
+                                      onsubmit="return confirm('Excluir \'@p.Titulo\'?')">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn-admin btn-admin-danger" style="font-size:.8rem;padding:.3rem .7rem;">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>

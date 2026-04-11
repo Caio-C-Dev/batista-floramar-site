@@ -1,0 +1,18 @@
+@using BatistaFloramar.Application.Services
+@{
+    var versiculo = ViewBag.Versiculo as BibleVerseDto;
+    var texto = versiculo?.Texto ?? "Confie no Senhor de todo o seu coração e não se apoie em seu próprio entendimento.";
+    var referencia = versiculo?.Referencia ?? "Provérbios 3:5 (NVI)";
+}
+<section class="verse-section">
+    <div class="container">
+        <div class="verse-banner scroll-reveal">
+            <div class="verse-icon"><i class="fas fa-book-open"></i></div>
+            <p class="section-eyebrow mb-3">Versículo do Dia</p>
+            <blockquote class="verse-quote">
+                "@texto"
+            </blockquote>
+            <cite class="verse-cite">— @referencia</cite>
+        </div>
+    </div>
+</section>
