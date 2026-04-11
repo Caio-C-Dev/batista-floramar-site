@@ -2930,3 +2930,142 @@ textarea {
     padding: 1.1rem 0.75rem;
   }
 }
+
+/* ══════════════════════════════════════════════════════════
+   MOBILE PASS 2 — horizontal cards Palavra/Podcast,
+   2-col compact ministry, evento banner reduzido.
+   (these rules override earlier mobile blocks via cascade)
+   ══════════════════════════════════════════════════════════ */
+@media (max-width: 575.98px) {
+
+  /* ── Ministérios: card compacto para 2 colunas ── */
+  .ministry-card {
+    padding: 0.95rem 0.65rem;
+    text-align: center;
+  }
+
+  .ministry-icon {
+    width: 46px;
+    height: 46px;
+    font-size: 1.1rem;
+    margin: 0 auto 0.55rem;
+  }
+
+  .ministry-card h5 {
+    font-size: 0.82rem;
+    margin-bottom: 0.2rem;
+    line-height: 1.3;
+  }
+
+  /* Ocultar descrição no layout 2-col — icon + título + "Ver mais" é suficiente */
+  .ministry-card p {
+    display: none;
+  }
+
+  /* ── Palavra do Pastor: card horizontal ── */
+  .palavra-preview-card {
+    flex-direction: row;
+    align-items: stretch;
+    min-height: 110px;
+  }
+
+  .palavra-preview-img {
+    width: 130px;
+    min-width: 130px;
+    flex-shrink: 0;
+    aspect-ratio: auto;
+    height: auto;
+  }
+
+  .palavra-preview-img::after {
+    display: none;
+  }
+
+  .palavra-preview-placeholder {
+    min-height: 110px;
+    font-size: 1.8rem;
+  }
+
+  .palavra-preview-body {
+    padding: 0.85rem 0.9rem !important;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .palavra-preview-title {
+    font-size: 0.88rem !important;
+    -webkit-line-clamp: 3;
+    margin-bottom: 0.4rem;
+  }
+
+  .palavra-preview-excerpt {
+    display: none !important;
+  }
+
+  .palavra-type-badge {
+    font-size: 0.62rem;
+    padding: 0.15rem 0.45rem;
+    top: 0.5rem;
+    left: 0.5rem;
+  }
+
+  /* ── Podcast: card horizontal ── */
+  .podcast-card {
+    flex-direction: row;
+    align-items: stretch;
+    min-height: 110px;
+  }
+
+  .podcast-thumb-wrap {
+    width: 130px;
+    min-width: 130px;
+    flex-shrink: 0;
+    aspect-ratio: auto;
+    height: auto;
+    min-height: 110px;
+  }
+
+  .podcast-thumb-wrap::before {
+    display: none;
+  }
+
+  .podcast-play-overlay {
+    background: rgba(0, 0, 0, 0.18);
+    opacity: 1;
+  }
+
+  .podcast-play-btn {
+    width: 34px;
+    height: 34px;
+    font-size: 0.85rem;
+    box-shadow: none;
+  }
+
+  .podcast-card-body {
+    padding: 0.85rem 0.9rem !important;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .podcast-card-title {
+    font-size: 0.88rem !important;
+    -webkit-line-clamp: 3;
+  }
+
+  .podcast-card-desc {
+    display: none !important;
+  }
+
+  /* ── Eventos: banner menos alto ── */
+  .evento-banner {
+    height: 145px !important;
+  }
+
+  /* ── Reduzir gutter Bootstrap em seções de cards ── */
+  #ministerios .row,
+  #palavra-preview .row,
+  #podcast-preview .row {
+    --bs-gutter-x: 0.85rem;
+    --bs-gutter-y: 0.85rem;
+  }
+}
