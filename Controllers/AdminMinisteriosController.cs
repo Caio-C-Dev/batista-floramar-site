@@ -127,7 +127,7 @@ namespace BatistaFloramar.Controllers
                 return RedirectToAction(nameof(Fotos), new { id });
             }
 
-            var pasta = Path.Combine(_env.WebRootPath, "images", "ministerios", ministerio.Slug);
+            var pasta = Path.Combine(_env.WebRootPath, "images", "uploads", "ministerios", ministerio.Slug);
             Directory.CreateDirectory(pasta);
 
             var nomeArquivo = $"{Guid.NewGuid():N}{ext}";
@@ -139,7 +139,7 @@ namespace BatistaFloramar.Controllers
             _db.MinisterioFotos.Add(new MinisterioFoto
             {
                 MinisterioId = id,
-                CaminhoArquivo = $"/images/ministerios/{ministerio.Slug}/{nomeArquivo}",
+                CaminhoArquivo = $"/images/uploads/ministerios/{ministerio.Slug}/{nomeArquivo}",
                 Legenda = legenda?.Trim(),
                 DataUpload = DateTime.UtcNow
             });

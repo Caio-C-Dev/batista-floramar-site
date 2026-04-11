@@ -113,12 +113,12 @@ namespace BatistaFloramar.Controllers
         {
             var ext = Path.GetExtension(file.FileName).ToLowerInvariant();
             var nome = $"{Guid.NewGuid()}{ext}";
-            var pasta = Path.Combine(_env.WebRootPath, "images", "Celulas");
+            var pasta = Path.Combine(_env.WebRootPath, "images", "uploads", "celulas");
             Directory.CreateDirectory(pasta);
             var caminho = Path.Combine(pasta, nome);
             using var stream = new FileStream(caminho, FileMode.Create);
             await file.CopyToAsync(stream);
-            return $"Celulas/{nome}";
+            return $"/images/uploads/celulas/{nome}";
         }
     }
 }

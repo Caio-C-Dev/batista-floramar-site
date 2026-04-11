@@ -131,12 +131,12 @@ namespace BatistaFloramar.Controllers
         {
             var ext = Path.GetExtension(file.FileName).ToLowerInvariant();
             var nome = $"{Guid.NewGuid()}{ext}";
-            var pasta = Path.Combine(_env.WebRootPath, "images", "eventos");
+            var pasta = Path.Combine(_env.WebRootPath, "images", "uploads", "eventos");
             Directory.CreateDirectory(pasta);
             var caminho = Path.Combine(pasta, nome);
             using var stream = new FileStream(caminho, FileMode.Create);
             await file.CopyToAsync(stream);
-            return $"/images/eventos/{nome}";
+            return $"/images/uploads/eventos/{nome}";
         }
 
         private void DeletarBannerAntigo(string? caminhoRelativo)
