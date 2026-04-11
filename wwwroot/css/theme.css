@@ -528,12 +528,15 @@ textarea {
   border-radius: 22px;
   padding: 2rem;
   box-shadow: var(--shadow-soft);
+  text-align: center;
 }
 
 .footer-brand-block {
   display: flex;
   gap: 1rem;
   align-items: center;
+  flex-direction: column;
+  text-align: center;
 }
 
 .footer-logo-image,
@@ -560,14 +563,15 @@ textarea {
 }
 
 .footer-info-block h5,
-.footer-social-block h5 {
+.footer-social-block h5,
+.footer-links h6 {
   color: var(--text-primary);
   margin-bottom: 1rem;
+  text-align: center;
 }
 
 .footer-address {
-  font-size: 0.88rem;
-  line-height: 1.5;
+  text-align: center;
 }
 
 .footer-map iframe {
@@ -612,6 +616,7 @@ textarea {
   display: flex;
   gap: 0.9rem;
   flex-wrap: wrap;
+  justify-content: center;
 }
 
 .social-links a {
@@ -1050,6 +1055,13 @@ textarea {
 .navbar .nav-item .btn-nav-pastor:hover i,
 .navbar .nav-item .btn-nav-pastor:focus i {
   color: #000 !important;
+}
+
+/* Mobile nav: gap between Contato pill and Área do Pastor pill */
+@media (max-width: 991.98px) {
+  .nav-item:has(.btn-nav-pastor) {
+    margin-top: 0.6rem;
+  }
 }
 
 /* ============================================================
@@ -1562,12 +1574,14 @@ textarea {
   color: var(--text-primary);
   margin-bottom: 1rem;
   font-weight: 600;
+  text-align: center;
 }
 
 .footer-links ul {
   list-style: none;
   padding: 0;
-  margin: 0;
+  margin: 0 auto;
+  text-align: center;
 }
 
 .footer-links li {
