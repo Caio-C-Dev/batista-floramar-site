@@ -11,8 +11,22 @@ builder.Services.AddSingleton<BatistaFloramar.Application.Services.BibleService>
 builder.Services.AddMemoryCache();
 builder.Services.AddScoped<BatistaFloramar.Application.Services.FinanceiroService>();
 builder.Services.AddScoped<BatistaFloramar.Application.Services.DoacaoService>();
-builder.Services.AddDbContext<BatistaFloramarDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
+if (databaseUrl != null)
+{
+    var uri = new Uri(databaseUrl);
+    var userInfo = uri.UserInfo.Split(':', 2);
+    var connStr = $"Host={uri.Host};Port={uri.Port};"
+        + $"Username={userInfo[0]};Password={Uri.UnescapeDataString(userInfo[1])};"
+        + $"Database={uri.AbsolutePath.TrimStart('/')};SSL Mode=Require;Trust Server Certificate=true";
+    builder.Services.AddDbContext<BatistaFloramarDbContext>(options => options.UseNpgsql(connStr));
+}
+else
+{
+    builder.Services.AddDbContext<BatistaFloramarDbContext>(options =>
+        options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+}
 
 builder.Services.AddAuthentication("AdminCookie")
     .AddCookie("AdminCookie", options =>
@@ -22,6 +36,9 @@ builder.Services.AddAuthentication("AdminCookie")
         options.ExpireTimeSpan = TimeSpan.FromHours(8);
         options.Cookie.HttpOnly = true;
     });
+
+var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
+builder.WebHost.UseUrls($"http://*:{port}");
 
 var app = builder.Build();
 
@@ -34,7 +51,10 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-app.UseHttpsRedirection();
+if (!app.Environment.IsProduction())
+{
+    app.UseHttpsRedirection();
+}
 app.UseStaticFiles();
 app.UseRouting();
 app.UseAuthentication();
@@ -50,6 +70,15 @@ app.MapGet("/", async (context) =>
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<BatistaFloramarDbContext>();
+    if (databaseUrl != null)
+        await db.Database.EnsureCreatedAsync();
+    else
+        await db.Database.MigrateAsync();
+}
 
 await SeedData.InicializarAsync(app.Services);
 

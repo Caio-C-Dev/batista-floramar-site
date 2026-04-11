@@ -1,6 +1,122 @@
-bin/
-obj/
-.vs/
+## ── .NET / ASP.NET Core ────────────────────────────────────────────────────────
+# Build outputs
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+# Publish output
+publish/
+out/
+
+# NuGet
+*.nupkg
+*.snupkg
+.nuget/
+packages/
+project.lock.json
+project.fragment.lock.json
+
+# dotnet CLI
+*.exe
+*.pdb
+*.dll
+!**/wwwroot/**/*.dll  # Allow precompiled Blazor WASM (if any)
+
+# MSBuild
 *.user
+*.userosscache
+*.sln.docstates
+*.pidb
+*.booproj
+
+## ── Visual Studio ──────────────────────────────────────────────────────────────
+.vs/
 *.suo
+*.rsuser
+*.vsp
+*.vspx
+*.sap
+*.vbw
+*_i.c
+*_p.c
+*_h.h
+*.ilk
+*.meta
+*.map
+*.exp
+*.iobj
+*.ipdb
+*.pgc
+*.pgd
+*.rsp
+*.sbr
+*.tlb
+*.tli
+*.tlh
+*.tmp_proj
+*_wpftmp.csproj
+*.vspscc
+*.vssscc
+.builds
+*.pidb
+
+# Test results
+TestResults/
+[Tt]est[Rr]esult*/
+*.trx
+*.coverage
+*.coveragexml
+*.runsettings
+
+## ── Rider / JetBrains ──────────────────────────────────────────────────────────
+.idea/
+*.iml
+*.ipr
+*.iws
+
+## ── Secrets & environment-specific config (NEVER commit) ──────────────────────
+appsettings.Development.json
+appsettings.Production.json
+appsettings.*.json
+!appsettings.json
+secrets.json
+.env
+.env.*
+*.pfx
+*.p12
+*.key
+*_rsa
+
+## ── OS ─────────────────────────────────────────────────────────────────────────
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+
+# Linux
+*~
+
+## ── Logs ───────────────────────────────────────────────────────────────────────
 *.log
+nohup.out
+
+## ── Docker ─────────────────────────────────────────────────────────────────────
+.dockerignore
+
+## ── Uploads / user content ─────────────────────────────────────────────────────
+# Uncomment if you don't want to track uploaded images:
+# BatistaFloramar/wwwroot/uploads/
+*.json

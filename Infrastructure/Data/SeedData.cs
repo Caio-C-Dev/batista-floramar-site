@@ -9,7 +9,6 @@ namespace BatistaFloramar.Infrastructure.Data
         {
             using var scope = serviceProvider.CreateScope();
             var db = scope.ServiceProvider.GetRequiredService<BatistaFloramarDbContext>();
-            await db.Database.MigrateAsync();
 
             await SeedCredenciaisAsync(db);
             await SeedCelulasAsync(db);
