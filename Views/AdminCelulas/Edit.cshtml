@@ -86,8 +86,9 @@
                 <label class="form-label">Imagem da Célula</label>
                 @if (!string.IsNullOrEmpty(Model.ImagemUrl))
                 {
+                    var imgSrc = Model.ImagemUrl.StartsWith("/") ? Model.ImagemUrl : $"/images/{Model.ImagemUrl}";
                     <div class="mb-2">
-                        <img src="~/images/@Model.ImagemUrl" alt="@Model.Nome"
+                        <img src="@imgSrc" alt="@Model.Nome"
                              style="width:100%;max-height:180px;object-fit:cover;border-radius:8px;" />
                         <div class="form-text" style="color:var(--admin-text-muted);">Imagem atual. Faça upload para substituir.</div>
                     </div>

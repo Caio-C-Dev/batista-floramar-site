@@ -42,7 +42,7 @@
                 {
                     <div class="col">
                         <div class="section-card h-100">
-                            <img src="~/images/@c.ImagemUrl" alt="Célula @c.Nome" class="img-fluid rounded mb-3" />
+                            <img src="@(c.ImagemUrl.StartsWith("/") ? c.ImagemUrl : $"/images/{c.ImagemUrl}")" alt="Célula @c.Nome" class="img-fluid rounded mb-3" />
                             <h3>@c.Nome</h3>
                             @if (!string.IsNullOrEmpty(c.Lideres))
                             {
