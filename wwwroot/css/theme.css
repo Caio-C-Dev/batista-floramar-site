@@ -2932,46 +2932,60 @@ textarea {
 }
 
 /* ══════════════════════════════════════════════════════════
-   MOBILE PASS 2 — horizontal cards Palavra/Podcast,
-   2-col compact ministry, evento banner reduzido.
-   (these rules override earlier mobile blocks via cascade)
+   MOBILE PASS 2 — FULL UX overhaul for ≤575px
+   Covers: Ministérios, Palavra, Podcast, Cultos, Contato,
+   Depoimentos, Footer centralizado, Eventos, global spacing.
    ══════════════════════════════════════════════════════════ */
 @media (max-width: 575.98px) {
 
-  /* ── Ministérios: card compacto para 2 colunas ── */
+  /* ─── Global gutter reduction ─── */
+  .row {
+    --bs-gutter-x: 0.75rem;
+    --bs-gutter-y: 0.75rem;
+  }
+
+  /* ─── Section heading tighten ─── */
+  .text-center.mb-5 {
+    margin-bottom: 1.75rem !important;
+  }
+
+  /* ══ MINISTÉRIOS: compacto 2-col ══ */
   .ministry-card {
-    padding: 0.95rem 0.65rem;
+    padding: 0.9rem 0.6rem;
     text-align: center;
   }
 
   .ministry-icon {
-    width: 46px;
-    height: 46px;
-    font-size: 1.1rem;
-    margin: 0 auto 0.55rem;
+    width: 44px;
+    height: 44px;
+    font-size: 1.05rem;
+    margin: 0 auto 0.5rem;
   }
 
   .ministry-card h5 {
-    font-size: 0.82rem;
-    margin-bottom: 0.2rem;
+    font-size: 0.8rem;
+    margin-bottom: 0.15rem;
     line-height: 1.3;
   }
 
-  /* Ocultar descrição no layout 2-col — icon + título + "Ver mais" é suficiente */
   .ministry-card p {
     display: none;
   }
 
-  /* ── Palavra do Pastor: card horizontal ── */
+  .ministry-card .text-gold {
+    font-size: 0.72rem;
+  }
+
+  /* ══ PALAVRA DO PASTOR: horizontal card ══ */
   .palavra-preview-card {
     flex-direction: row;
     align-items: stretch;
-    min-height: 110px;
+    min-height: 105px;
   }
 
   .palavra-preview-img {
-    width: 130px;
-    min-width: 130px;
+    width: 120px;
+    min-width: 120px;
     flex-shrink: 0;
     aspect-ratio: auto;
     height: auto;
@@ -2982,20 +2996,20 @@ textarea {
   }
 
   .palavra-preview-placeholder {
-    min-height: 110px;
-    font-size: 1.8rem;
+    min-height: 105px;
+    font-size: 1.6rem;
   }
 
   .palavra-preview-body {
-    padding: 0.85rem 0.9rem !important;
+    padding: 0.75rem 0.85rem !important;
     flex: 1;
     min-width: 0;
   }
 
   .palavra-preview-title {
-    font-size: 0.88rem !important;
+    font-size: 0.85rem !important;
     -webkit-line-clamp: 3;
-    margin-bottom: 0.4rem;
+    margin-bottom: 0.35rem;
   }
 
   .palavra-preview-excerpt {
@@ -3003,26 +3017,32 @@ textarea {
   }
 
   .palavra-type-badge {
-    font-size: 0.62rem;
-    padding: 0.15rem 0.45rem;
-    top: 0.5rem;
-    left: 0.5rem;
+    font-size: 0.6rem;
+    padding: 0.12rem 0.4rem;
+    top: 0.4rem;
+    left: 0.4rem;
   }
 
-  /* ── Podcast: card horizontal ── */
+  .palavra-preview-meta {
+    font-size: 0.72rem;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+
+  /* ══ PODCAST: horizontal card ══ */
   .podcast-card {
     flex-direction: row;
     align-items: stretch;
-    min-height: 110px;
+    min-height: 105px;
   }
 
   .podcast-thumb-wrap {
-    width: 130px;
-    min-width: 130px;
+    width: 120px;
+    min-width: 120px;
     flex-shrink: 0;
     aspect-ratio: auto;
     height: auto;
-    min-height: 110px;
+    min-height: 105px;
   }
 
   .podcast-thumb-wrap::before {
@@ -3030,25 +3050,25 @@ textarea {
   }
 
   .podcast-play-overlay {
-    background: rgba(0, 0, 0, 0.18);
+    background: rgba(0, 0, 0, 0.2);
     opacity: 1;
   }
 
   .podcast-play-btn {
-    width: 34px;
-    height: 34px;
-    font-size: 0.85rem;
+    width: 32px;
+    height: 32px;
+    font-size: 0.8rem;
     box-shadow: none;
   }
 
   .podcast-card-body {
-    padding: 0.85rem 0.9rem !important;
+    padding: 0.75rem 0.85rem !important;
     flex: 1;
     min-width: 0;
   }
 
   .podcast-card-title {
-    font-size: 0.88rem !important;
+    font-size: 0.85rem !important;
     -webkit-line-clamp: 3;
   }
 
@@ -3056,16 +3076,233 @@ textarea {
     display: none !important;
   }
 
-  /* ── Eventos: banner menos alto ── */
-  .evento-banner {
-    height: 145px !important;
+  .podcast-card-meta {
+    font-size: 0.7rem;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.2rem;
   }
 
-  /* ── Reduzir gutter Bootstrap em seções de cards ── */
+  /* ══ CULTOS: card compacto 2-col ══ */
+  .service-time-card {
+    padding: 1.1rem 0.75rem;
+    text-align: center;
+  }
+
+  .service-time-icon {
+    width: 44px;
+    height: 44px;
+    font-size: 1.1rem;
+    margin: 0 auto 0.6rem;
+  }
+
+  .service-time-card h4 {
+    font-size: 0.88rem;
+    margin-bottom: 0.2rem;
+  }
+
+  .service-hour {
+    font-size: 1.35rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .service-time-card .text-muted-section {
+    font-size: 0.78rem;
+    line-height: 1.4;
+  }
+
+  .service-time-card .small {
+    font-size: 0.72rem !important;
+  }
+
+  /* Libras banner compacto */
+  .libras-banner {
+    gap: 0.75rem;
+    padding: 0.9rem 1rem;
+    flex-wrap: nowrap;
+    align-items: flex-start;
+  }
+
+  .libras-banner-icon {
+    width: 38px;
+    height: 38px;
+    font-size: 1rem;
+    flex-shrink: 0;
+  }
+
+  .libras-banner-title {
+    font-size: 0.88rem;
+  }
+
+  .libras-banner-text {
+    font-size: 0.78rem;
+  }
+
+  .libras-banner-badge {
+    display: none;
+  }
+
+  /* ══ CONTATO: cards compactos ══ */
+  .contact-card {
+    padding: 1.1rem 0.75rem;
+    text-align: center;
+  }
+
+  .contact-icon {
+    width: 44px;
+    height: 44px;
+    font-size: 1.1rem;
+    margin: 0 auto 0.55rem;
+  }
+
+  .contact-card h5 {
+    font-size: 0.85rem;
+    margin-bottom: 0.2rem;
+  }
+
+  .contact-card p {
+    font-size: 0.78rem;
+    line-height: 1.4;
+    margin: 0;
+  }
+
+  /* ══ DEPOIMENTOS: compactar ══ */
+  .testimonial-card {
+    padding: 1rem 0.9rem;
+    gap: 0.6rem;
+  }
+
+  .testimonial-quote-icon {
+    font-size: 1.2rem;
+  }
+
+  .testimonial-text {
+    font-size: 0.83rem;
+    line-height: 1.65;
+    -webkit-line-clamp: 5;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .testimonial-stars {
+    font-size: 0.7rem;
+    gap: 0.15rem;
+  }
+
+  .testimonial-author {
+    padding-top: 0.65rem;
+    gap: 0.6rem;
+  }
+
+  .testimonial-avatar {
+    width: 34px;
+    height: 34px;
+    font-size: 0.68rem;
+  }
+
+  .testimonial-name {
+    font-size: 0.8rem;
+  }
+
+  .testimonial-role {
+    font-size: 0.7rem;
+  }
+
+  /* ══ EVENTOS: banner reduzido ══ */
+  .evento-banner {
+    height: 140px !important;
+  }
+
+  /* ══ FOOTER: centralizado ══ */
+  .footer-shell {
+    padding: 1.5rem 1rem;
+    border-radius: 16px;
+  }
+
+  .footer-shell .row {
+    text-align: center;
+  }
+
+  .footer-brand-block {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 0.6rem;
+  }
+
+  .footer-logo-image {
+    width: 64px;
+    height: 64px;
+    border-radius: 12px;
+    margin: 0 auto;
+  }
+
+  .footer-shell h5,
+  .footer-address,
+  .footer-links h6 {
+    text-align: center;
+  }
+
+  .footer-address {
+    font-size: 0.8rem;
+    text-align: center;
+  }
+
+  .footer-address p {
+    justify-content: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.1rem;
+  }
+
+  .footer-map {
+    margin-top: 0.75rem;
+  }
+
+  .footer-map iframe {
+    height: 110px;
+    border-radius: 8px;
+  }
+
+  .footer-links ul {
+    padding: 0;
+    list-style: none;
+    margin: 0 auto;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.1rem 1.25rem;
+  }
+
+  .footer-links li {
+    margin: 0;
+  }
+
+  .footer-links a {
+    font-size: 0.82rem;
+  }
+
+  .footer-social-block {
+    text-align: center;
+  }
+
+  .social-links {
+    justify-content: center;
+  }
+
+  .footer-copy {
+    text-align: center !important;
+  }
+
+  /* ══ Gutter por seção ══ */
   #ministerios .row,
   #palavra-preview .row,
-  #podcast-preview .row {
-    --bs-gutter-x: 0.85rem;
-    --bs-gutter-y: 0.85rem;
+  #podcast-preview .row,
+  #cultos .row,
+  #contato .row {
+    --bs-gutter-x: 0.75rem;
+    --bs-gutter-y: 0.75rem;
   }
 }
