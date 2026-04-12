@@ -77,7 +77,22 @@ using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<BatistaFloramarDbContext>();
     if (databaseUrl != null)
+    {
         await db.Database.EnsureCreatedAsync();
+        // Cria tabelas novas que EnsureCreated não adiciona em bancos já existentes
+        await db.Database.ExecuteSqlRawAsync(@"
+            CREATE TABLE IF NOT EXISTS ""EventosSemanais"" (
+                ""Id"" SERIAL PRIMARY KEY,
+                ""Titulo"" VARCHAR(200) NOT NULL,
+                ""DiaSemana"" VARCHAR(20) NOT NULL,
+                ""Horario"" VARCHAR(30) NOT NULL,
+                ""Descricao"" VARCHAR(500),
+                ""Ativo"" BOOLEAN NOT NULL DEFAULT TRUE,
+                ""Ordem"" INTEGER NOT NULL DEFAULT 0,
+                ""DataCriacao"" TIMESTAMP NOT NULL
+            )
+        ");
+    }
     else
         await db.Database.MigrateAsync();
 }
