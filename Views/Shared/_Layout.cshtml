@@ -186,6 +186,131 @@
         })();
     </script>
     @await RenderSectionAsync("Scripts", required: false)
+
+    <!-- Aviso Ao Vivo -->
+    <div id="aovivo-banner" style="display:none;" role="alert" aria-live="polite">
+        <span class="aovivo-pulse"></span>
+        <span class="aovivo-texto">Estamos ao vivo agora</span>
+        <a id="aovivo-btn" href="https://www.youtube.com/@@igrejabatistafloramar" target="_blank" rel="noopener noreferrer" class="aovivo-assistir">
+            <i class="fas fa-play me-1"></i>Assistir ao vivo
+        </a>
+        <button class="aovivo-fechar" id="aovivo-fechar" aria-label="Fechar aviso">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    <style>
+        #aovivo-banner {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            gap: .75rem;
+            background: #1a1a2e;
+            border: 1px solid rgba(230,193,90,.3);
+            border-left: 4px solid #e53e3e;
+            border-radius: 12px;
+            padding: .75rem 1.1rem;
+            box-shadow: 0 8px 32px rgba(0,0,0,.55);
+            max-width: 340px;
+            animation: aovivo-slide-in .4s ease;
+        }
+        @@keyframes aovivo-slide-in {
+            from { opacity: 0; transform: translateY(20px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .aovivo-pulse {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #e53e3e;
+            flex-shrink: 0;
+            animation: aovivo-pulsar 1.4s ease-in-out infinite;
+        }
+        @@keyframes aovivo-pulsar {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(229,62,62,.6); }
+            50%       { box-shadow: 0 0 0 8px rgba(229,62,62,0); }
+        }
+        .aovivo-texto {
+            color: #fff;
+            font-size: .9rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        .aovivo-assistir {
+            background: linear-gradient(135deg, #E6C15A, #c9a63c);
+            color: #1a1a1a;
+            font-size: .82rem;
+            font-weight: 700;
+            padding: .38rem .9rem;
+            border-radius: 20px;
+            text-decoration: none;
+            white-space: nowrap;
+            transition: opacity .2s;
+        }
+        .aovivo-assistir:hover { opacity: .88; color: #1a1a1a; }
+        .aovivo-fechar {
+            background: none;
+            border: none;
+            color: #888;
+            cursor: pointer;
+            padding: 0 0 0 .25rem;
+            font-size: .9rem;
+            line-height: 1;
+            flex-shrink: 0;
+        }
+        .aovivo-fechar:hover { color: #fff; }
+        @@media (max-width: 575.98px) {
+            #aovivo-banner {
+                bottom: 16px;
+                right: 12px;
+                left: 12px;
+                max-width: none;
+                border-radius: 10px;
+            }
+            .aovivo-texto { font-size: .82rem; }
+        }
+    </style>
+    <script>
+        (function () {
+            const YOUTUBE_URL = 'https://www.youtube.com/@@igrejabatistafloramar';
+            document.getElementById('aovivo-btn').href = YOUTUBE_URL;
+
+            function estaAoVivo() {
+                // Horário do Brasil: UTC-3
+                const agora = new Date();
+                const offsetBrasil = -3 * 60; // minutos
+                const utcMs = agora.getTime() + agora.getTimezoneOffset() * 60000;
+                const brasilDate = new Date(utcMs + offsetBrasil * 60000);
+
+                const dia = brasilDate.getDay();    // 0=Dom, 3=Qua
+                const h   = brasilDate.getHours();
+                const m   = brasilDate.getMinutes();
+                const hm  = h * 60 + m;             // minutos desde meia-noite
+
+                // Domingo 10:00 – 12:00
+                if (dia === 0 && hm >= 600 && hm < 720) return true;
+                // Quarta 20:00 – 21:15
+                if (dia === 3 && hm >= 1200 && hm < 1275) return true;
+                return false;
+            }
+
+            function mostrarBanner() {
+                if (estaAoVivo()) {
+                    document.getElementById('aovivo-banner').style.display = 'flex';
+                }
+            }
+
+            document.getElementById('aovivo-fechar').addEventListener('click', function () {
+                document.getElementById('aovivo-banner').style.display = 'none';
+            });
+
+            mostrarBanner();
+            // Verifica a cada minuto (para caso a página fique aberta)
+            setInterval(mostrarBanner, 60000);
+        })();
+    </script>
 </body>
 </html>
 
