@@ -19,7 +19,7 @@
             <div class="col-6 col-md-4">
                 <div class="service-time-card" style="position:relative;">
                     <span class="badge-libras-card">
-                        <i class="fas fa-hands me-1"></i>LIBRAS
+                        <i class="fas fa-hands"></i><span class="badge-libras-texto"> LIBRAS</span>
                     </span>
                     <div class="service-time-icon">
                         <i class="fas fa-moon"></i>
@@ -114,6 +114,16 @@
         color: var(--text-muted, #aaa);
         font-size: .92rem;
         line-height: 1.5;
+    }
+
+    @media (max-width: 575.98px) {
+        .badge-libras-card {
+            padding: 5px 7px;
+            font-size: .65rem;
+        }
+        .badge-libras-texto {
+            display: none;
+        }
     }
 
     .libras-banner-badge {
