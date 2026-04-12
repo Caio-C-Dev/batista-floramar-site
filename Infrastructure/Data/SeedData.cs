@@ -139,16 +139,15 @@ namespace BatistaFloramar.Infrastructure.Data
             if (await db.EventosSemanais.AnyAsync()) return;
 
             db.EventosSemanais.AddRange(
-                new EventoSemanal { DiaSemana = "Segunda",  Titulo = "Seminário Teológico",          Horario = "19h30", Descricao = "Estudo aprofundado da Palavra para discipulado e formação teólógica.",    Ativo = true, Ordem = 1 },
-                new EventoSemanal { DiaSemana = "Terça",    Titulo = "Oração da Manhã",              Horario = "07h",   Descricao = "Momento de intercessão coletiva para começar a semana na presença de Deus.", Ativo = true, Ordem = 1 },
-                new EventoSemanal { DiaSemana = "Terça",    Titulo = "Células de Discípulos",          Horario = "20h",   Descricao = "Grupos de discípulos ao redor da cidade para crescer juntos na fé.",        Ativo = true, Ordem = 2 },
-                new EventoSemanal { DiaSemana = "Quarta",   Titulo = "Culto de Família",              Horario = "20h",   Descricao = "Culto de oração em família com louvor compartilhado.",                        Ativo = true, Ordem = 1 },
-                new EventoSemanal { DiaSemana = "Sexta",    Titulo = "Culto de Jovens",              Horario = "20h",   Descricao = "Espaço vibrante de crescimento espiritual e conexão para os jovens.",       Ativo = true, Ordem = 1 },
-                new EventoSemanal { DiaSemana = "Sábado",   Titulo = "Bazar Solidário",              Horario = "09h",   Descricao = "Bazar beneficente com peças de roupas, calçados e objetos.",                 Ativo = false, Ordem = 1 },
-                new EventoSemanal { DiaSemana = "Sábado",   Titulo = "Futebol",                      Horario = "17h30", Descricao = "Confraternização e integração através do esporte.",                            Ativo = true, Ordem = 2 },
-                new EventoSemanal { DiaSemana = "Sábado",   Titulo = "Curso de Libras",              Horario = "09h",   Descricao = "Curso de Língua Brasileira de Sinais para membros e amigos da comunidade.",  Ativo = true, Ordem = 3 },
-                new EventoSemanal { DiaSemana = "Domingo",  Titulo = "Culto da Manhã",               Horario = "10h",   Descricao = "Culto de adoração com louvor e estudo bíblico.",                             Ativo = true, Ordem = 1 },
-                new EventoSemanal { DiaSemana = "Domingo",  Titulo = "Culto da Noite + Libras",    Horario = "18h",   Descricao = "Culto de aprofundamento com intérprete de Libras presente.",                Ativo = true, Ordem = 2 }
+                new EventoSemanal { DiaSemana = "Segunda",  Titulo = "Seminário Teológico",   Horario = "19h30", Descricao = "Estudo aprofundado da Palavra para discipulado e formação teológica.",              Ativo = true, Ordem = 1 },
+                new EventoSemanal { DiaSemana = "Terça",    Titulo = "Oração da Manhã",       Horario = "20h",   Descricao = "Momento de intercessão coletiva na presença de Deus.",                            Ativo = true, Ordem = 1 },
+                new EventoSemanal { DiaSemana = "Quarta",   Titulo = "Culto de Família",      Horario = "20h",   Descricao = "Culto de oração em família com louvor compartilhado.",                             Ativo = true, Ordem = 1 },
+                new EventoSemanal { DiaSemana = "Sexta",    Titulo = "Culto de Jovens",       Horario = "20h",   Descricao = "Espaço vibrante de crescimento espiritual e conexão para os jovens.",              Ativo = true, Ordem = 1 },
+                new EventoSemanal { DiaSemana = "Sábado",   Titulo = "Bazar Solidário",       Horario = "09h",   Descricao = "Bazar beneficente com peças de roupas, calçados e objetos.",                      Ativo = true, Ordem = 1 },
+                new EventoSemanal { DiaSemana = "Sábado",   Titulo = "Curso de Libras",       Horario = "17h",   Descricao = "Curso de Língua Brasileira de Sinais para membros e amigos da comunidade.",       Ativo = true, Ordem = 2 },
+                new EventoSemanal { DiaSemana = "Sábado",   Titulo = "Futebol",               Horario = "17h30", Descricao = "Confraternização e integração através do esporte.",                                 Ativo = true, Ordem = 3 },
+                new EventoSemanal { DiaSemana = "Domingo",  Titulo = "Culto da Manhã",        Horario = "10h",   Descricao = "Culto de adoração com louvor e estudo bíblico.",                                   Ativo = true, Ordem = 1 },
+                new EventoSemanal { DiaSemana = "Domingo",  Titulo = "Culto da Noite",        Horario = "18h",   Descricao = "Culto de aprofundamento com intérprete de Libras presente.",                      Ativo = true, Ordem = 2 }
             );
             await db.SaveChangesAsync();
         }
