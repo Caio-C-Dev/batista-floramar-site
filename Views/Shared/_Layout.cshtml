@@ -290,7 +290,7 @@
                 const hm  = h * 60 + m;             // minutos desde meia-noite
 
                 // Domingo 10:00 – 12:00
-                if (dia === 0 && hm >= 600 && hm < 1020) return true;
+                if (dia === 0 && hm >= 600 && hm < 720) return true;
                 // Quarta 20:00 – 21:15
                 if (dia === 3 && hm >= 1200 && hm < 1275) return true;
                 return false;
