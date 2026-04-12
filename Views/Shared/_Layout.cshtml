@@ -184,6 +184,17 @@
             }, { threshold: 0.12 });
             document.querySelectorAll('.scroll-reveal').forEach(el => observer.observe(el));
         })();
+
+        // Navbar scroll-shrink
+        (function () {
+            const navbar = document.querySelector('.main-navbar');
+            if (!navbar) return;
+            function onScroll() {
+                navbar.classList.toggle('scrolled', window.scrollY > 40);
+            }
+            window.addEventListener('scroll', onScroll, { passive: true });
+            onScroll();
+        })();
     </script>
     @await RenderSectionAsync("Scripts", required: false)
 
