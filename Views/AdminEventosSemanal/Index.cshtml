@@ -1,0 +1,85 @@
+@model List<BatistaFloramar.Domain.Entities.EventoSemanal>
+@{
+    Layout = "_AdminLayout";
+    ViewBag.Title = "Agenda Semanal";
+    ViewBag.AdminSection = "eventos-semanais";
+    var agrupados = ViewBag.Agrupados as IEnumerable<dynamic>;
+}
+
+@section TopbarActions {
+    <a href="@Url.Action("Novo")" class="btn-admin btn-admin-success">
+        <i class="fas fa-plus"></i> Novo Evento
+    </a>
+}
+
+@if (!Model.Any())
+{
+    <div class="admin-card empty-state">
+        <i class="fas fa-calendar-week"></i>
+        <p>Nenhum evento semanal cadastrado ainda.</p>
+        <a href="@Url.Action("Novo")" class="btn-admin btn-admin-success">
+            <i class="fas fa-plus"></i> Criar primeiro evento
+        </a>
+    </div>
+}
+else
+{
+    <div class="admin-card">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Dia</th>
+                    <th>Título</th>
+                    <th>Horário</th>
+                    <th>Descrição</th>
+                    <th>Ordem</th>
+                    <th>Status</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var ev in Model.OrderBy(e => Array.IndexOf(new[]{"Segunda","Terça","Quarta","Quinta","Sexta","Sábado","Domingo"}, e.DiaSemana)).ThenBy(e => e.Ordem))
+                {
+                    <tr style="@(!ev.Ativo ? "opacity:0.55;" : "")">
+                        <td>
+                            <span style="background:rgba(230,193,90,.15);color:var(--admin-accent);border:1px solid rgba(230,193,90,.3);border-radius:6px;padding:.2rem .6rem;font-size:.78rem;font-weight:700;white-space:nowrap;">
+                                @ev.DiaSemana
+                            </span>
+                        </td>
+                        <td><strong style="color:var(--admin-text);">@ev.Titulo</strong></td>
+                        <td style="color:var(--admin-accent);font-weight:600;">@ev.Horario</td>
+                        <td style="color:var(--admin-text-muted);font-size:.85rem;max-width:220px;">
+                            @(ev.Descricao != null && ev.Descricao.Length > 70 ? ev.Descricao.Substring(0, 70) + "…" : ev.Descricao)
+                        </td>
+                        <td style="color:var(--admin-text-muted);">@ev.Ordem</td>
+                        <td>
+                            <form method="post" action="@Url.Action("ToggleAtivo")" style="display:inline;">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@ev.Id" />
+                                <button type="submit"
+                                        style="background:@(ev.Ativo ? "rgba(37,162,90,.2)" : "rgba(120,120,120,.2)");color:@(ev.Ativo ? "#25a25a" : "#888");border:1px solid @(ev.Ativo ? "rgba(37,162,90,.4)" : "rgba(120,120,120,.3)");border-radius:20px;padding:.2rem .7rem;font-size:.75rem;font-weight:700;cursor:pointer;letter-spacing:.04em;">
+                                    @(ev.Ativo ? "Ativo" : "Inativo")
+                                </button>
+                            </form>
+                        </td>
+                        <td>
+                            <div class="d-flex gap-2">
+                                <a href="@Url.Action("Editar", new { id = ev.Id })" class="btn-admin" style="padding:.3rem .75rem;font-size:.8rem;">
+                                    <i class="fas fa-pen"></i>
+                                </a>
+                                <form method="post" action="@Url.Action("Excluir")"
+                                      onsubmit="return confirm('Remover evento «@Html.Raw(ev.Titulo.Replace("'","\'"))»?')">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@ev.Id" />
+                                    <button type="submit" class="btn-admin" style="padding:.3rem .75rem;font-size:.8rem;background:rgba(200,50,50,.15);color:#e06060;border-color:rgba(200,50,50,.3);">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

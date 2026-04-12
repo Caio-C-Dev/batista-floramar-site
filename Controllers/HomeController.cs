@@ -47,6 +47,10 @@ namespace BatistaFloramar.Controllers
                 .Where(c => c.Ativo)
                 .OrderBy(c => c.Ordem)
                 .ToListAsync();
+            ViewBag.EventosSemanais = await _db.EventosSemanais
+                .Where(e => e.Ativo)
+                .OrderBy(e => e.Ordem)
+                .ToListAsync();
             ViewBag.MpPublicKey = _config["MercadoPago:PublicKey"] ?? "";
             return View();
         }

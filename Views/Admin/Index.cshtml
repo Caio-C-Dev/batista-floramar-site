@@ -71,6 +71,17 @@
             </div>
         </a>
     </div>
+    <div class="col-sm-6 col-xl-3">
+        <a href="@Url.Action("Index","AdminEventosSemanal")" class="text-decoration-none">
+            <div class="admin-stat-card">
+                <div class="admin-stat-icon"><i class="fas fa-calendar-week"></i></div>
+                <div class="admin-stat-info">
+                    <h2>@ViewBag.TotalEventosSemanais</h2>
+                    <p>Eventos semanais</p>
+                </div>
+            </div>
+        </a>
+    </div>
 </div>
 
 <div class="row g-3">
@@ -83,6 +94,7 @@
                 <a href="@Url.Action("Create","AdminPodcasts")" class="btn-admin"><i class="fas fa-plus"></i> Novo Podcast</a>
                 <a href="@Url.Action("Nova","AdminSeries")" class="btn-admin"><i class="fas fa-plus"></i> Nova Série</a>
                 <a href="@Url.Action("Nova","AdminPalavra")" class="btn-admin"><i class="fas fa-plus"></i> Nova Palavra do Pastor</a>
+                <a href="@Url.Action("Novo","AdminEventosSemanal")" class="btn-admin"><i class="fas fa-plus"></i> Novo Evento Semanal</a>
             </div>
         </div>
     </div>

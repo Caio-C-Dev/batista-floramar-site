@@ -28,6 +28,7 @@ namespace BatistaFloramar.Controllers
             ViewBag.TotalMensagens = await _db.PerguntasPastor.CountAsync();
             ViewBag.TotalSeries = await _db.SeriesMensagens.CountAsync(s => s.Ativo);
             ViewBag.TotalPalavras = await _db.PalavrasDoPastor.CountAsync(p => p.Publicado);
+            ViewBag.TotalEventosSemanais = await _db.EventosSemanais.CountAsync(e => e.Ativo);
             return View();
         }
 

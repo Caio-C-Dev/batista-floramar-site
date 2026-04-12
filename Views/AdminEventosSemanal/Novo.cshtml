@@ -1,0 +1,81 @@
+@model BatistaFloramar.Domain.Entities.EventoSemanal
+@{
+    Layout = "_AdminLayout";
+    ViewBag.Title = "Novo Evento Semanal";
+    ViewBag.AdminSection = "eventos-semanais";
+    var dias = ViewBag.Dias as string[];
+}
+
+<div class="admin-card" style="max-width:680px;">
+    <form method="post" action="@Url.Action("Novo")">
+        @Html.AntiForgeryToken()
+
+        <div class="row g-3 mb-4">
+            <div class="col-md-8">
+                <label class="form-label">Título do Evento *</label>
+                <input type="text" name="Titulo" value="@Model.Titulo"
+                       class="form-control" placeholder="Ex: Seminário Teológico" required />
+                @if (ViewData.ModelState["Titulo"]?.Errors.Count > 0)
+                {
+                    <div class="text-danger small mt-1">@ViewData.ModelState["Titulo"]!.Errors[0].ErrorMessage</div>
+                }
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Horário *</label>
+                <input type="text" name="Horario" value="@Model.Horario"
+                       class="form-control" placeholder="Ex: 19h30" required />
+                @if (ViewData.ModelState["Horario"]?.Errors.Count > 0)
+                {
+                    <div class="text-danger small mt-1">@ViewData.ModelState["Horario"]!.Errors[0].ErrorMessage</div>
+                }
+            </div>
+        </div>
+
+        <div class="row g-3 mb-4">
+            <div class="col-md-6">
+                <label class="form-label">Dia da Semana *</label>
+                <select name="DiaSemana" class="form-control" required>
+                    <option value="">— Selecione —</option>
+                    @foreach (var dia in dias!)
+                    {
+                        var displayDia = (dia == "Sábado" || dia == "Domingo") ? dia : dia + "-feira";
+                        <option value="@dia" selected="@(Model.DiaSemana == dia)">@displayDia</option>
+                    }
+                </select>
+                @if (ViewData.ModelState["DiaSemana"]?.Errors.Count > 0)
+                {
+                    <div class="text-danger small mt-1">@ViewData.ModelState["DiaSemana"]!.Errors[0].ErrorMessage</div>
+                }
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Ordem</label>
+                <input type="number" name="Ordem" value="@Model.Ordem"
+                       class="form-control" min="0" />
+                <div class="form-text" style="color:var(--admin-text-muted);">Para ordenar dentro do mesmo dia.</div>
+            </div>
+            <div class="col-md-3 d-flex align-items-center pt-4">
+                <div class="form-check" style="margin-top:.5rem;">
+                    <input type="checkbox" name="Ativo" value="true" id="ativo"
+                           class="form-check-input" @(Model.Ativo ? "checked" : "") />
+                    <input type="hidden" name="Ativo" value="false" />
+                    <label class="form-check-label" for="ativo" style="color:var(--admin-text);">Ativo</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="mb-4">
+            <label class="form-label">Descrição</label>
+            <textarea name="Descricao" rows="3" class="form-control"
+                      placeholder="Breve descrição do evento...">@Model.Descricao</textarea>
+        </div>
+
+        <div class="d-flex gap-3">
+            <button type="submit" class="btn-admin btn-admin-success">
+                <i class="fas fa-save me-1"></i> Salvar
+            </button>
+            <a href="@Url.Action("Index")" class="btn-admin btn-admin-outline" style="color:var(--admin-text);">
+                Cancelar
+            </a>
+        </div>
+    </form>
+</div>

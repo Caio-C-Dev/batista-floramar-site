@@ -21,6 +21,7 @@ namespace BatistaFloramar.Infrastructure.Data
         public DbSet<Evento> Eventos => Set<Evento>();
         public DbSet<PalavraDoPastor> PalavrasDoPastor => Set<PalavraDoPastor>();
         public DbSet<SerieMensagem> SeriesMensagens => Set<SerieMensagem>();
+        public DbSet<EventoSemanal> EventosSemanais => Set<EventoSemanal>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -147,6 +148,16 @@ namespace BatistaFloramar.Infrastructure.Data
                 e.Property(x => x.PlaylistId).HasMaxLength(100).IsRequired();
                 e.Property(x => x.Descricao).HasMaxLength(1000);
                 e.Property(x => x.ImagemCapa).HasMaxLength(500);
+            });
+
+            modelBuilder.Entity<EventoSemanal>(e =>
+            {
+                e.ToTable("EventosSemanais");
+                e.HasKey(x => x.Id);
+                e.Property(x => x.Titulo).HasMaxLength(200).IsRequired();
+                e.Property(x => x.DiaSemana).HasMaxLength(20).IsRequired();
+                e.Property(x => x.Horario).HasMaxLength(30).IsRequired();
+                e.Property(x => x.Descricao).HasMaxLength(500);
             });
         }
     }
