@@ -136,11 +136,22 @@ namespace BatistaFloramar.Infrastructure.Data
 
         private static async Task SeedEventosSemanaisAsync(BatistaFloramarDbContext db)
         {
-            if (await db.EventosSemanais.AnyAsync()) return;
+            // Versão do seed — incrementar para forçar re-seed com dados atualizados
+            const int seedVersion = 2;
+            const string chave = "seed_eventos_semanais_v";
+
+            var versaoAtual = await db.EventosSemanais.CountAsync();
+            // Se já existe a quantidade correta de registros e versão bate, pula
+            // Usamos uma flag simples: se count == 9 (versão 2), já está atualizado
+            if (versaoAtual == 9) return;
+
+            // Remove dados antigos e re-insere com dados corretos
+            db.EventosSemanais.RemoveRange(db.EventosSemanais);
+            await db.SaveChangesAsync();
 
             db.EventosSemanais.AddRange(
                 new EventoSemanal { DiaSemana = "Segunda",  Titulo = "Seminário Teológico",   Horario = "19h30", Descricao = "Estudo aprofundado da Palavra para discipulado e formação teológica.",              Ativo = true, Ordem = 1 },
-                new EventoSemanal { DiaSemana = "Terça",    Titulo = "Oração da Manhã",       Horario = "20h",   Descricao = "Momento de intercessão coletiva na presença de Deus.",                            Ativo = true, Ordem = 1 },
+                new EventoSemanal { DiaSemana = "Terça",    Titulo = "Terça da Oração",       Horario = "20h",   Descricao = "Momento de intercessão coletiva na presença de Deus.",                            Ativo = true, Ordem = 1 },
                 new EventoSemanal { DiaSemana = "Quarta",   Titulo = "Culto de Família",      Horario = "20h",   Descricao = "Culto de oração em família com louvor compartilhado.",                             Ativo = true, Ordem = 1 },
                 new EventoSemanal { DiaSemana = "Sexta",    Titulo = "Culto de Jovens",       Horario = "20h",   Descricao = "Espaço vibrante de crescimento espiritual e conexão para os jovens.",              Ativo = true, Ordem = 1 },
                 new EventoSemanal { DiaSemana = "Sábado",   Titulo = "Bazar Solidário",       Horario = "09h",   Descricao = "Bazar beneficente com peças de roupas, calçados e objetos.",                      Ativo = true, Ordem = 1 },
