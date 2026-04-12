@@ -124,7 +124,10 @@
                         <button type="button" class="btn btn-outline-secondary btn-sm mb-3" onclick="voltarParaValor()">
                             <i class="fas fa-arrow-left me-1"></i> Alterar valor
                         </button>
-                        <div id="cardPaymentBrick_container"></div>
+                        <div id="brickLoading" class="text-center py-4">
+                            <span class="spinner-border spinner-border-sm me-2"></span>Carregando formulário...
+                        </div>
+                        <div id="cardPaymentBrick_container" style="min-height:300px;"></div>
                         <div id="paymentResult" class="mt-3 d-none"></div>
                     </div>
                 </div>
@@ -234,11 +237,16 @@
         }
 
         showStep(2);
+        document.getElementById('brickLoading').style.display = 'block';
+        document.getElementById('cardPaymentBrick_container').innerHTML = '';
 
         if (brickController) {
             brickController.unmount();
             brickController = null;
         }
+
+        // Aguarda modal renderizar completamente antes de criar o brick
+        await new Promise(resolve => setTimeout(resolve, 300));
 
         const settings = {
             initialization: {
@@ -253,7 +261,9 @@
                 }
             },
             callbacks: {
-                onReady: () => {},
+                onReady: () => {
+                    document.getElementById('brickLoading').style.display = 'none';
+                },
                 onSubmit: (formData) => {
                     return new Promise(async (resolve, reject) => {
                         try {
@@ -282,6 +292,8 @@
                 },
                 onError: (error) => {
                     console.error('MP Brick error:', error);
+                    document.getElementById('brickLoading').style.display = 'none';
+                    mostrarResultado(false, 'Erro ao carregar formulário de cartão. Verifique sua conexão e tente novamente.');
                 }
             }
         };
@@ -289,8 +301,9 @@
         try {
             brickController = await mp.bricks().create('cardPayment', 'cardPaymentBrick_container', settings);
         } catch (e) {
-            showStep(1);
-            alert('Não foi possível carregar o formulário de cartão. Verifique sua conexão.');
+            console.error('Brick create error:', e);
+            document.getElementById('brickLoading').style.display = 'none';
+            mostrarResultado(false, 'Não foi possível carregar o formulário de cartão. Tente novamente ou use o PIX.');
         }
     }
 
