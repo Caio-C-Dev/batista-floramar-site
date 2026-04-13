@@ -64,7 +64,7 @@
 
     .min-carousel-track {
         display: flex;
-        gap: 1rem;
+        gap: 6px;
         overflow-x: hidden;
         padding: 0.75rem 0.5rem 1.25rem;
     }
@@ -197,42 +197,69 @@
     const N = origSlides.length;
     if (N === 0) return;
 
-    /* ── Clone slides: [last→0 copies before] + [real] + [0→last copies after] ── */
+    /* ── Clone for infinite loop ── */
     origSlides.forEach(s => {
-        const c = s.cloneNode(true);
-        c.dataset.clone = 'after';
-        track.appendChild(c);
+        const c = s.cloneNode(true); c.dataset.clone = 'after'; track.appendChild(c);
     });
     [...origSlides].reverse().forEach(s => {
-        const c = s.cloneNode(true);
-        c.dataset.clone = 'before';
-        track.prepend(c);
+        const c = s.cloneNode(true); c.dataset.clone = 'before'; track.prepend(c);
     });
 
-    /* ── Helpers ── */
-    function gap() {
-        return parseFloat(getComputedStyle(track).gap) || 16;
-    }
-    function sw() {
+    /* ── Metrics ── */
+    function slideWidth() {
         const s = track.querySelector('.min-carousel-slide');
-        return s ? s.offsetWidth + gap() : 191;
+        const g = parseFloat(getComputedStyle(track).gap) || 6;
+        return s ? s.offsetWidth + g : 181;
     }
-    function absOffset() {
-        return Math.round(track.scrollLeft / sw());
-    }
-    function realIdx() {
-        return ((absOffset() - N) % N + N) % N;
+    function absOffset() { return Math.round(track.scrollLeft / slideWidth()); }
+    function realIdx()   { return ((absOffset() - N) % N + N) % N; }
+
+    /* ── Custom animation (ease-out cubic, 650ms) ── */
+    let isAnimating = false;
+    let cooldown    = false;
+    let rafId       = null;
+
+    function animateTo(targetLeft) {
+        if (rafId) cancelAnimationFrame(rafId);
+        isAnimating = true;
+        const startLeft = track.scrollLeft;
+        const dist      = targetLeft - startLeft;
+        if (Math.abs(dist) < 1) { isAnimating = false; return; }
+        const DURATION  = 650;
+        const t0        = performance.now();
+
+        function step(now) {
+            const t  = Math.min((now - t0) / DURATION, 1);
+            const e  = 1 - Math.pow(1 - t, 3); // ease-out cubic
+            track.scrollLeft = startLeft + dist * e;
+            if (t < 1) {
+                rafId = requestAnimationFrame(step);
+            } else {
+                track.scrollLeft = targetLeft;
+                isAnimating = false;
+                rafId = null;
+                /* brief cooldown so mouse-stay doesn’t re-trigger */
+                cooldown = true;
+                setTimeout(() => { cooldown = false; }, 180);
+                /* wrap if in clone zone */
+                const off = absOffset();
+                if (off >= N * 2)      track.scrollLeft = (off - N) * slideWidth();
+                else if (off < N)      track.scrollLeft = (off + N) * slideWidth();
+                updateDots();
+            }
+        }
+        rafId = requestAnimationFrame(step);
     }
 
-    function goTo(absIdx, smooth) {
-        const left = absIdx * sw();
-        track.scrollTo({ left, behavior: smooth ? 'smooth' : 'instant' });
+    function goTo(absIdx) {
+        animateTo(absIdx * slideWidth());
+    }
+    function goToInstant(absIdx) {
+        track.scrollLeft = absIdx * slideWidth();
     }
 
-    /* ── Init: show first real slide ── */
-    function init() {
-        track.scrollTo({ left: N * sw(), behavior: 'instant' });
-    }
+    /* ── Init ── */
+    function init() { goToInstant(N); }
 
     /* ── Dots ── */
     function buildDots() {
@@ -241,7 +268,7 @@
             const d = document.createElement('button');
             d.className = 'min-dot';
             d.setAttribute('aria-label', 'Ministério ' + (i + 1));
-            d.addEventListener('click', () => goTo(N + i, true));
+            d.addEventListener('click', () => { if (!isAnimating) goTo(N + i); });
             dotsEl.appendChild(d);
         }
     }
@@ -251,46 +278,35 @@
              .forEach((d, i) => d.classList.toggle('active', i === ri));
     }
 
-    /* ── Infinite wrap ── */
-    let wrapTimer = null;
-    track.addEventListener('scroll', () => {
-        clearTimeout(wrapTimer);
-        updateDots();
-        wrapTimer = setTimeout(() => {
-            const off = absOffset();
-            if (off >= N * 2) {
-                track.scrollTo({ left: (off - N) * sw(), behavior: 'instant' });
-            } else if (off < N) {
-                track.scrollTo({ left: (off + N) * sw(), behavior: 'instant' });
-            }
-        }, 80);
-    }, { passive: true });
+    /* ── Scroll → update dots only (wrap handled inside animateTo) ── */
+    track.addEventListener('scroll', updateDots, { passive: true });
 
     /* ── Buttons ── */
-    prevBtn.addEventListener('click', () => goTo(absOffset() - 1, true));
-    nextBtn.addEventListener('click', () => goTo(absOffset() + 1, true));
+    prevBtn.addEventListener('click', () => { if (!isAnimating) goTo(absOffset() - 1); });
+    nextBtn.addEventListener('click', () => { if (!isAnimating) goTo(absOffset() + 1); });
 
     /* ── Touch swipe ── */
     let tx = 0;
     track.addEventListener('touchstart', e => { tx = e.touches[0].clientX; }, { passive: true });
     track.addEventListener('touchend', e => {
         const dx = tx - e.changedTouches[0].clientX;
-        if (Math.abs(dx) > 40) goTo(absOffset() + (dx > 0 ? 1 : -1), true);
+        if (Math.abs(dx) > 40 && !isAnimating) goTo(absOffset() + (dx > 0 ? 1 : -1));
     }, { passive: true });
 
     /* ── Keyboard ── */
     document.addEventListener('keydown', e => {
         const r = document.getElementById('ministerios')?.getBoundingClientRect();
         if (!r || r.top > innerHeight || r.bottom < 0) return;
-        if (e.key === 'ArrowLeft')  goTo(absOffset() - 1, true);
-        if (e.key === 'ArrowRight') goTo(absOffset() + 1, true);
+        if (e.key === 'ArrowLeft'  && !isAnimating) goTo(absOffset() - 1);
+        if (e.key === 'ArrowRight' && !isAnimating) goTo(absOffset() + 1);
     });
 
-    /* ── Hover → rotate to that slide ── */
+    /* ── Hover → desliza 1 passo, depois para ── */
     function attachHover() {
         Array.from(track.querySelectorAll('.min-carousel-slide')).forEach((slide, idx) => {
             slide.addEventListener('mouseenter', () => {
-                if (idx !== absOffset()) goTo(idx, true);
+                if (isAnimating || cooldown) return;
+                if (idx !== absOffset()) goTo(idx);
             });
         });
     }
