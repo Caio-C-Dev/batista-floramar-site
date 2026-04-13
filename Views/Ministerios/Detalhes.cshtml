@@ -144,9 +144,10 @@
 
 <div class="modal fade" id="fotoModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" style="width:fit-content;max-width:min(92vw,900px);">
-        <div class="modal-content bg-dark border-0" style="width:fit-content;margin:0 auto;">
-            <div class="modal-body p-2 text-center">
-                <button type="button" class="btn-close btn-close-white float-end m-2" data-bs-dismiss="modal"></button>
+        <div class="modal-content bg-dark border-0" style="width:fit-content;margin:0 auto;position:relative;">
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                style="position:absolute;top:0.6rem;right:0.6rem;z-index:10;"></button>
+            <div class="modal-body p-2 text-center" style="padding-top:2.5rem!important;">
                 <img id="fotoModalImg" src="" alt="" class="rounded-3 d-block" style="max-height:82vh;max-width:min(88vw,860px);width:auto;height:auto;" />
                 <p id="fotoModalLegenda" class="text-secondary mt-2 mb-1"></p>
             </div>
