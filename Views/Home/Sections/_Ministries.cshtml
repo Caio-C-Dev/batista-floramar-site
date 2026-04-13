@@ -254,7 +254,7 @@
 
         /* Speed proportional to distance (in card-widths from center), max 5px/frame */
         var cardsAway = (Math.abs(offset) - half) / step();
-        var speed = Math.min(5, 0.8 + cardsAway * 1.4);
+        var speed = Math.min(10, 1.5 + cardsAway * 2.5);
         track.scrollLeft += offset > 0 ? speed : -speed;
 
         autoRaf = requestAnimationFrame(autoTick);
