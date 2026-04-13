@@ -43,8 +43,8 @@
     <div class="min-carousel-dots" id="minDots" aria-label="Navegacao"></div>
 
     <div class="text-center mt-5">
-        <a href="/Ministerios" class="btn btn-secondary">
-            Ver todos os minist&eacute;rios <i class="fas fa-arrow-right ms-2"></i>
+        <a href="/Ministerios" class="btn btn-outline-gold">
+            <i class="fas fa-hands-praying me-2"></i>Ver todos os minist&eacute;rios
         </a>
     </div>
 </section>
@@ -136,8 +136,6 @@
 <script>
 (function () {
     var track   = document.getElementById('minTrack');
-    var prevBtn = document.getElementById('minPrev');
-    var nextBtn = document.getElementById('minNext');
     var dotsEl  = document.getElementById('minDots');
     if (!track) return;
 
@@ -267,16 +265,23 @@
         snapTo(centeredIdx());
     });
 
-    /* Prev/Next buttons */
-    prevBtn.addEventListener('click', function() { snapTo(centeredIdx() - 1); });
-    nextBtn.addEventListener('click', function() { snapTo(centeredIdx() + 1); });
-
-    /* Touch swipe */
-    var tx = 0;
-    track.addEventListener('touchstart', function(e) { tx = e.touches[0].clientX; stopAuto(); }, { passive: true });
-    track.addEventListener('touchend', function(e) {
-        var dx = tx - e.changedTouches[0].clientX;
-        snapTo(Math.abs(dx) > 40 ? centeredIdx() + (dx > 0 ? 1 : -1) : centeredIdx());
+    /* Touch drag: move freely with finger, snap on release */
+    var tx = 0, startScroll = 0, isDragging = false;
+    track.addEventListener('touchstart', function(e) {
+        tx = e.touches[0].clientX;
+        startScroll = track.scrollLeft;
+        isDragging = true;
+        stopAuto();
+    }, { passive: true });
+    track.addEventListener('touchmove', function(e) {
+        if (!isDragging) return;
+        var dx = tx - e.touches[0].clientX;
+        track.scrollLeft = startScroll + dx;
+        wrapIfNeeded();
+    }, { passive: true });
+    track.addEventListener('touchend', function() {
+        isDragging = false;
+        snapTo(centeredIdx());
     }, { passive: true });
 
     /* Keyboard */
