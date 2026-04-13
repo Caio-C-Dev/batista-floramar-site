@@ -31,16 +31,13 @@
                              : m.Descricao?.Length > 0 ? m.Descricao.Substring(0, Math.Min(90, m.Descricao.Length)) + "…"
                              : "";
                 <div class="min-carousel-slide">
-                    <a href="@(string.IsNullOrEmpty(m.Slug) ? "#" : "/Ministerios/Detalhes/" + m.Slug)" class="text-decoration-none">
-                        <div class="min-card">
-                            <div class="min-card-icon">
-                                <i class="@m.Icone"></i>
-                            </div>
-                            <h5 class="min-card-title">@m.Nome</h5>
-                            <p class="min-card-desc">@resumo</p>
-                            <span class="min-card-cta">Ver mais <i class="fas fa-arrow-right ms-1"></i></span>
+                    <div class="min-card">
+                        <div class="min-card-icon">
+                            <i class="@m.Icone"></i>
                         </div>
-                    </a>
+                        <h5 class="min-card-title">@m.Nome</h5>
+                        <p class="min-card-desc">@resumo</p>
+                    </div>
                 </div>
             }
         </div>
@@ -104,7 +101,7 @@
         flex-direction: column;
         gap: 0.75rem;
         transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
-        cursor: pointer;
+        cursor: default;
     }
     .min-card:hover {
         transform: translateY(-6px);
@@ -143,14 +140,6 @@
         margin: 0;
         flex: 1;
     }
-    .min-card-cta {
-        color: #E6C15A;
-        font-size: 0.82rem;
-        font-weight: 600;
-        opacity: 0;
-        transition: opacity 0.2s ease;
-    }
-    .min-card:hover .min-card-cta { opacity: 1; }
 
     /* ── Nav Buttons ── */
     .min-carousel-btn {
@@ -213,7 +202,6 @@
     @@media (max-width: 767px) {
         .min-carousel-slide { flex: 0 0 calc(50% - 0.75rem); }
         .min-carousel-root { padding: 0 2.5rem; }
-        .min-card-cta { opacity: 1; }
     }
     @@media (max-width: 479px) {
         .min-carousel-slide { flex: 0 0 calc(85% - 0.5rem); }
@@ -295,5 +283,13 @@
     buildDots();
     updateState();
     window.addEventListener('resize', updateState, { passive: true });
+
+    // Hover → gira o carrossel para centralizar o slide
+    slides.forEach((slide, idx) => {
+        slide.addEventListener('mouseenter', () => {
+            const cur = currentIndex();
+            if (idx !== cur) scrollToSlide(idx);
+        });
+    });
 })();
 </script>
