@@ -1,23 +1,23 @@
-﻿@using BatistaFloramar.Domain.Entities
+@using BatistaFloramar.Domain.Entities
 @{
     var ministerios = ViewBag.Ministerios as IEnumerable<Ministerio>;
     var items = ministerios?.Where(m => m.Ativo).OrderBy(m => m.Ordem).ToList()
                 ?? new List<Ministerio> {
-                    new() { Nome="Jovens",    Icone="fas fa-bolt",    Slug="jovens",   ResumoBreve="Culto de Jovens e aÃ§Ãµes de impacto para a juventude." },
-                    new() { Nome="Kids",      Icone="fas fa-child",   Slug="kids",     ResumoBreve="Cuidando das crianÃ§as com amor e carinho." },
-                    new() { Nome="Louvor",    Icone="fas fa-music",   Slug="louvor",   ResumoBreve="AdoraÃ§Ã£o e mÃºsica para glorificar a Deus." },
-                    new() { Nome="Batismo",   Icone="fas fa-water",   Slug="batismo",  ResumoBreve="Celebrando o passo pÃºblico da fÃ©." },
-                    new() { Nome="Casais",    Icone="fas fa-heart",   Slug="casais",   ResumoBreve="Fortalecendo famÃ­lias com a Palavra." },
-                    new() { Nome="MissÃµes",   Icone="fas fa-globe",   Slug="missoes",  ResumoBreve="Levando o evangelho alÃ©m das fronteiras." },
+                    new() { Nome="Jovens",    Icone="fas fa-bolt",   Slug="jovens",   ResumoBreve="Culto de Jovens e acoes de impacto para a juventude." },
+                    new() { Nome="Kids",      Icone="fas fa-child",  Slug="kids",     ResumoBreve="Cuidando das criancas com amor e carinho." },
+                    new() { Nome="Louvor",    Icone="fas fa-music",  Slug="louvor",   ResumoBreve="Adoracao e musica para glorificar a Deus." },
+                    new() { Nome="Batismo",   Icone="fas fa-water",  Slug="batismo",  ResumoBreve="Celebrando o passo publico da fe." },
+                    new() { Nome="Casais",    Icone="fas fa-heart",  Slug="casais",   ResumoBreve="Fortalecendo familias com a Palavra." },
+                    new() { Nome="Missoes",   Icone="fas fa-globe",  Slug="missoes",  ResumoBreve="Levando o evangelho alem das fronteiras." },
                 };
 }
 
 <section class="page-section" id="ministerios" style="overflow:hidden;">
     <div class="container">
         <div class="text-center mb-5 scroll-reveal">
-            <span class="section-eyebrow">MinistÃ©rios</span>
+            <span class="section-eyebrow">Minist&eacute;rios</span>
             <h2 class="section-heading">Sirva com seus dons</h2>
-            <p class="text-secondary" style="max-width:540px;margin:0 auto;">ConheÃ§a cada ministÃ©rio e descubra onde vocÃª pode servir e florescer.</p>
+            <p class="text-secondary" style="max-width:540px;margin:0 auto;">Conhe&ccedil;a cada minist&eacute;rio e descubra onde voc&ecirc; pode servir e florescer.</p>
         </div>
     </div>
 
@@ -27,7 +27,7 @@
             {
                 var resumo = !string.IsNullOrEmpty(m.ResumoBreve) ? m.ResumoBreve
                              : m.Descricao?.Length > 0 ? m.Descricao : "";
-                var desc = resumo.Length > 60 ? resumo.Substring(0, 60) + "â€¦" : resumo;
+                var desc = resumo.Length > 60 ? resumo.Substring(0, 60) + "..." : resumo;
                 <div class="min-carousel-slide">
                     <div class="min-card">
                         <div class="min-card-icon"><i class="@m.Icone"></i></div>
@@ -40,16 +40,16 @@
         <button class="min-carousel-btn min-carousel-prev" id="minPrev" aria-label="Anterior">
             <i class="fas fa-chevron-left"></i>
         </button>
-        <button class="min-carousel-btn min-carousel-next" id="minNext" aria-label="PrÃ³ximo">
+        <button class="min-carousel-btn min-carousel-next" id="minNext" aria-label="Proximo">
             <i class="fas fa-chevron-right"></i>
         </button>
     </div>
 
-    <div class="min-carousel-dots" id="minDots" aria-label="NavegaÃ§Ã£o"></div>
+    <div class="min-carousel-dots" id="minDots" aria-label="Navegacao"></div>
 
     <div class="text-center mt-5">
         <a href="/Ministerios" class="btn btn-secondary">
-            Ver todos os ministÃ©rios <i class="fas fa-arrow-right ms-2"></i>
+            Ver todos os minist&eacute;rios <i class="fas fa-arrow-right ms-2"></i>
         </a>
     </div>
 </section>
@@ -61,18 +61,13 @@
         padding: 0 3.5rem;
         box-sizing: border-box;
     }
-
     .min-carousel-track {
         display: flex;
         gap: 4px;
         overflow-x: hidden;
         padding: 0.75rem 0.5rem 1.25rem;
     }
-
-    .min-carousel-slide {
-        flex: 0 0 175px;
-    }
-
+    .min-carousel-slide { flex: 0 0 175px; }
     .min-card {
         width: 175px;
         height: 175px;
@@ -95,84 +90,40 @@
         box-shadow: 0 10px 30px rgba(0,0,0,0.5), 0 0 0 1px rgba(230,193,90,0.22);
         border-color: rgba(230,193,90,0.28);
     }
-
     .min-card-icon {
-        width: 44px;
-        height: 44px;
-        border-radius: 12px;
+        width: 44px; height: 44px; border-radius: 12px;
         background: rgba(230,193,90,0.10);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.15rem;
-        color: #E6C15A;
-        flex-shrink: 0;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.15rem; color: #E6C15A; flex-shrink: 0;
         transition: background 0.22s ease;
     }
     .min-card:hover .min-card-icon { background: rgba(230,193,90,0.20); }
-
-    .min-card-title {
-        color: #fff;
-        font-size: 0.92rem;
-        font-weight: 700;
-        margin: 0;
-        line-height: 1.2;
-    }
+    .min-card-title { color: #fff; font-size: 0.92rem; font-weight: 700; margin: 0; line-height: 1.2; }
     .min-card-desc {
-        color: #9ca3af;
-        font-size: 0.75rem;
-        line-height: 1.4;
-        margin: 0;
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
+        color: #9ca3af; font-size: 0.75rem; line-height: 1.4; margin: 0;
+        display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
     }
-
     .min-carousel-btn {
-        position: absolute;
-        top: 50%;
-        transform: translateY(-60%);
-        width: 36px;
-        height: 36px;
-        border-radius: 50%;
-        border: 1px solid rgba(230,193,90,0.35);
-        background: rgba(10,10,14,0.88);
-        color: #E6C15A;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        z-index: 10;
-        backdrop-filter: blur(6px);
+        position: absolute; top: 50%; transform: translateY(-60%);
+        width: 36px; height: 36px; border-radius: 50%;
+        border: 1px solid rgba(230,193,90,0.35); background: rgba(10,10,14,0.88);
+        color: #E6C15A; display: flex; align-items: center; justify-content: center;
+        cursor: pointer; z-index: 10; backdrop-filter: blur(6px);
         transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
     }
     .min-carousel-btn:hover {
-        background: rgba(230,193,90,0.15);
-        border-color: rgba(230,193,90,0.7);
+        background: rgba(230,193,90,0.15); border-color: rgba(230,193,90,0.7);
         box-shadow: 0 0 14px rgba(230,193,90,0.25);
     }
     .min-carousel-prev { left: 0.5rem; }
     .min-carousel-next { right: 0.5rem; }
-
-    .min-carousel-dots {
-        display: flex;
-        justify-content: center;
-        gap: 6px;
-        margin-top: 0.5rem;
-    }
+    .min-carousel-dots { display: flex; justify-content: center; gap: 6px; margin-top: 0.5rem; }
     .min-dot {
-        width: 7px;
-        height: 7px;
-        border-radius: 50%;
-        background: rgba(255,255,255,0.18);
-        border: none;
-        padding: 0;
-        cursor: pointer;
+        width: 7px; height: 7px; border-radius: 50%;
+        background: rgba(255,255,255,0.18); border: none; padding: 0; cursor: pointer;
         transition: background 0.2s ease, transform 0.2s ease;
     }
     .min-dot.active { background: #E6C15A; transform: scale(1.35); }
-
     @@media (max-width: 767px) {
         .min-carousel-slide { flex: 0 0 150px; }
         .min-card { width: 150px; height: 150px; }
@@ -187,150 +138,166 @@
 
 <script>
 (function () {
-    const track   = document.getElementById('minTrack');
-    const prevBtn = document.getElementById('minPrev');
-    const nextBtn = document.getElementById('minNext');
-    const dotsEl  = document.getElementById('minDots');
+    var track   = document.getElementById('minTrack');
+    var prevBtn = document.getElementById('minPrev');
+    var nextBtn = document.getElementById('minNext');
+    var dotsEl  = document.getElementById('minDots');
     if (!track) return;
 
-    const origSlides = Array.from(track.querySelectorAll('.min-carousel-slide'));
-    const N = origSlides.length;
+    var origSlides = Array.from(track.querySelectorAll('.min-carousel-slide'));
+    var N = origSlides.length;
     if (N === 0) return;
 
-    /* â”€â”€ Clone for infinite loop â”€â”€ */
-    origSlides.forEach(s => {
-        const c = s.cloneNode(true); c.dataset.clone = 'after'; track.appendChild(c);
+    /* Clone: [N before][N real][N after] = infinite loop */
+    origSlides.forEach(function(s) {
+        var c = s.cloneNode(true); c.dataset.clone = 'after'; track.appendChild(c);
     });
-    [...origSlides].reverse().forEach(s => {
-        const c = s.cloneNode(true); c.dataset.clone = 'before'; track.prepend(c);
+    origSlides.slice().reverse().forEach(function(s) {
+        var c = s.cloneNode(true); c.dataset.clone = 'before'; track.prepend(c);
     });
 
-    /* â”€â”€ MÃ©tricas â”€â”€ */
     function step() {
-        const s = track.querySelector('.min-carousel-slide');
-        const g = parseFloat(getComputedStyle(track).gap) || 4;
+        var s = track.querySelector('.min-carousel-slide');
+        var g = parseFloat(getComputedStyle(track).gap) || 4;
         return s ? s.offsetWidth + g : 179;
     }
     function cardW() {
-        const s = track.querySelector('.min-carousel-slide');
+        var s = track.querySelector('.min-carousel-slide');
         return s ? s.offsetWidth : 175;
     }
-    /* scrollLeft para centrar o slide de Ã­ndice absIdx */
     function scrollForCenter(absIdx) {
         return absIdx * step() - (track.clientWidth - cardW()) / 2;
     }
-    /* qual Ã­ndice abs estÃ¡ atualmente centrado na viewport */
     function centeredIdx() {
         return Math.round((track.scrollLeft + (track.clientWidth - cardW()) / 2) / step());
     }
     function realIdx() { return ((centeredIdx() - N) % N + N) % N; }
-
-    /* -- Animacao RAF - duracao proporcional a distancia (mais longe = px/ms mais rapido) -- */
-    let isAnimating = false;
-    let cooldown    = false;
-    let rafId       = null;
-
-    function animateTo(targetLeft, duration) {
-        if (rafId) cancelAnimationFrame(rafId);
-        isAnimating = true;
-        const startLeft = track.scrollLeft;
-        const dist      = targetLeft - startLeft;
-        if (Math.abs(dist) < 1) { isAnimating = false; return; }
-        const t0 = performance.now();
-
-        function easeOut(t) { return 1 - Math.pow(1 - t, 3); }
-
-        function frame(now) {
-            const t = Math.min((now - t0) / duration, 1);
-            track.scrollLeft = startLeft + dist * easeOut(t);
-            if (t < 1) {
-                rafId = requestAnimationFrame(frame);
-            } else {
-                track.scrollLeft = targetLeft;
-                isAnimating = false;
-                rafId = null;
-                cooldown = true;
-                setTimeout(() => { cooldown = false; }, 220);
-                const ci = centeredIdx();
-                if (ci >= N * 2) track.scrollLeft -= N * step();
-                else if (ci < N) track.scrollLeft += N * step();
-                updateDots();
-            }
-        }
-        rafId = requestAnimationFrame(frame);
+    function wrapIfNeeded() {
+        var ci = centeredIdx();
+        if (ci >= N * 2) track.scrollLeft -= N * step();
+        else if (ci < N) track.scrollLeft += N * step();
     }
 
-    /* Centraliza absIdx; 1 passo->380ms, 2->440ms; px/ms cresce com distancia */
-    function goToCenter(absIdx) {
-        const dist = Math.abs(absIdx - centeredIdx());
-        if (dist === 0) return;
-        animateTo(scrollForCenter(absIdx), 320 + dist * 60);
-    }
-
-    /* -- Init: centraliza primeiro slide real -- */
-    function init() { track.scrollLeft = scrollForCenter(N); }
-
-    /* â”€â”€ Dots â”€â”€ */
+    /* Dots */
+    var dotsArr = [];
     function buildDots() {
         dotsEl.innerHTML = '';
-        for (let i = 0; i < N; i++) {
-            const d = document.createElement('button');
+        dotsArr = [];
+        for (var i = 0; i < N; i++) {
+            var d = document.createElement('button');
             d.className = 'min-dot';
-            d.setAttribute('aria-label', 'MinistÃ©rio ' + (i + 1));
-            d.addEventListener('click', () => { if (!isAnimating) goToCenter(N + i); });
+            d.setAttribute('aria-label', 'Ministerio ' + (i + 1));
+            (function(idx) {
+                d.addEventListener('click', function() { snapTo(N + idx); });
+            })(i);
             dotsEl.appendChild(d);
+            dotsArr.push(d);
         }
     }
     function updateDots() {
-        const ri = realIdx();
-        Array.from(dotsEl.querySelectorAll('.min-dot'))
-             .forEach((d, i) => d.classList.toggle('active', i === ri));
+        var ri = realIdx();
+        dotsArr.forEach(function(d, i) { d.classList.toggle('active', i === ri); });
     }
+    track.addEventListener('scroll', function() { wrapIfNeeded(); updateDots(); }, { passive: true });
 
-    /* â”€â”€ Scroll â†’ atualiza dots â”€â”€ */
-    track.addEventListener('scroll', updateDots, { passive: true });
-
-    /* â”€â”€ BotÃµes â”€â”€ */
-    prevBtn.addEventListener('click', () => { if (!isAnimating) goToCenter(centeredIdx() - 1); });
-    nextBtn.addEventListener('click', () => { if (!isAnimating) goToCenter(centeredIdx() + 1); });
-
-    /* â”€â”€ Touch swipe â”€â”€ */
-    let tx = 0;
-    track.addEventListener('touchstart', e => { tx = e.touches[0].clientX; }, { passive: true });
-    track.addEventListener('touchend', e => {
-        const dx = tx - e.changedTouches[0].clientX;
-        if (Math.abs(dx) > 40 && !isAnimating)
-            goToCenter(centeredIdx() + (dx > 0 ? 1 : -1));
-    }, { passive: true });
-
-    /* â”€â”€ Teclado â”€â”€ */
-    document.addEventListener('keydown', e => {
-        const r = document.getElementById('ministerios')?.getBoundingClientRect();
-        if (!r || r.top > innerHeight || r.bottom < 0) return;
-        if (e.key === 'ArrowLeft'  && !isAnimating) goToCenter(centeredIdx() - 1);
-        if (e.key === 'ArrowRight' && !isAnimating) goToCenter(centeredIdx() + 1);
-    });
+    /* Snap animation: ease-out 320ms to center of absIdx */
+    var snapRaf = null;
+    function snapTo(absIdx) {
+        stopAuto();
+        var target = scrollForCenter(absIdx);
+        var start  = track.scrollLeft;
+        var dist   = target - start;
+        if (Math.abs(dist) < 1) { updateDots(); return; }
+        var t0  = performance.now();
+        var dur = 320;
+        if (snapRaf) cancelAnimationFrame(snapRaf);
+        function frame(now) {
+            var t = Math.min((now - t0) / dur, 1);
+            var e = 1 - Math.pow(1 - t, 3);
+            track.scrollLeft = start + dist * e;
+            if (t < 1) { snapRaf = requestAnimationFrame(frame); }
+            else { track.scrollLeft = target; snapRaf = null; wrapIfNeeded(); updateDots(); }
+        }
+        snapRaf = requestAnimationFrame(frame);
+    }
 
     /*
-     * Hover:
-     * - Card centralizado â†’ fica parado
-     * - Card adjacente (dist=1) â†’ 380ms
-     * - Card 2 posiÃ§Ãµes (dist=2) â†’ 440ms mas cobre 2Ã— a distÃ¢ncia â†’ px/ms maior
+     * Continuous auto-scroll driven by mouse position.
+     * - Mouse over center card: snap and stop.
+     * - Mouse right of center: scroll right continuously, speed up with distance.
+     * - Mouse left of center: scroll left continuously.
+     * - Mouse leaves: snap to nearest card.
      */
-    function attachHover() {
-        Array.from(track.querySelectorAll('.min-carousel-slide')).forEach((slide, idx) => {
-            slide.addEventListener('mouseenter', () => {
-                if (isAnimating || cooldown) return;
-                if (idx === centeredIdx()) return;
-                goToCenter(idx);
-            });
-        });
+    var mouseX  = null;
+    var autoRaf = null;
+
+    function stopAuto() {
+        if (autoRaf) { cancelAnimationFrame(autoRaf); autoRaf = null; }
     }
 
+    function autoTick() {
+        autoRaf = null;
+        if (mouseX === null) return;
+        if (snapRaf) { autoRaf = requestAnimationFrame(autoTick); return; }
+
+        var rect   = track.getBoundingClientRect();
+        var relX   = mouseX - rect.left;
+        var center = rect.width / 2;
+        var offset = relX - center;
+        var half   = cardW() / 2;
+
+        if (Math.abs(offset) < half) {
+            /* Mouse is over center card: snap to it and stop */
+            snapTo(centeredIdx());
+            return;
+        }
+
+        /* Speed proportional to distance (in card-widths from center), max 5px/frame */
+        var cardsAway = (Math.abs(offset) - half) / step();
+        var speed = Math.min(5, 0.8 + cardsAway * 1.4);
+        track.scrollLeft += offset > 0 ? speed : -speed;
+
+        autoRaf = requestAnimationFrame(autoTick);
+    }
+
+    track.addEventListener('mousemove', function(e) {
+        mouseX = e.clientX;
+        if (!autoRaf && !snapRaf) autoRaf = requestAnimationFrame(autoTick);
+    });
+    track.addEventListener('mouseleave', function() {
+        mouseX = null;
+        stopAuto();
+        snapTo(centeredIdx());
+    });
+
+    /* Prev/Next buttons */
+    prevBtn.addEventListener('click', function() { snapTo(centeredIdx() - 1); });
+    nextBtn.addEventListener('click', function() { snapTo(centeredIdx() + 1); });
+
+    /* Touch swipe */
+    var tx = 0;
+    track.addEventListener('touchstart', function(e) { tx = e.touches[0].clientX; stopAuto(); }, { passive: true });
+    track.addEventListener('touchend', function(e) {
+        var dx = tx - e.changedTouches[0].clientX;
+        snapTo(Math.abs(dx) > 40 ? centeredIdx() + (dx > 0 ? 1 : -1) : centeredIdx());
+    }, { passive: true });
+
+    /* Keyboard */
+    document.addEventListener('keydown', function(e) {
+        var sec = document.getElementById('ministerios');
+        if (!sec) return;
+        var r = sec.getBoundingClientRect();
+        if (r.top > innerHeight || r.bottom < 0) return;
+        if (e.key === 'ArrowLeft')  snapTo(centeredIdx() - 1);
+        if (e.key === 'ArrowRight') snapTo(centeredIdx() + 1);
+    });
+
     buildDots();
-    init();
+    track.scrollLeft = scrollForCenter(N);
     updateDots();
-    attachHover();
-    window.addEventListener('resize', () => { init(); updateDots(); }, { passive: true });
+    window.addEventListener('resize', function() {
+        track.scrollLeft = scrollForCenter(N);
+        updateDots();
+    }, { passive: true });
 })();
 </script>
