@@ -4,13 +4,305 @@
     var items = ministerios?.Where(m => m.Ativo).OrderBy(m => m.Ordem).ToList()
                 ?? new List<Ministerio> {
                     new() { Nome="Jovens",    Icone="fas fa-bolt",    Slug="jovens",   ResumoBreve="Culto de Jovens e ações de impacto para a juventude." },
-                    new() { Nome="Kids",      Icone="fas fa-child",   Slug="kids",     ResumoBreve="Cuidando das crianças com amor enquanto o culto acontece." },
-                    new() { Nome="Louvor",    Icone="fas fa-music",   Slug="louvor",   ResumoBreve="Liderando a congregação na adoração através da música." },
-                    new() { Nome="Batismo",   Icone="fas fa-water",   Slug="batismo",  ResumoBreve="Preparando e celebrando o passo público da fé." },
-                    new() { Nome="Casais",    Icone="fas fa-heart",   Slug="casais",   ResumoBreve="Fortalecendo famílias através do amor e da Palavra." },
+                    new() { Nome="Kids",      Icone="fas fa-child",   Slug="kids",     ResumoBreve="Cuidando das crianças com amor e carinho." },
+                    new() { Nome="Louvor",    Icone="fas fa-music",   Slug="louvor",   ResumoBreve="Adoração e música para glorificar a Deus." },
+                    new() { Nome="Batismo",   Icone="fas fa-water",   Slug="batismo",  ResumoBreve="Celebrando o passo público da fé." },
+                    new() { Nome="Casais",    Icone="fas fa-heart",   Slug="casais",   ResumoBreve="Fortalecendo famílias com a Palavra." },
                     new() { Nome="Missões",   Icone="fas fa-globe",   Slug="missoes",  ResumoBreve="Levando o evangelho além das fronteiras." },
                 };
 }
+
+<section class="page-section" id="ministerios" style="overflow:hidden;">
+    <div class="container">
+        <div class="text-center mb-5 scroll-reveal">
+            <span class="section-eyebrow">Ministérios</span>
+            <h2 class="section-heading">Sirva com seus dons</h2>
+            <p class="text-secondary" style="max-width:540px;margin:0 auto;">Conheça cada ministério e descubra onde você pode servir e florescer.</p>
+        </div>
+    </div>
+
+    <div class="min-carousel-root">
+        <div class="min-carousel-track" id="minTrack">
+            @foreach (var m in items)
+            {
+                var resumo = !string.IsNullOrEmpty(m.ResumoBreve) ? m.ResumoBreve
+                             : m.Descricao?.Length > 0 ? m.Descricao : "";
+                var desc = resumo.Length > 60 ? resumo.Substring(0, 60) + "…" : resumo;
+                <div class="min-carousel-slide">
+                    <div class="min-card">
+                        <div class="min-card-icon"><i class="@m.Icone"></i></div>
+                        <h5 class="min-card-title">@m.Nome</h5>
+                        <p class="min-card-desc">@desc</p>
+                    </div>
+                </div>
+            }
+        </div>
+        <button class="min-carousel-btn min-carousel-prev" id="minPrev" aria-label="Anterior">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+        <button class="min-carousel-btn min-carousel-next" id="minNext" aria-label="Próximo">
+            <i class="fas fa-chevron-right"></i>
+        </button>
+    </div>
+
+    <div class="min-carousel-dots" id="minDots" aria-label="Navegação"></div>
+
+    <div class="text-center mt-5">
+        <a href="/Ministerios" class="btn btn-secondary">
+            Ver todos os ministérios <i class="fas fa-arrow-right ms-2"></i>
+        </a>
+    </div>
+</section>
+
+<style>
+    .min-carousel-root {
+        position: relative;
+        width: 100%;
+        padding: 0 3.5rem;
+        box-sizing: border-box;
+    }
+
+    .min-carousel-track {
+        display: flex;
+        gap: 1rem;
+        overflow-x: hidden;
+        padding: 0.75rem 0.5rem 1.25rem;
+    }
+
+    .min-carousel-slide {
+        flex: 0 0 175px;
+    }
+
+    .min-card {
+        width: 175px;
+        height: 175px;
+        background: #141418;
+        border: 1px solid rgba(230,193,90,0.10);
+        border-radius: 16px;
+        padding: 1.1rem 0.9rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        gap: 0.5rem;
+        transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+        cursor: default;
+        box-sizing: border-box;
+    }
+    .min-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.5), 0 0 0 1px rgba(230,193,90,0.22);
+        border-color: rgba(230,193,90,0.28);
+    }
+
+    .min-card-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        background: rgba(230,193,90,0.10);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.15rem;
+        color: #E6C15A;
+        flex-shrink: 0;
+        transition: background 0.22s ease;
+    }
+    .min-card:hover .min-card-icon { background: rgba(230,193,90,0.20); }
+
+    .min-card-title {
+        color: #fff;
+        font-size: 0.92rem;
+        font-weight: 700;
+        margin: 0;
+        line-height: 1.2;
+    }
+    .min-card-desc {
+        color: #9ca3af;
+        font-size: 0.75rem;
+        line-height: 1.4;
+        margin: 0;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .min-carousel-btn {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-60%);
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        border: 1px solid rgba(230,193,90,0.35);
+        background: rgba(10,10,14,0.88);
+        color: #E6C15A;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        z-index: 10;
+        backdrop-filter: blur(6px);
+        transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .min-carousel-btn:hover {
+        background: rgba(230,193,90,0.15);
+        border-color: rgba(230,193,90,0.7);
+        box-shadow: 0 0 14px rgba(230,193,90,0.25);
+    }
+    .min-carousel-prev { left: 0.5rem; }
+    .min-carousel-next { right: 0.5rem; }
+
+    .min-carousel-dots {
+        display: flex;
+        justify-content: center;
+        gap: 6px;
+        margin-top: 0.5rem;
+    }
+    .min-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.18);
+        border: none;
+        padding: 0;
+        cursor: pointer;
+        transition: background 0.2s ease, transform 0.2s ease;
+    }
+    .min-dot.active { background: #E6C15A; transform: scale(1.35); }
+
+    @@media (max-width: 767px) {
+        .min-carousel-slide { flex: 0 0 150px; }
+        .min-card { width: 150px; height: 150px; }
+        .min-carousel-root { padding: 0 2.75rem; }
+    }
+    @@media (max-width: 479px) {
+        .min-carousel-slide { flex: 0 0 135px; }
+        .min-card { width: 135px; height: 135px; }
+        .min-carousel-root { padding: 0 2.5rem; }
+    }
+</style>
+
+<script>
+(function () {
+    const track   = document.getElementById('minTrack');
+    const prevBtn = document.getElementById('minPrev');
+    const nextBtn = document.getElementById('minNext');
+    const dotsEl  = document.getElementById('minDots');
+    if (!track) return;
+
+    const origSlides = Array.from(track.querySelectorAll('.min-carousel-slide'));
+    const N = origSlides.length;
+    if (N === 0) return;
+
+    /* ── Clone slides: [last→0 copies before] + [real] + [0→last copies after] ── */
+    origSlides.forEach(s => {
+        const c = s.cloneNode(true);
+        c.dataset.clone = 'after';
+        track.appendChild(c);
+    });
+    [...origSlides].reverse().forEach(s => {
+        const c = s.cloneNode(true);
+        c.dataset.clone = 'before';
+        track.prepend(c);
+    });
+
+    /* ── Helpers ── */
+    function gap() {
+        return parseFloat(getComputedStyle(track).gap) || 16;
+    }
+    function sw() {
+        const s = track.querySelector('.min-carousel-slide');
+        return s ? s.offsetWidth + gap() : 191;
+    }
+    function absOffset() {
+        return Math.round(track.scrollLeft / sw());
+    }
+    function realIdx() {
+        return ((absOffset() - N) % N + N) % N;
+    }
+
+    function goTo(absIdx, smooth) {
+        const left = absIdx * sw();
+        track.scrollTo({ left, behavior: smooth ? 'smooth' : 'instant' });
+    }
+
+    /* ── Init: show first real slide ── */
+    function init() {
+        track.scrollTo({ left: N * sw(), behavior: 'instant' });
+    }
+
+    /* ── Dots ── */
+    function buildDots() {
+        dotsEl.innerHTML = '';
+        for (let i = 0; i < N; i++) {
+            const d = document.createElement('button');
+            d.className = 'min-dot';
+            d.setAttribute('aria-label', 'Ministério ' + (i + 1));
+            d.addEventListener('click', () => goTo(N + i, true));
+            dotsEl.appendChild(d);
+        }
+    }
+    function updateDots() {
+        const ri = realIdx();
+        Array.from(dotsEl.querySelectorAll('.min-dot'))
+             .forEach((d, i) => d.classList.toggle('active', i === ri));
+    }
+
+    /* ── Infinite wrap ── */
+    let wrapTimer = null;
+    track.addEventListener('scroll', () => {
+        clearTimeout(wrapTimer);
+        updateDots();
+        wrapTimer = setTimeout(() => {
+            const off = absOffset();
+            if (off >= N * 2) {
+                track.scrollTo({ left: (off - N) * sw(), behavior: 'instant' });
+            } else if (off < N) {
+                track.scrollTo({ left: (off + N) * sw(), behavior: 'instant' });
+            }
+        }, 80);
+    }, { passive: true });
+
+    /* ── Buttons ── */
+    prevBtn.addEventListener('click', () => goTo(absOffset() - 1, true));
+    nextBtn.addEventListener('click', () => goTo(absOffset() + 1, true));
+
+    /* ── Touch swipe ── */
+    let tx = 0;
+    track.addEventListener('touchstart', e => { tx = e.touches[0].clientX; }, { passive: true });
+    track.addEventListener('touchend', e => {
+        const dx = tx - e.changedTouches[0].clientX;
+        if (Math.abs(dx) > 40) goTo(absOffset() + (dx > 0 ? 1 : -1), true);
+    }, { passive: true });
+
+    /* ── Keyboard ── */
+    document.addEventListener('keydown', e => {
+        const r = document.getElementById('ministerios')?.getBoundingClientRect();
+        if (!r || r.top > innerHeight || r.bottom < 0) return;
+        if (e.key === 'ArrowLeft')  goTo(absOffset() - 1, true);
+        if (e.key === 'ArrowRight') goTo(absOffset() + 1, true);
+    });
+
+    /* ── Hover → rotate to that slide ── */
+    function attachHover() {
+        Array.from(track.querySelectorAll('.min-carousel-slide')).forEach((slide, idx) => {
+            slide.addEventListener('mouseenter', () => {
+                if (idx !== absOffset()) goTo(idx, true);
+            });
+        });
+    }
+
+    buildDots();
+    init();
+    updateDots();
+    attachHover();
+    window.addEventListener('resize', () => { init(); updateDots(); }, { passive: true });
+})();
+</script>
+
 
 <section class="page-section" id="ministerios" style="overflow:hidden;">
     <div class="container">
