@@ -1,4 +1,5 @@
 ﻿using BatistaFloramar.Infrastructure.Data;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.EntityFrameworkCore;
 
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
@@ -53,10 +54,52 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-if (!app.Environment.IsProduction())
+// Forçar www + HTTPS em produção (deve ser o primeiro middleware do pipeline)
+if (app.Environment.IsProduction())
+{
+    app.Use(async (context, next) =>
+    {
+        var host = context.Request.Host.Host;
+
+        // Se o host não começa com "www.", redirecionar 301 para a versão www
+        if (!host.StartsWith("www.", StringComparison.OrdinalIgnoreCase))
+        {
+            var wwwHost = new HostString("www." + host, context.Request.Host.Port ?? -1);
+            var redirect = UriHelper.BuildAbsolute(
+                scheme: "https",
+                host: wwwHost,
+                pathBase: context.Request.PathBase,
+                path: context.Request.Path,
+                query: context.Request.QueryString);
+
+            context.Response.StatusCode  = StatusCodes.Status301MovedPermanently;
+            context.Response.Headers.Location = redirect;
+            return;
+        }
+
+        // Se chegou com www mas via HTTP, forçar HTTPS
+        if (context.Request.Scheme.Equals("http", StringComparison.OrdinalIgnoreCase))
+        {
+            var redirect = UriHelper.BuildAbsolute(
+                scheme: "https",
+                host: context.Request.Host,
+                pathBase: context.Request.PathBase,
+                path: context.Request.Path,
+                query: context.Request.QueryString);
+
+            context.Response.StatusCode  = StatusCodes.Status301MovedPermanently;
+            context.Response.Headers.Location = redirect;
+            return;
+        }
+
+        await next();
+    });
+}
+else
 {
     app.UseHttpsRedirection();
 }
+
 app.UseStaticFiles();
 app.UseRouting();
 app.UseAuthentication();
