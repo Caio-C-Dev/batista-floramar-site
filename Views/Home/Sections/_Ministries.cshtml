@@ -1,67 +1,299 @@
 @using BatistaFloramar.Domain.Entities
 @{
     var ministerios = ViewBag.Ministerios as IEnumerable<Ministerio>;
+    var items = ministerios?.Where(m => m.Ativo).OrderBy(m => m.Ordem).ToList()
+                ?? new List<Ministerio> {
+                    new() { Nome="Jovens",    Icone="fas fa-bolt",    Slug="jovens",   ResumoBreve="Culto de Jovens e ações de impacto para a juventude." },
+                    new() { Nome="Kids",      Icone="fas fa-child",   Slug="kids",     ResumoBreve="Cuidando das crianças com amor enquanto o culto acontece." },
+                    new() { Nome="Louvor",    Icone="fas fa-music",   Slug="louvor",   ResumoBreve="Liderando a congregação na adoração através da música." },
+                    new() { Nome="Batismo",   Icone="fas fa-water",   Slug="batismo",  ResumoBreve="Preparando e celebrando o passo público da fé." },
+                    new() { Nome="Casais",    Icone="fas fa-heart",   Slug="casais",   ResumoBreve="Fortalecendo famílias através do amor e da Palavra." },
+                    new() { Nome="Missões",   Icone="fas fa-globe",   Slug="missoes",  ResumoBreve="Levando o evangelho além das fronteiras." },
+                };
 }
-<section class="page-section" id="ministerios">
+
+<section class="page-section" id="ministerios" style="overflow:hidden;">
     <div class="container">
-        <div class="text-center mb-5">
+        <div class="text-center mb-5 scroll-reveal">
             <span class="section-eyebrow">Ministérios</span>
             <h2 class="section-heading">Sirva com seus dons</h2>
-            <p class="text-secondary" style="max-width:560px;margin:0 auto;">Conheça cada ministério e descubra onde você pode servir.</p>
-        </div>
-        <div class="row g-4">
-            @if (ministerios != null)
-            {
-                @foreach (var m in ministerios.Take(8))
-                {
-                    <div class="col-6 col-md-6 col-lg-3">
-                        <a href="/Ministerios/Detalhes/@m.Slug" class="text-decoration-none">
-                            <div class="ministry-card h-100">
-                                <div class="ministry-icon"><i class="@m.Icone"></i></div>
-                                <h5>@m.Nome</h5>
-                                <p class="small">@(string.IsNullOrEmpty(m.ResumoBreve) ? m.Descricao.Substring(0, Math.Min(90, m.Descricao.Length)) + "…" : m.ResumoBreve)</p>
-                                <span class="text-gold small">Ver mais <i class="fas fa-arrow-right ms-1"></i></span>
-                            </div>
-                        </a>
-                    </div>
-                }
-            }
-            else
-            {
-                <div class="col-6 col-md-6 col-lg-3">
-                    <div class="ministry-card">
-                        <div class="ministry-icon"><i class="fas fa-bolt"></i></div>
-                        <h5>Jovens</h5>
-                        <p class="small">Culto de Jovens e ações de impacto para a juventude.</p>
-                    </div>
-                </div>
-                <div class="col-6 col-md-6 col-lg-3">
-                    <div class="ministry-card">
-                        <div class="ministry-icon"><i class="fas fa-child"></i></div>
-                        <h5>Kids</h5>
-                        <p class="small">Cuidando das crianças com amor enquanto o culto acontece.</p>
-                    </div>
-                </div>
-                <div class="col-6 col-md-6 col-lg-3">
-                    <div class="ministry-card">
-                        <div class="ministry-icon"><i class="fas fa-music"></i></div>
-                        <h5>Louvor</h5>
-                        <p class="small">Liderando a congregação na adoração através da música.</p>
-                    </div>
-                </div>
-                <div class="col-6 col-md-6 col-lg-3">
-                    <div class="ministry-card">
-                        <div class="ministry-icon"><i class="fas fa-water"></i></div>
-                        <h5>Batismo</h5>
-                        <p class="small">Preparando e celebrando o passo público da fé.</p>
-                    </div>
-                </div>
-            }
-        </div>
-        <div class="text-center mt-4">
-            <a href="/Ministerios" class="btn btn-secondary">
-                Ver todos os ministérios <i class="fas fa-arrow-right ms-2"></i>
-            </a>
+            <p class="text-secondary" style="max-width:540px;margin:0 auto;">Conheça cada ministério e descubra onde você pode servir e florescer.</p>
         </div>
     </div>
+
+    <!-- Carousel wrapper (full-width for overflow peek) -->
+    <div class="min-carousel-root">
+        <!-- Track -->
+        <div class="min-carousel-track" id="minTrack">
+            @foreach (var m in items)
+            {
+                var resumo = !string.IsNullOrEmpty(m.ResumoBreve) ? m.ResumoBreve
+                             : m.Descricao?.Length > 0 ? m.Descricao.Substring(0, Math.Min(90, m.Descricao.Length)) + "…"
+                             : "";
+                <div class="min-carousel-slide">
+                    <a href="@(string.IsNullOrEmpty(m.Slug) ? "#" : "/Ministerios/Detalhes/" + m.Slug)" class="text-decoration-none">
+                        <div class="min-card">
+                            <div class="min-card-icon">
+                                <i class="@m.Icone"></i>
+                            </div>
+                            <h5 class="min-card-title">@m.Nome</h5>
+                            <p class="min-card-desc">@resumo</p>
+                            <span class="min-card-cta">Ver mais <i class="fas fa-arrow-right ms-1"></i></span>
+                        </div>
+                    </a>
+                </div>
+            }
+        </div>
+
+        <!-- Prev / Next -->
+        <button class="min-carousel-btn min-carousel-prev" id="minPrev" aria-label="Anterior">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+        <button class="min-carousel-btn min-carousel-next" id="minNext" aria-label="Próximo">
+            <i class="fas fa-chevron-right"></i>
+        </button>
+    </div>
+
+    <!-- Dots -->
+    <div class="min-carousel-dots" id="minDots" aria-label="Navegação do carrossel"></div>
+
+    <div class="text-center mt-5">
+        <a href="/Ministerios" class="btn btn-secondary">
+            Ver todos os ministérios <i class="fas fa-arrow-right ms-2"></i>
+        </a>
+    </div>
 </section>
+
+<style>
+    /* ── Root ── */
+    .min-carousel-root {
+        position: relative;
+        width: 100%;
+        padding: 0 3rem;
+        box-sizing: border-box;
+    }
+
+    /* ── Track ── */
+    .min-carousel-track {
+        display: flex;
+        gap: 1.25rem;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        padding: 0.5rem 0.25rem 1.25rem;
+        scroll-behavior: smooth;
+    }
+    .min-carousel-track::-webkit-scrollbar { display: none; }
+
+    /* ── Slide ── */
+    .min-carousel-slide {
+        scroll-snap-align: start;
+        flex: 0 0 calc(25% - 1rem);
+        min-width: 220px;
+    }
+
+    /* ── Card ── */
+    .min-card {
+        background: #141418;
+        border: 1px solid rgba(230,193,90,0.10);
+        border-radius: 16px;
+        padding: 1.75rem 1.5rem 1.5rem;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+        cursor: pointer;
+    }
+    .min-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 12px 36px rgba(0,0,0,0.45), 0 0 0 1px rgba(230,193,90,0.22);
+        border-color: rgba(230,193,90,0.28);
+    }
+
+    /* ── Icon ── */
+    .min-card-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 14px;
+        background: rgba(230,193,90,0.10);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.35rem;
+        color: #E6C15A;
+        transition: background 0.22s ease;
+    }
+    .min-card:hover .min-card-icon {
+        background: rgba(230,193,90,0.18);
+    }
+
+    /* ── Text ── */
+    .min-card-title {
+        color: #fff;
+        font-size: 1.05rem;
+        font-weight: 700;
+        margin: 0;
+    }
+    .min-card-desc {
+        color: #9ca3af;
+        font-size: 0.875rem;
+        line-height: 1.55;
+        margin: 0;
+        flex: 1;
+    }
+    .min-card-cta {
+        color: #E6C15A;
+        font-size: 0.82rem;
+        font-weight: 600;
+        opacity: 0;
+        transition: opacity 0.2s ease;
+    }
+    .min-card:hover .min-card-cta { opacity: 1; }
+
+    /* ── Nav Buttons ── */
+    .min-carousel-btn {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-60%);
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        border: 1px solid rgba(230,193,90,0.35);
+        background: rgba(10,10,14,0.82);
+        color: #E6C15A;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+        z-index: 10;
+        backdrop-filter: blur(6px);
+    }
+    .min-carousel-btn:hover {
+        background: rgba(230,193,90,0.15);
+        border-color: rgba(230,193,90,0.7);
+        box-shadow: 0 0 14px rgba(230,193,90,0.25);
+    }
+    .min-carousel-btn:disabled {
+        opacity: 0.3;
+        cursor: default;
+        pointer-events: none;
+    }
+    .min-carousel-prev { left: 0.25rem; }
+    .min-carousel-next { right: 0.25rem; }
+
+    /* ── Dots ── */
+    .min-carousel-dots {
+        display: flex;
+        justify-content: center;
+        gap: 6px;
+        margin-top: 0.25rem;
+    }
+    .min-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.18);
+        border: none;
+        padding: 0;
+        cursor: pointer;
+        transition: background 0.2s ease, transform 0.2s ease;
+    }
+    .min-dot.active {
+        background: #E6C15A;
+        transform: scale(1.35);
+    }
+
+    /* ── Responsive ── */
+    @@media (max-width: 1199px) {
+        .min-carousel-slide { flex: 0 0 calc(33.33% - 1rem); }
+    }
+    @@media (max-width: 767px) {
+        .min-carousel-slide { flex: 0 0 calc(50% - 0.75rem); }
+        .min-carousel-root { padding: 0 2.5rem; }
+        .min-card-cta { opacity: 1; }
+    }
+    @@media (max-width: 479px) {
+        .min-carousel-slide { flex: 0 0 calc(85% - 0.5rem); }
+        .min-carousel-root { padding: 0 2rem; }
+    }
+</style>
+
+<script>
+(function () {
+    const track  = document.getElementById('minTrack');
+    const prev   = document.getElementById('minPrev');
+    const next   = document.getElementById('minNext');
+    const dotsEl = document.getElementById('minDots');
+    if (!track) return;
+
+    const slides = Array.from(track.querySelectorAll('.min-carousel-slide'));
+    let dots = [];
+
+    function visibleCount() {
+        const tw = track.offsetWidth;
+        const sw = slides[0]?.offsetWidth || 1;
+        return Math.round(tw / sw);
+    }
+
+    function buildDots() {
+        dotsEl.innerHTML = '';
+        dots = [];
+        const n = slides.length;
+        for (let i = 0; i < n; i++) {
+            const d = document.createElement('button');
+            d.className = 'min-dot';
+            d.setAttribute('aria-label', `Ministério ${i + 1}`);
+            d.addEventListener('click', () => scrollToSlide(i));
+            dotsEl.appendChild(d);
+            dots.push(d);
+        }
+    }
+
+    function currentIndex() {
+        const gap = parseFloat(getComputedStyle(track).gap) || 0;
+        const sw  = (slides[0]?.offsetWidth || 1) + gap;
+        return Math.round(track.scrollLeft / sw);
+    }
+
+    function updateState() {
+        const idx = currentIndex();
+        dots.forEach((d, i) => d.classList.toggle('active', i === idx));
+        prev.disabled = track.scrollLeft <= 4;
+        next.disabled = track.scrollLeft >= track.scrollWidth - track.offsetWidth - 4;
+    }
+
+    function scrollToSlide(idx) {
+        const gap = parseFloat(getComputedStyle(track).gap) || 0;
+        const sw  = (slides[0]?.offsetWidth || 1) + gap;
+        track.scrollTo({ left: idx * sw, behavior: 'smooth' });
+    }
+
+    prev.addEventListener('click', () => scrollToSlide(Math.max(0, currentIndex() - 1)));
+    next.addEventListener('click', () => scrollToSlide(Math.min(slides.length - 1, currentIndex() + 1)));
+    track.addEventListener('scroll', updateState, { passive: true });
+
+    // Touch swipe
+    let tx = 0;
+    track.addEventListener('touchstart', e => { tx = e.touches[0].clientX; }, { passive: true });
+    track.addEventListener('touchend', e => {
+        const dx = tx - e.changedTouches[0].clientX;
+        if (Math.abs(dx) > 40) scrollToSlide(currentIndex() + (dx > 0 ? 1 : -1));
+    }, { passive: true });
+
+    // Keyboard
+    document.addEventListener('keydown', e => {
+        const sec = document.getElementById('ministerios');
+        const r = sec?.getBoundingClientRect();
+        if (!r || r.top > window.innerHeight || r.bottom < 0) return;
+        if (e.key === 'ArrowLeft')  scrollToSlide(Math.max(0, currentIndex() - 1));
+        if (e.key === 'ArrowRight') scrollToSlide(Math.min(slides.length - 1, currentIndex() + 1));
+    });
+
+    buildDots();
+    updateState();
+    window.addEventListener('resize', updateState, { passive: true });
+})();
+</script>
