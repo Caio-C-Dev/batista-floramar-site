@@ -255,9 +255,19 @@
         autoRaf = requestAnimationFrame(autoTick);
     }
 
-    track.addEventListener('mousemove', function(e) {
-        mouseX = e.clientX;
-        if (!autoRaf && !snapRaf) autoRaf = requestAnimationFrame(autoTick);
+    /* Use document-level mousemove so overlapping elements (floatNav etc.) don't block it */
+    document.addEventListener('mousemove', function(e) {
+        var rect = track.getBoundingClientRect();
+        var inTrack = e.clientX >= rect.left && e.clientX <= rect.right &&
+                      e.clientY >= rect.top  && e.clientY <= rect.bottom;
+        if (inTrack) {
+            mouseX = e.clientX;
+            if (!autoRaf && !snapRaf) autoRaf = requestAnimationFrame(autoTick);
+        } else if (mouseX !== null) {
+            mouseX = null;
+            stopAuto();
+            snapTo(centeredIdx());
+        }
     });
     track.addEventListener('mouseleave', function() {
         mouseX = null;
