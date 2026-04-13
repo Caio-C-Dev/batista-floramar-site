@@ -1,0 +1,15 @@
+User-agent: *
+Allow: /
+
+Disallow: /Admin/
+Disallow: /AdminCelulas/
+Disallow: /AdminEventos/
+Disallow: /AdminEventosSemanal/
+Disallow: /AdminFinanceiro/
+Disallow: /AdminMensagens/
+Disallow: /AdminMinisterios/
+Disallow: /AdminPalavra/
+Disallow: /AdminPodcasts/
+Disallow: /AdminSeries/
+
+Sitemap: https://batista-floramar-site-production.up.railway.app/sitemap.xml

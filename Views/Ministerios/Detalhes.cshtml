@@ -159,6 +159,7 @@
     document.querySelectorAll('.min-foto-thumb').forEach(el => {
         el.addEventListener('click', () => {
             document.getElementById('fotoModalImg').src = el.dataset.src;
+            document.getElementById('fotoModalImg').alt = el.dataset.legenda || 'Foto do ministério';
             document.getElementById('fotoModalLegenda').textContent = el.dataset.legenda || '';
         });
     });

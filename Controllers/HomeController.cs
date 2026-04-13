@@ -22,6 +22,8 @@ namespace BatistaFloramar.Controllers
 
         public async Task<IActionResult> Index()
         {
+            ViewBag.Title = "In\u00edcio";
+            ViewBag.MetaDescription = "Igreja evang\u00e9lica batista no Floramar, Belo Horizonte \u2013 MG. Cultos domingo 10h, 18h e quarta 20h. Venha crescer na Palavra e fazer parte da nossa fam\u00edlia em Cristo.";
             ViewBag.LatestVideos = await _youtube.GetLatestVideosAsync(5);
             ViewBag.Versiculo = await _bible.GetVersiculoDoDiaAsync();
             ViewBag.Ministerios = await _db.Ministerios
