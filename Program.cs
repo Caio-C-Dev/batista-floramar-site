@@ -61,10 +61,15 @@ if (app.Environment.IsProduction())
     {
         var host = context.Request.Host.Host;
 
-        // Se o host não começa com "www.", redirecionar 301 para a versão www
+        // Railway termina TLS na borda e repassa como HTTP internamente.
+        // Usar X-Forwarded-Proto para saber o scheme real do cliente.
+        var realScheme = context.Request.Headers["X-Forwarded-Proto"].FirstOrDefault()
+                         ?? context.Request.Scheme;
+
+        // Se o host não começa com "www.", redirecionar 301 para https://www.
         if (!host.StartsWith("www.", StringComparison.OrdinalIgnoreCase))
         {
-            var wwwHost = new HostString("www." + host, context.Request.Host.Port ?? -1);
+            var wwwHost = new HostString("www." + host);
             var redirect = UriHelper.BuildAbsolute(
                 scheme: "https",
                 host: wwwHost,
@@ -72,13 +77,13 @@ if (app.Environment.IsProduction())
                 path: context.Request.Path,
                 query: context.Request.QueryString);
 
-            context.Response.StatusCode  = StatusCodes.Status301MovedPermanently;
+            context.Response.StatusCode = StatusCodes.Status301MovedPermanently;
             context.Response.Headers.Location = redirect;
             return;
         }
 
-        // Se chegou com www mas via HTTP, forçar HTTPS
-        if (context.Request.Scheme.Equals("http", StringComparison.OrdinalIgnoreCase))
+        // Se chegou com www mas via HTTP real (não interno do Railway), forçar HTTPS
+        if (realScheme.Equals("http", StringComparison.OrdinalIgnoreCase))
         {
             var redirect = UriHelper.BuildAbsolute(
                 scheme: "https",
@@ -87,17 +92,13 @@ if (app.Environment.IsProduction())
                 path: context.Request.Path,
                 query: context.Request.QueryString);
 
-            context.Response.StatusCode  = StatusCodes.Status301MovedPermanently;
+            context.Response.StatusCode = StatusCodes.Status301MovedPermanently;
             context.Response.Headers.Location = redirect;
             return;
         }
 
         await next();
     });
-}
-else
-{
-    app.UseHttpsRedirection();
 }
 
 app.UseStaticFiles();
