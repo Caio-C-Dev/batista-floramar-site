@@ -37,12 +37,7 @@
                 </div>
             }
         </div>
-        <button class="min-carousel-btn min-carousel-prev" id="minPrev" aria-label="Anterior">
-            <i class="fas fa-chevron-left"></i>
-        </button>
-        <button class="min-carousel-btn min-carousel-next" id="minNext" aria-label="Proximo">
-            <i class="fas fa-chevron-right"></i>
-        </button>
+
     </div>
 
     <div class="min-carousel-dots" id="minDots" aria-label="Navegacao"></div>
@@ -254,7 +249,7 @@
 
         /* Speed proportional to distance (in card-widths from center), max 5px/frame */
         var cardsAway = (Math.abs(offset) - half) / step();
-        var speed = Math.min(20, 2.0 + cardsAway * 3.5);
+        var speed = Math.min(35, 4.0 + cardsAway * 6.0);
         track.scrollLeft += offset > 0 ? speed : -speed;
 
         autoRaf = requestAnimationFrame(autoTick);
