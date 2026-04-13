@@ -53,8 +53,10 @@
     .min-carousel-root {
         position: relative;
         width: 100%;
-        padding: 0 3.5rem;
+        padding: 0;
         box-sizing: border-box;
+        -webkit-mask-image: linear-gradient(to right, transparent 0, black 80px, black calc(100% - 80px), transparent 100%);
+        mask-image: linear-gradient(to right, transparent 0, black 80px, black calc(100% - 80px), transparent 100%);
     }
     .min-carousel-track {
         display: flex;
