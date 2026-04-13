@@ -1,6 +1,6 @@
 <section class="donation-section" id="doacao">
     <div class="container">
-        <div class="donation-card scroll-reveal">
+        <div class="donation-card scroll-reveal" id="donationCard">
             <div class="donation-icon"><i class="fas fa-seedling"></i></div>
             <span class="section-eyebrow mb-2 d-block">Contribuição</span>
             <h2 class="section-heading">Semeie com alegria.<br>Participe da obra.</h2>
@@ -21,3 +21,54 @@
         </div>
     </div>
 </section>
+
+<script>
+(function () {
+    var card = document.getElementById('donationCard');
+    if (!card || window.matchMedia('(hover: none)').matches) return;
+
+    var MAX_TILT = 10; // graus máx
+    var rafId = null;
+    var targetRX = 0, targetRY = 0;
+    var currentRX = 0, currentRY = 0;
+
+    card.style.willChange = 'transform';
+    card.style.transition = 'box-shadow 0.3s ease';
+
+    card.addEventListener('mousemove', function (e) {
+        var rect = card.getBoundingClientRect();
+        var x = (e.clientX - rect.left) / rect.width  - 0.5; // -0.5 .. 0.5
+        var y = (e.clientY - rect.top)  / rect.height - 0.5;
+        targetRY =  x * MAX_TILT;
+        targetRX = -y * MAX_TILT;
+        if (!rafId) rafId = requestAnimationFrame(animate);
+        card.style.boxShadow = 'var(--shadow-gold), 0 0 0 1px rgba(230,193,90,0.06), 0 24px 60px rgba(0,0,0,0.55)';
+    });
+
+    card.addEventListener('mouseleave', function () {
+        targetRX = 0;
+        targetRY = 0;
+        card.style.boxShadow = '';
+        if (!rafId) rafId = requestAnimationFrame(animate);
+    });
+
+    function animate() {
+        currentRX += (targetRX - currentRX) * 0.12;
+        currentRY += (targetRY - currentRY) * 0.12;
+
+        card.style.transform =
+            'perspective(900px) rotateX(' + currentRX.toFixed(2) + 'deg) rotateY(' + currentRY.toFixed(2) + 'deg) scale3d(1.02,1.02,1.02)';
+
+        if (Math.abs(currentRX - targetRX) > 0.05 || Math.abs(currentRY - targetRY) > 0.05) {
+            rafId = requestAnimationFrame(animate);
+        } else {
+            currentRX = targetRX;
+            currentRY = targetRY;
+            if (targetRX === 0 && targetRY === 0) {
+                card.style.transform = '';
+            }
+            rafId = null;
+        }
+    }
+})();
+</script>
