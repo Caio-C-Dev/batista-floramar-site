@@ -3,64 +3,43 @@
     var ministerios = ViewBag.Ministerios as IEnumerable<Ministerio>;
     var items = ministerios?.Where(m => m.Ativo).OrderBy(m => m.Ordem).ToList()
                 ?? new List<Ministerio> {
-                    new() { Nome="Jovens",      Icone="fas fa-bolt",          Slug="jovens",      ResumoBreve="Culto de Jovens e acoes de impacto para a juventude." },
-                    new() { Nome="Kids",        Icone="fas fa-child",         Slug="kids",        ResumoBreve="Cuidando das criancas com amor e carinho." },
-                    new() { Nome="Louvor",      Icone="fas fa-music",         Slug="louvor",      ResumoBreve="Adoracao e musica para glorificar a Deus." },
-                    new() { Nome="Batismo",     Icone="fas fa-water",         Slug="batismo",     ResumoBreve="Celebrando o passo publico da fe." },
-                    new() { Nome="Casais",      Icone="fas fa-heart",         Slug="casais",      ResumoBreve="Fortalecendo familias com a Palavra." },
-                    new() { Nome="Missoes",     Icone="fas fa-globe",         Slug="missoes",     ResumoBreve="Levando o evangelho alem das fronteiras." },
+                    new() { Nome="Jovens",    Icone="fas fa-bolt",   Slug="jovens",   ResumoBreve="Culto de Jovens e acoes de impacto para a juventude." },
+                    new() { Nome="Kids",      Icone="fas fa-child",  Slug="kids",     ResumoBreve="Cuidando das criancas com amor e carinho." },
+                    new() { Nome="Louvor",    Icone="fas fa-music",  Slug="louvor",   ResumoBreve="Adoracao e musica para glorificar a Deus." },
+                    new() { Nome="Batismo",   Icone="fas fa-water",  Slug="batismo",  ResumoBreve="Celebrando o passo publico da fe." },
+                    new() { Nome="Casais",    Icone="fas fa-heart",  Slug="casais",   ResumoBreve="Fortalecendo familias com a Palavra." },
+                    new() { Nome="Missoes",   Icone="fas fa-globe",  Slug="missoes",  ResumoBreve="Levando o evangelho alem das fronteiras." },
                 };
 }
 
-<section class="page-section mc-section" id="ministerios">
+<section class="page-section" id="ministerios" style="overflow:hidden;">
     <div class="container">
         <div class="text-center mb-5 scroll-reveal">
             <span class="section-eyebrow">Minist&eacute;rios</span>
-            <h2 class="section-heading">Nossos Minist&eacute;rios</h2>
-            <p class="text-secondary" style="max-width:540px;margin:0 auto;">
-                Conhe&ccedil;a cada minist&eacute;rio e descubra onde voc&ecirc; pode servir e florescer.
-            </p>
+            <h2 class="section-heading">Sirva com seus dons</h2>
+            <p class="text-secondary" style="max-width:540px;margin:0 auto;">Conhe&ccedil;a cada minist&eacute;rio e descubra onde voc&ecirc; pode servir e florescer.</p>
         </div>
     </div>
 
-    <!-- Carousel root -->
-    <div class="mc-root" role="region" aria-label="Carrossel de Ministerios">
-
-        <!-- Track -->
-        <div class="mc-viewport">
-            <div class="mc-track" id="mcTrack">
-                @foreach (var m in items)
-                {
-                    var resumo = !string.IsNullOrEmpty(m.ResumoBreve) ? m.ResumoBreve
-                                 : (m.Descricao?.Length > 0 ? m.Descricao : "");
-                    var desc = resumo.Length > 72 ? resumo.Substring(0, 72) + "..." : resumo;
-                    <div class="mc-slide" role="group" aria-label="@m.Nome">
-                        <article class="mc-card">
-                            <div class="mc-card-icon" aria-hidden="true">
-                                <i class="@m.Icone"></i>
-                            </div>
-                            <h3 class="mc-card-title">@m.Nome</h3>
-                            <p class="mc-card-desc">@desc</p>
-                            <a href="/Ministerios/@m.Slug" class="mc-card-link">
-                                Saiba mais <i class="fas fa-arrow-right"></i>
-                            </a>
-                        </article>
+    <div class="min-carousel-root">
+        <div class="min-carousel-track" id="minTrack">
+            @foreach (var m in items)
+            {
+                var resumo = !string.IsNullOrEmpty(m.ResumoBreve) ? m.ResumoBreve
+                             : m.Descricao?.Length > 0 ? m.Descricao : "";
+                var desc = resumo.Length > 60 ? resumo.Substring(0, 60) + "..." : resumo;
+                <div class="min-carousel-slide">
+                    <div class="min-card">
+                        <div class="min-card-icon"><i class="@m.Icone"></i></div>
+                        <h5 class="min-card-title">@m.Nome</h5>
+                        <p class="min-card-desc">@desc</p>
                     </div>
-                }
-            </div>
+                </div>
+            }
         </div>
-
-        <!-- Nav buttons -->
-        <button class="mc-btn mc-btn-prev" id="mcPrev" aria-label="Anterior" type="button">
-            <i class="fas fa-chevron-left"></i>
-        </button>
-        <button class="mc-btn mc-btn-next" id="mcNext" aria-label="Proximo" type="button">
-            <i class="fas fa-chevron-right"></i>
-        </button>
     </div>
 
-    <!-- Dots -->
-    <div class="mc-dots" id="mcDots" role="tablist" aria-label="Navegar pelos ministerios"></div>
+    <div class="min-carousel-dots" id="minDots" aria-label="Navegacao"></div>
 
     <div class="text-center mt-5">
         <a href="/Ministerios" class="btn btn-outline-gold">
@@ -70,355 +49,212 @@
 </section>
 
 <style>
-/* ─── Section ─────────────────────────────────────────────── */
-.mc-section { overflow: hidden; }
-
-/* ─── Root / Viewport ────────────────────────────────────── */
-.mc-root {
-    position: relative;
-    width: 100%;
-}
-.mc-viewport {
-    overflow: hidden;
-    -webkit-mask-image: linear-gradient(
-        to right,
-        transparent 0,
-        #000 100px,
-        #000 calc(100% - 100px),
-        transparent 100%
-    );
-    mask-image: linear-gradient(
-        to right,
-        transparent 0,
-        #000 100px,
-        #000 calc(100% - 100px),
-        transparent 100%
-    );
-}
-
-/* ─── Track ───────────────────────────────────────────────── */
-.mc-track {
-    display: flex;
-    gap: 20px;
-    padding: 1rem 0 1.5rem;
-    will-change: transform;
-    /* no overflow-x: using transform for precise control */
-}
-
-/* ─── Slide ───────────────────────────────────────────────── */
-.mc-slide {
-    flex: 0 0 var(--mc-card-w, 260px);
-    user-select: none;
-}
-
-/* ─── Card ────────────────────────────────────────────────── */
-.mc-card {
-    background: #1A1A1E;
-    border: 1px solid rgba(230,193,90,.10);
-    border-radius: 16px;
-    padding: 2rem 1.5rem 1.75rem;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    gap: .75rem;
-    transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
-    cursor: default;
-    min-height: 220px;
-}
-.mc-card:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 16px 40px rgba(0,0,0,.55), 0 0 0 1px rgba(230,193,90,.22);
-    border-color: rgba(230,193,90,.28);
-}
-
-/* ─── Card Icon ───────────────────────────────────────────── */
-.mc-card-icon {
-    width: 52px; height: 52px;
-    border-radius: 14px;
-    background: rgba(230,193,90,.10);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 1.35rem;
-    color: #E6C15A;
-    flex-shrink: 0;
-    transition: background .25s ease, box-shadow .25s ease;
-}
-.mc-card:hover .mc-card-icon {
-    background: rgba(230,193,90,.18);
-    box-shadow: 0 0 18px rgba(230,193,90,.20);
-}
-
-/* ─── Card Text ───────────────────────────────────────────── */
-.mc-card-title {
-    color: #fff;
-    font-size: 1.05rem;
-    font-weight: 700;
-    margin: 0;
-    line-height: 1.25;
-}
-.mc-card-desc {
-    color: #9CA3AF;
-    font-size: .82rem;
-    line-height: 1.55;
-    margin: 0;
-    flex: 1;
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-}
-.mc-card-link {
-    font-size: .8rem;
-    font-weight: 600;
-    color: #E6C15A;
-    text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    gap: .35rem;
-    opacity: 0;
-    transform: translateY(4px);
-    transition: opacity .2s ease, transform .2s ease, color .2s ease;
-    margin-top: .25rem;
-}
-.mc-card-link i { font-size: .7rem; }
-.mc-card:hover .mc-card-link {
-    opacity: 1;
-    transform: translateY(0);
-}
-.mc-card-link:hover { color: #f0d070; }
-
-/* ─── Nav Buttons ─────────────────────────────────────────── */
-.mc-btn {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 42px; height: 42px;
-    border-radius: 50%;
-    border: 1.5px solid rgba(230,193,90,.40);
-    background: rgba(11,11,14,.85);
-    color: #E6C15A;
-    font-size: 1rem;
-    display: flex; align-items: center; justify-content: center;
-    cursor: pointer;
-    z-index: 20;
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    transition: background .2s ease, border-color .2s ease, box-shadow .2s ease, transform .2s ease;
-}
-.mc-btn:hover {
-    background: rgba(230,193,90,.15);
-    border-color: rgba(230,193,90,.75);
-    box-shadow: 0 0 18px rgba(230,193,90,.28);
-    transform: translateY(-50%) scale(1.08);
-}
-.mc-btn:disabled {
-    opacity: .25;
-    cursor: default;
-    pointer-events: none;
-}
-.mc-btn-prev { left: 18px; }
-.mc-btn-next { right: 18px; }
-
-/* ─── Dots ────────────────────────────────────────────────── */
-.mc-dots {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 7px;
-    margin-top: .5rem;
-}
-.mc-dot {
-    width: 7px; height: 7px;
-    border-radius: 50%;
-    background: rgba(255,255,255,.18);
-    border: none; padding: 0;
-    cursor: pointer;
-    transition: background .2s ease, transform .2s ease, width .25s ease;
-}
-.mc-dot.active {
-    background: #E6C15A;
-    transform: scale(1.4);
-    width: 18px;
-    border-radius: 4px;
-}
-
-/* ─── Responsive ──────────────────────────────────────────── */
-@@media (max-width: 1199px) {
-    :root { --mc-card-w: 230px; }
-}
-@@media (max-width: 767px) {
-    :root { --mc-card-w: 200px; }
-    .mc-btn { width: 36px; height: 36px; font-size: .85rem; }
-    .mc-btn-prev { left: 8px; }
-    .mc-btn-next { right: 8px; }
-    .mc-viewport {
-        -webkit-mask-image: linear-gradient(to right, transparent 0, #000 60px, #000 calc(100% - 60px), transparent 100%);
-        mask-image: linear-gradient(to right, transparent 0, #000 60px, #000 calc(100% - 60px), transparent 100%);
+    .min-carousel-root {
+        position: relative;
+        width: 100%;
+        padding: 0;
+        box-sizing: border-box;
+        -webkit-mask-image: linear-gradient(to right, transparent 0, black 80px, black calc(100% - 80px), transparent 100%);
+        mask-image: linear-gradient(to right, transparent 0, black 80px, black calc(100% - 80px), transparent 100%);
     }
-}
-@@media (max-width: 479px) {
-    :root { --mc-card-w: 175px; }
-    .mc-btn-prev { left: 4px; }
-    .mc-btn-next { right: 4px; }
-}
+    .min-carousel-track {
+        display: flex;
+        gap: 4px;
+        overflow-x: hidden;
+        padding: 0.75rem 0.5rem 1.25rem;
+    }
+    .min-carousel-slide { flex: 0 0 175px; }
+    .min-card {
+        width: 175px; height: 175px;
+        background: #141418;
+        border: 1px solid rgba(230,193,90,0.10);
+        border-radius: 16px;
+        padding: 1.1rem 0.9rem;
+        display: flex; flex-direction: column;
+        align-items: center; justify-content: center;
+        text-align: center; gap: 0.5rem;
+        transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+        cursor: default; box-sizing: border-box;
+    }
+    .min-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.5), 0 0 0 1px rgba(230,193,90,0.22);
+        border-color: rgba(230,193,90,0.28);
+    }
+    .min-card-icon {
+        width: 44px; height: 44px; border-radius: 12px;
+        background: rgba(230,193,90,0.10);
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.15rem; color: #E6C15A; flex-shrink: 0;
+        transition: background 0.22s ease;
+    }
+    .min-card:hover .min-card-icon { background: rgba(230,193,90,0.20); }
+    .min-card-title { color: #fff; font-size: 0.92rem; font-weight: 700; margin: 0; line-height: 1.2; }
+    .min-card-desc {
+        color: #9ca3af; font-size: 0.75rem; line-height: 1.4; margin: 0;
+        display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+    }
+    .min-carousel-dots { display: flex; justify-content: center; gap: 6px; margin-top: 0.5rem; }
+    .min-dot {
+        width: 7px; height: 7px; border-radius: 50%;
+        background: rgba(255,255,255,0.18); border: none; padding: 0; cursor: pointer;
+        transition: background 0.2s ease, transform 0.2s ease;
+    }
+    .min-dot.active { background: #E6C15A; transform: scale(1.35); }
+    @@media (max-width: 767px) {
+        .min-carousel-slide { flex: 0 0 150px; }
+        .min-card { width: 150px; height: 150px; }
+    }
+    @@media (max-width: 479px) {
+        .min-carousel-slide { flex: 0 0 135px; }
+        .min-card { width: 135px; height: 135px; }
+    }
 </style>
 
 <script>
 (function () {
-    var track  = document.getElementById('mcTrack');
-    var prev   = document.getElementById('mcPrev');
-    var next   = document.getElementById('mcNext');
-    var dotsEl = document.getElementById('mcDots');
+    var track  = document.getElementById('minTrack');
+    var dotsEl = document.getElementById('minDots');
     if (!track) return;
 
-    var slides    = Array.from(track.querySelectorAll('.mc-slide'));
-    var N         = slides.length;
-    var current   = 0;
-    var dots      = [];
-    var rafId     = null;
-    var isAnimate = false;
+    var origSlides = Array.from(track.querySelectorAll('.min-carousel-slide'));
+    var N = origSlides.length;
+    if (N === 0) return;
 
-    /* ── Helpers ──────────────────────────────────────────── */
-    function gap() {
-        return parseFloat(getComputedStyle(track).gap) || 20;
+    /* Clone infinite loop: [N before][N real][N after] */
+    origSlides.forEach(function(s) {
+        var c = s.cloneNode(true); c.dataset.clone = 'after'; track.appendChild(c);
+    });
+    origSlides.slice().reverse().forEach(function(s) {
+        var c = s.cloneNode(true); c.dataset.clone = 'before'; track.prepend(c);
+    });
+
+    function step() {
+        var s = track.querySelector('.min-carousel-slide');
+        var g = parseFloat(getComputedStyle(track).gap) || 4;
+        return s ? s.offsetWidth + g : 179;
     }
     function cardW() {
-        return slides[0] ? slides[0].offsetWidth : 260;
+        var s = track.querySelector('.min-carousel-slide');
+        return s ? s.offsetWidth : 175;
     }
-    function perView() {
-        var vw = track.parentElement.offsetWidth;
-        return Math.max(1, Math.floor((vw + gap()) / (cardW() + gap())));
+    function scrollForCenter(absIdx) {
+        return absIdx * step() - (track.clientWidth - cardW()) / 2;
     }
-    function maxIdx() {
-        return Math.max(0, N - perView());
+    function centeredIdx() {
+        return Math.round((track.scrollLeft + (track.clientWidth - cardW()) / 2) / step());
     }
-    function targetX(idx) {
-        return -(idx * (cardW() + gap()));
-    }
-
-    /* ── Animate track ────────────────────────────────────── */
-    function slideTo(idx, instant) {
-        idx = Math.max(0, Math.min(idx, maxIdx()));
-        current = idx;
-
-        var tx  = targetX(idx);
-        if (instant) {
-            track.style.transition = 'none';
-            track.style.transform  = 'translateX(' + tx + 'px)';
-        } else {
-            track.style.transition = 'transform .45s cubic-bezier(.4,0,.2,1)';
-            track.style.transform  = 'translateX(' + tx + 'px)';
-        }
-        updateUI();
+    function realIdx() { return ((centeredIdx() - N) % N + N) % N; }
+    function wrapIfNeeded() {
+        var ci = centeredIdx();
+        if (ci >= N * 2) track.scrollLeft -= N * step();
+        else if (ci < N) track.scrollLeft += N * step();
     }
 
-    /* ── UI (dots + buttons) ──────────────────────────────── */
+    /* Dots */
+    var dotsArr = [];
     function buildDots() {
-        dotsEl.innerHTML = '';
-        dots = [];
-        var pages = maxIdx() + 1;
-        for (var i = 0; i < pages; i++) {
+        dotsEl.innerHTML = ''; dotsArr = [];
+        for (var i = 0; i < N; i++) {
             var d = document.createElement('button');
-            d.className = 'mc-dot';
-            d.setAttribute('role', 'tab');
-            d.setAttribute('aria-label', 'Pagina ' + (i + 1));
-            (function (idx) {
-                d.addEventListener('click', function () { slideTo(idx); });
-            })(i);
-            dotsEl.appendChild(d);
-            dots.push(d);
+            d.className = 'min-dot';
+            d.setAttribute('aria-label', 'Ministerio ' + (i + 1));
+            (function(idx) { d.addEventListener('click', function() { snapTo(N + idx); }); })(i);
+            dotsEl.appendChild(d); dotsArr.push(d);
         }
     }
-    function updateUI() {
-        dots.forEach(function (d, i) { d.classList.toggle('active', i === current); });
-        prev.disabled = current === 0;
-        next.disabled = current >= maxIdx();
+    function updateDots() {
+        var ri = realIdx();
+        dotsArr.forEach(function(d, i) { d.classList.toggle('active', i === ri); });
+    }
+    track.addEventListener('scroll', function() { wrapIfNeeded(); updateDots(); }, { passive: true });
+
+    /* Snap */
+    var snapRaf = null;
+    function snapTo(absIdx) {
+        stopAuto();
+        var target = scrollForCenter(absIdx);
+        var start  = track.scrollLeft;
+        var dist   = target - start;
+        if (Math.abs(dist) < 1) { updateDots(); return; }
+        var t0 = performance.now(), dur = 320;
+        if (snapRaf) cancelAnimationFrame(snapRaf);
+        function frame(now) {
+            var t = Math.min((now - t0) / dur, 1);
+            var e = 1 - Math.pow(1 - t, 3);
+            track.scrollLeft = start + dist * e;
+            if (t < 1) { snapRaf = requestAnimationFrame(frame); }
+            else { track.scrollLeft = target; snapRaf = null; wrapIfNeeded(); updateDots(); }
+        }
+        snapRaf = requestAnimationFrame(frame);
     }
 
-    /* ── Buttons ──────────────────────────────────────────── */
-    prev.addEventListener('click', function () { slideTo(current - 1); });
-    next.addEventListener('click', function () { slideTo(current + 1); });
+    /* Continuous mouse-position scroll */
+    var mouseX = null, autoRaf = null;
+    function stopAuto() { if (autoRaf) { cancelAnimationFrame(autoRaf); autoRaf = null; } }
 
-    /* ── Touch / Mouse drag ───────────────────────────────── */
-    var dragStart = null, dragStartScroll = 0, isDragging = false;
+    function autoTick() {
+        autoRaf = null;
+        if (mouseX === null) return;
+        if (snapRaf) { autoRaf = requestAnimationFrame(autoTick); return; }
 
-    function pointerDown(clientX) {
-        dragStart       = clientX;
-        dragStartScroll = current * (cardW() + gap());
-        isDragging      = false;
-        track.style.transition = 'none';
+        var rect   = track.getBoundingClientRect();
+        var relX   = mouseX - rect.left;
+        var center = rect.width / 2;
+        var offset = relX - center;
+        var half   = cardW() / 2;
+
+        if (Math.abs(offset) < half) { snapTo(centeredIdx()); return; }
+
+        var cardsAway = (Math.abs(offset) - half) / step();
+        var speed = Math.min(35, 4.0 + cardsAway * 6.0);
+        track.scrollLeft += offset > 0 ? speed : -speed;
+        autoRaf = requestAnimationFrame(autoTick);
     }
-    function pointerMove(clientX) {
-        if (dragStart === null) return;
-        var dx = clientX - dragStart;
-        if (Math.abs(dx) > 5) isDragging = true;
+
+    /* Listen on document so overlapping elements (floatNav) do not block */
+    document.addEventListener('mousemove', function(e) {
+        var rect = track.getBoundingClientRect();
+        var inTrack = e.clientX >= rect.left && e.clientX <= rect.right &&
+                      e.clientY >= rect.top  && e.clientY <= rect.bottom;
+        if (inTrack) {
+            mouseX = e.clientX;
+            if (!autoRaf && !snapRaf) autoRaf = requestAnimationFrame(autoTick);
+        } else if (mouseX !== null) {
+            mouseX = null; stopAuto(); snapTo(centeredIdx());
+        }
+    });
+    track.addEventListener('mouseleave', function() {
+        mouseX = null; stopAuto(); snapTo(centeredIdx());
+    });
+
+    /* Touch drag: free movement, snap on release */
+    var tx = 0, startScroll = 0, isDragging = false;
+    track.addEventListener('touchstart', function(e) {
+        tx = e.touches[0].clientX; startScroll = track.scrollLeft; isDragging = true; stopAuto();
+    }, { passive: true });
+    track.addEventListener('touchmove', function(e) {
         if (!isDragging) return;
-        var tx = -(dragStartScroll - dx);
-        var limit = targetX(maxIdx());
-        tx = Math.max(limit - 60, Math.min(0 + 60, tx));
-        track.style.transform = 'translateX(' + tx + 'px)';
-    }
-    function pointerUp(clientX) {
-        if (dragStart === null) return;
-        var dx = dragStart - clientX;
-        dragStart = null;
-        if (Math.abs(dx) > 50) {
-            slideTo(current + (dx > 0 ? 1 : -1));
-        } else {
-            slideTo(current);
-        }
-    }
-
-    /* Touch */
-    track.addEventListener('touchstart', function (e) {
-        pointerDown(e.touches[0].clientX);
+        track.scrollLeft = startScroll + (tx - e.touches[0].clientX);
+        wrapIfNeeded();
     }, { passive: true });
-    track.addEventListener('touchmove', function (e) {
-        pointerMove(e.touches[0].clientX);
-    }, { passive: true });
-    track.addEventListener('touchend', function (e) {
-        pointerUp(e.changedTouches[0].clientX);
-    }, { passive: true });
+    track.addEventListener('touchend', function() { isDragging = false; snapTo(centeredIdx()); }, { passive: true });
 
-    /* Mouse drag */
-    track.addEventListener('mousedown', function (e) {
-        pointerDown(e.clientX);
-        e.preventDefault();
-    });
-    window.addEventListener('mousemove', function (e) {
-        if (dragStart !== null) pointerMove(e.clientX);
-    });
-    window.addEventListener('mouseup', function (e) {
-        if (dragStart !== null) pointerUp(e.clientX);
-    });
-    /* Prevent click on links during drag */
-    track.addEventListener('click', function (e) {
-        if (isDragging) e.preventDefault();
-    }, true);
-
-    /* ── Keyboard ─────────────────────────────────────────── */
-    document.addEventListener('keydown', function (e) {
+    /* Keyboard */
+    document.addEventListener('keydown', function(e) {
         var sec = document.getElementById('ministerios');
         if (!sec) return;
         var r = sec.getBoundingClientRect();
         if (r.top > innerHeight || r.bottom < 0) return;
-        if (e.key === 'ArrowLeft')  slideTo(current - 1);
-        if (e.key === 'ArrowRight') slideTo(current + 1);
+        if (e.key === 'ArrowLeft')  snapTo(centeredIdx() - 1);
+        if (e.key === 'ArrowRight') snapTo(centeredIdx() + 1);
     });
 
-    /* ── Resize ───────────────────────────────────────────── */
-    var resizeTimer;
-    window.addEventListener('resize', function () {
-        clearTimeout(resizeTimer);
-        resizeTimer = setTimeout(function () {
-            buildDots();
-            slideTo(Math.min(current, maxIdx()), true);
-        }, 120);
-    }, { passive: true });
-
-    /* ── Init ─────────────────────────────────────────────── */
     buildDots();
-    slideTo(0, true);
+    track.scrollLeft = scrollForCenter(N);
+    updateDots();
+    window.addEventListener('resize', function() {
+        track.scrollLeft = scrollForCenter(N); updateDots();
+    }, { passive: true });
 })();
 </script>
