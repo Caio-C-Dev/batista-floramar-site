@@ -106,13 +106,6 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-// Redirecionar raiz para Home/Index
-app.MapGet("/", async (context) =>
-{
-    context.Response.Redirect("/Home/Index");
-    await Task.CompletedTask;
-});
-
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");

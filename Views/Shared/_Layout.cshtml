@@ -10,10 +10,16 @@
                                 : "Comunidade Batista Floramar – Igreja em Floramar, Belo Horizonte";
         var pageDescription = ViewBag.MetaDescription as string
                                 ?? "Igreja evangélica batista no Floramar, Belo Horizonte – MG. Cultos aos Domingos 10h e 18h e Quartas 20h. Venha crescer na Palavra, servir e fazer parte da nossa família.";
+        var rawPath         = Context.Request.Path.Value ?? "/";
+        // Normaliza rotas padrão do MVC para URL limpa (sem /Home/Index)
+        var normalizedPath  = rawPath.Equals("/Home/Index", StringComparison.OrdinalIgnoreCase)
+                                  || rawPath.Equals("/Home", StringComparison.OrdinalIgnoreCase)
+                                ? "/"
+                                : rawPath;
         var canonicalUrl    = ViewBag.CanonicalUrl as string
-                                ?? "https://batista-floramar-site-production.up.railway.app" + Context.Request.Path;
+                                ?? "https://www.batistafloramar.com.br" + normalizedPath;
         var ogImage         = ViewBag.OgImage as string
-                                ?? "https://batista-floramar-site-production.up.railway.app/images/church-logo.png";
+                                ?? "https://www.batistafloramar.com.br/images/church-logo.png";
     }
 
     <title>@pageTitle</title>
@@ -47,9 +53,9 @@
       "name": "Comunidade Batista Floramar",
       "alternateName": "Igreja Batista Floramar",
       "description": "Igreja evangélica batista no bairro Floramar, Belo Horizonte – MG. Cultos, células, ministérios e palavra expositiva.",
-      "url": "https://batista-floramar-site-production.up.railway.app",
-      "logo": "https://batista-floramar-site-production.up.railway.app/images/church-logo.png",
-      "image": "https://batista-floramar-site-production.up.railway.app/images/church-logo.png",
+      "url": "https://www.batistafloramar.com.br",
+      "logo": "https://www.batistafloramar.com.br/images/church-logo.png",
+      "image": "https://www.batistafloramar.com.br/images/church-logo.png",
       "telephone": "",
       "address": {
         "@@type": "PostalAddress",

@@ -1,57 +1,57 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://batista-floramar-site-production.up.railway.app/</loc>
+    <loc>https://www.batistafloramar.com.br/</loc>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://batista-floramar-site-production.up.railway.app/Sobre</loc>
+    <loc>https://www.batistafloramar.com.br/Sobre</loc>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://batista-floramar-site-production.up.railway.app/Cultos</loc>
+    <loc>https://www.batistafloramar.com.br/Cultos</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://batista-floramar-site-production.up.railway.app/Celula</loc>
+    <loc>https://www.batistafloramar.com.br/Celula</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://batista-floramar-site-production.up.railway.app/Ministerios</loc>
+    <loc>https://www.batistafloramar.com.br/Ministerios</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://batista-floramar-site-production.up.railway.app/Podcast</loc>
+    <loc>https://www.batistafloramar.com.br/Podcast</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://batista-floramar-site-production.up.railway.app/PalavraDoPastor</loc>
+    <loc>https://www.batistafloramar.com.br/PalavraDoPastor</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://batista-floramar-site-production.up.railway.app/Series</loc>
+    <loc>https://www.batistafloramar.com.br/Series</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://batista-floramar-site-production.up.railway.app/Aovivo</loc>
+    <loc>https://www.batistafloramar.com.br/Aovivo</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://batista-floramar-site-production.up.railway.app/Doacao</loc>
+    <loc>https://www.batistafloramar.com.br/Doacao</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://batista-floramar-site-production.up.railway.app/Napalavra</loc>
+    <loc>https://www.batistafloramar.com.br/Napalavra</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>

@@ -12,4 +12,4 @@ Disallow: /AdminPalavra/
 Disallow: /AdminPodcasts/
 Disallow: /AdminSeries/
 
-Sitemap: https://batista-floramar-site-production.up.railway.app/sitemap.xml
+Sitemap: https://www.batistafloramar.com.br/sitemap.xml
