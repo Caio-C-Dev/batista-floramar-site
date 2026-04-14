@@ -970,7 +970,7 @@ textarea {
 .hero-section {
   position: relative;
   min-height: 100vh;
-  background-image: url("/images/image_principal2.jpeg");
+  background-image: url("/images/image_principal_2.jpeg");
   background-size: cover;
   background-position: center top;
   display: flex;
