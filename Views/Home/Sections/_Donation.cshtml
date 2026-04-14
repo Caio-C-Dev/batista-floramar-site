@@ -10,21 +10,103 @@
                 <br><em class="mt-2 d-block" style="color:var(--brand-gold);font-size:0.95rem;">&#8220;Deus ama quem doa com alegria.&#8221; &#8212; 2 Coríntios 9:7</em>
             </p>
             <div class="d-flex flex-wrap gap-3 justify-content-center mt-5">
-                <a href="/Doacao" class="btn btn-primary btn-xl px-5 py-3">
+                <button type="button" class="btn btn-primary btn-xl px-5 py-3" id="btnPixModal">
                     <i class="fas fa-qrcode me-2"></i> Contribuir via PIX
-                </a>
+                </button>
             </div>
         </div>
     </div>
 </section>
 
+<!-- Modal PIX -->
+<div class="modal fade" id="pixModal" tabindex="-1" aria-labelledby="pixModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width:420px;">
+        <div class="modal-content" style="background:var(--bg-card,#12172a);border:1px solid rgba(230,193,90,0.25);border-radius:20px;">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title text-gold fw-bold" id="pixModalLabel">
+                    <i class="fas fa-qrcode me-2"></i>Contribuir via PIX
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <div class="modal-body text-center px-4 pb-4">
+                <p class="text-secondary mb-3" style="font-size:.9rem;">Escaneie o QR Code ou copie a chave CNPJ para contribuir instantaneamente.</p>
+                <div class="pix-qr-wrap mb-3" style="display:inline-block;padding:12px;background:#fff;border-radius:12px;">
+                    <img src="/images/qr_code.png"
+                         alt="QR Code PIX Comunidade Batista Floramar"
+                         style="width:200px;height:200px;object-fit:contain;display:block;"
+                         onerror="this.parentElement.style.display='none'" />
+                </div>
+                <div class="rounded-3 p-3 mb-3" style="background:rgba(255,255,255,0.05);border:1px solid rgba(230,193,90,0.2);">
+                    <p class="mb-1 text-secondary" style="font-size:.8rem;">Chave PIX (CNPJ)</p>
+                    <strong class="text-gold fs-5">44.457.832/0001-07</strong>
+                </div>
+                <button type="button" id="btnCopiarPix" class="btn btn-primary w-100">
+                    <i class="fas fa-copy me-2"></i> Copiar chave
+                </button>
+                <p class="mt-3 mb-0 text-secondary" style="font-size:.8rem;">
+                    <i class="fas fa-heart me-1" style="color:var(--brand-gold);"></i>
+                    &#8220;Deus ama quem doa com alegria.&#8221; — 2 Coríntios 9:7
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Animação moeda girando */
+@@keyframes coinSpin {
+    from { transform: perspective(900px) rotateY(0deg); }
+    to   { transform: perspective(900px) rotateY(360deg); }
+}
+.donation-card.coin-spinning {
+    animation: coinSpin 2s cubic-bezier(0.05, 0.7, 0.3, 1) forwards;
+    pointer-events: none;
+}
+</style>
+
 <script>
 (function () {
-    var card = document.getElementById('donationCard');
+    var card    = document.getElementById('donationCard');
+    var btnPix  = document.getElementById('btnPixModal');
+    var btnCopy = document.getElementById('btnCopiarPix');
+
+    /* ── Abre modal com animação de moeda ── */
+    btnPix.addEventListener('click', function () {
+        // Para qualquer tilt ativo e dispara spin
+        card.style.transition = 'none';
+        card.style.transform  = '';
+        card.classList.add('coin-spinning');
+        rafActive = false;
+
+        // Abre o modal no meio da animação (após meio giro = ~350ms)
+        setTimeout(function () {
+            var modal = new bootstrap.Modal(document.getElementById('pixModal'));
+            modal.show();
+        }, 1800);
+
+        // Remove classe ao acabar a animação
+        card.addEventListener('animationend', function handler() {
+            card.classList.remove('coin-spinning');
+            card.style.transition = 'box-shadow 0.3s ease';
+            card.removeEventListener('animationend', handler);
+        });
+    });
+
+    /* ── Copiar chave PIX ── */
+    btnCopy.addEventListener('click', function () {
+        navigator.clipboard.writeText('44.457.832/0001-07').then(function () {
+            btnCopy.innerHTML = '<i class="fas fa-check me-2"></i> Copiado!';
+            setTimeout(function () {
+                btnCopy.innerHTML = '<i class="fas fa-copy me-2"></i> Copiar chave';
+            }, 2500);
+        });
+    });
+
+    /* ── Efeito tilt 3D no hover ── */
     if (!card || window.matchMedia('(hover: none)').matches) return;
 
-    var MAX_TILT = 10; // graus máx
-    var rafId = null;
+    var MAX_TILT = 10;
+    var rafId = null, rafActive = true;
     var targetRX = 0, targetRY = 0;
     var currentRX = 0, currentRY = 0;
 
@@ -32,8 +114,9 @@
     card.style.transition = 'box-shadow 0.3s ease';
 
     card.addEventListener('mousemove', function (e) {
+        if (card.classList.contains('coin-spinning')) return;
         var rect = card.getBoundingClientRect();
-        var x = (e.clientX - rect.left) / rect.width  - 0.5; // -0.5 .. 0.5
+        var x = (e.clientX - rect.left) / rect.width  - 0.5;
         var y = (e.clientY - rect.top)  / rect.height - 0.5;
         targetRY =  x * MAX_TILT;
         targetRX = -y * MAX_TILT;
@@ -42,8 +125,7 @@
     });
 
     card.addEventListener('mouseleave', function () {
-        targetRX = 0;
-        targetRY = 0;
+        targetRX = 0; targetRY = 0;
         card.style.boxShadow = '';
         if (!rafId) rafId = requestAnimationFrame(animate);
     });
@@ -51,18 +133,12 @@
     function animate() {
         currentRX += (targetRX - currentRX) * 0.12;
         currentRY += (targetRY - currentRY) * 0.12;
-
-        card.style.transform =
-            'perspective(900px) rotateX(' + currentRX.toFixed(2) + 'deg) rotateY(' + currentRY.toFixed(2) + 'deg) scale3d(1.02,1.02,1.02)';
-
+        card.style.transform = 'perspective(900px) rotateX(' + currentRX.toFixed(2) + 'deg) rotateY(' + currentRY.toFixed(2) + 'deg) scale3d(1.02,1.02,1.02)';
         if (Math.abs(currentRX - targetRX) > 0.05 || Math.abs(currentRY - targetRY) > 0.05) {
             rafId = requestAnimationFrame(animate);
         } else {
-            currentRX = targetRX;
-            currentRY = targetRY;
-            if (targetRX === 0 && targetRY === 0) {
-                card.style.transform = '';
-            }
+            currentRX = targetRX; currentRY = targetRY;
+            if (targetRX === 0 && targetRY === 0) card.style.transform = '';
             rafId = null;
         }
     }
