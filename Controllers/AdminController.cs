@@ -57,7 +57,12 @@ namespace BatistaFloramar.Controllers
                 return View(model);
             }
 
-            var claims = new List<Claim> { new Claim(ClaimTypes.Name, model.Usuario) };
+            var role = credencial.Role ?? "Admin";
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Name, model.Usuario),
+                new Claim(ClaimTypes.Role, role)
+            };
             var identity = new ClaimsIdentity(claims, "AdminCookie");
             var principal = new ClaimsPrincipal(identity);
             await HttpContext.SignInAsync("AdminCookie", principal, new AuthenticationProperties
@@ -76,29 +81,5 @@ namespace BatistaFloramar.Controllers
             return RedirectToAction("Login");
         }
 
-        // ROTA DE DEBUG TEMPORÁRIA — REMOVER DEPOIS
-        [HttpGet]
-        public async Task<IActionResult> Debug()
-        {
-            try
-            {
-                var credenciais = await _db.AdminCredenciais.ToListAsync();
-                var sb = new System.Text.StringBuilder();
-                sb.AppendLine($"Total de credenciais no banco: {credenciais.Count}");
-                foreach (var c in credenciais)
-                {
-                    sb.AppendLine($"  Id={c.Id} | Usuario='{c.Usuario}' | HashPreview='{c.SenhaHash[..20]}...' | CriadoEm={c.CriadoEm}");
-                    bool hashOk = BCrypt.Net.BCrypt.Verify("Floramar@2026", c.SenhaHash);
-                    sb.AppendLine($"  BCrypt.Verify('Floramar@2026') = {hashOk}");
-                }
-                sb.AppendLine();
-                sb.AppendLine($"User.Identity.IsAuthenticated = {User.Identity?.IsAuthenticated}");
-                return Content(sb.ToString(), "text/plain");
-            }
-            catch (Exception ex)
-            {
-                return Content($"ERRO: {ex.GetType().Name}: {ex.Message}\n\n{ex.StackTrace}", "text/plain");
-            }
-        }
     }
 }
