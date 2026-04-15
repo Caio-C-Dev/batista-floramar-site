@@ -129,6 +129,10 @@ using (var scope = app.Services.CreateScope())
                 ""DataCriacao"" TIMESTAMP NOT NULL
             )
         ");
+        // Adiciona colunas novas em tabelas existentes (EnsureCreated não faz isso)
+        await db.Database.ExecuteSqlRawAsync(@"
+            ALTER TABLE ""AdminCredenciais"" ADD COLUMN IF NOT EXISTS ""Role"" VARCHAR(100) NULL;
+        ");
     }
     else
         await db.Database.MigrateAsync();
