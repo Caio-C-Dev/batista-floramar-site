@@ -1,0 +1,53 @@
+@model IEnumerable<BatistaFloramar.Models.UsuarioListItemViewModel>
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewBag.Title = "Usuários";
+    ViewBag.AdminSection = "usuarios";
+}
+
+@section TopbarActions {
+    <a href="@Url.Action("Criar", "AdminUsuarios")" class="btn-admin">
+        <i class="fas fa-plus"></i> Novo Usuário
+    </a>
+}
+
+<div class="admin-card">
+    <table class="admin-table">
+        <thead>
+            <tr>
+                <th>Usuário</th>
+                <th>Perfil</th>
+                <th>Criado em</th>
+                <th style="width:180px">Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var u in Model)
+            {
+                <tr>
+                    <td><i class="fas fa-user me-2 text-muted"></i>@u.Usuario</td>
+                    <td><span class="badge bg-secondary">@u.Role</span></td>
+                    <td>@u.CriadoEm.ToString("dd/MM/yyyy HH:mm")</td>
+                    <td>
+                        <a href="@Url.Action("AlterarSenha", "AdminUsuarios", new { id = u.Id })"
+                           class="btn-admin-sm">
+                            <i class="fas fa-key"></i> Senha
+                        </a>
+                        @if (u.Usuario != User.Identity!.Name)
+                        {
+                            <form method="post" action="@Url.Action("Excluir","AdminUsuarios")"
+                                  style="display:inline"
+                                  onsubmit="return confirm('Excluir o usuário \'@u.Usuario\'?')">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@u.Id" />
+                                <button type="submit" class="btn-admin-sm btn-admin-danger">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

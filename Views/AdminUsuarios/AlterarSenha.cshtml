@@ -1,0 +1,35 @@
+@model BatistaFloramar.Models.AlterarSenhaViewModel
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewBag.Title = "Alterar Senha";
+    ViewBag.AdminSection = "usuarios";
+}
+
+<div class="admin-card" style="max-width:480px">
+    <p class="text-muted mb-3">Alterando senha de: <strong>@Model.Usuario</strong></p>
+    <form method="post" asp-action="AlterarSenha">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="Id" />
+        <input type="hidden" asp-for="Usuario" />
+        <div class="mb-3">
+            <label asp-for="NovaSenha" class="form-label"></label>
+            <input asp-for="NovaSenha" class="form-control" autocomplete="new-password" />
+            <span asp-validation-for="NovaSenha" class="text-danger small"></span>
+        </div>
+        <div class="mb-4">
+            <label asp-for="ConfirmarSenha" class="form-label"></label>
+            <input asp-for="ConfirmarSenha" class="form-control" autocomplete="new-password" />
+            <span asp-validation-for="ConfirmarSenha" class="text-danger small"></span>
+        </div>
+        <div class="d-flex gap-2">
+            <button type="submit" class="btn-admin">
+                <i class="fas fa-save"></i> Salvar Nova Senha
+            </button>
+            <a href="@Url.Action("Index")" class="btn-admin-outline">Cancelar</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
