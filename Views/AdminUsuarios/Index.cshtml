@@ -33,7 +33,7 @@
                            class="btn-admin-sm">
                             <i class="fas fa-key"></i> Senha
                         </a>
-                        @if (u.Usuario != User.Identity!.Name)
+                        @if (u.Usuario != User.Identity?.Name)
                         {
                             <form method="post" action="@Url.Action("Excluir","AdminUsuarios")"
                                   style="display:inline"
