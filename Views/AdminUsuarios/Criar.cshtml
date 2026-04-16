@@ -8,6 +8,16 @@
 <div class="admin-card" style="max-width:480px">
     <form method="post" asp-action="Criar">
         @Html.AntiForgeryToken()
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="alert-admin-error mb-3">
+                <i class="fas fa-exclamation-circle me-2"></i>
+                @foreach (var erro in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    <div>@erro.ErrorMessage</div>
+                }
+            </div>
+        }
         <div class="mb-3">
             <label asp-for="Usuario" class="form-label"></label>
             <input asp-for="Usuario" class="form-control" autocomplete="username" />

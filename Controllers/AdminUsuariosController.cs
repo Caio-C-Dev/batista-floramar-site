@@ -65,7 +65,15 @@ namespace BatistaFloramar.Controllers
                 Role = string.IsNullOrWhiteSpace(model.Role) ? null : model.Role.Trim(),
                 CriadoEm = DateTime.UtcNow
             });
-            await _db.SaveChangesAsync();
+            try
+            {
+                await _db.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", $"Erro ao salvar no banco: {ex.InnerException?.Message ?? ex.Message}");
+                return View(model);
+            }
 
             TempData["SuccessMessage"] = $"Usuário '{model.Usuario}' criado com sucesso.";
             return RedirectToAction("Index");
@@ -96,7 +104,15 @@ namespace BatistaFloramar.Controllers
             if (usuario == null) return NotFound();
 
             usuario.SenhaHash = BCrypt.Net.BCrypt.HashPassword(model.NovaSenha);
-            await _db.SaveChangesAsync();
+            try
+            {
+                await _db.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", $"Erro ao salvar no banco: {ex.InnerException?.Message ?? ex.Message}");
+                return View(model);
+            }
 
             TempData["SuccessMessage"] = $"Senha do usuário '{usuario.Usuario}' alterada com sucesso.";
             return RedirectToAction("Index");
