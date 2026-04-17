@@ -72,24 +72,8 @@
 
     /* ── Abre modal com animação de moeda ── */
     btnPix.addEventListener('click', function () {
-        // Para qualquer tilt ativo e dispara spin
-        card.style.transition = 'none';
-        card.style.transform  = '';
-        card.classList.add('coin-spinning');
-        rafActive = false;
-
-        // Abre o modal no meio da animação (após meio giro = ~350ms)
-        setTimeout(function () {
-            var modal = new bootstrap.Modal(document.getElementById('pixModal'));
-            modal.show();
-        }, 1800);
-
-        // Remove classe ao acabar a animação
-        card.addEventListener('animationend', function handler() {
-            card.classList.remove('coin-spinning');
-            card.style.transition = 'box-shadow 0.3s ease';
-            card.removeEventListener('animationend', handler);
-        });
+        var modal = new bootstrap.Modal(document.getElementById('pixModal'));
+        modal.show();
     });
 
     /* ── Copiar chave PIX ── */
