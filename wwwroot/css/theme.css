@@ -217,12 +217,21 @@ button {
 .main-navbar .nav-link {
   color: rgba(245, 245, 245, 0.82) !important;
   font-weight: 500;
-  font-size: 0.875rem;
-  letter-spacing: 0.025em;
-  padding-left: 0.7rem !important;
-  padding-right: 0.7rem !important;
+  font-size: 0.8rem;
+  letter-spacing: 0.015em;
+  padding-left: 0.45rem !important;
+  padding-right: 0.45rem !important;
+  white-space: nowrap;
   position: relative;
   transition: color 0.22s ease;
+}
+
+@media (min-width: 1200px) {
+  .main-navbar .nav-link {
+    font-size: 0.875rem;
+    padding-left: 0.65rem !important;
+    padding-right: 0.65rem !important;
+  }
 }
 
 /* underline animado da esquerda para direita */
