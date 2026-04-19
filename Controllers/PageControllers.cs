@@ -173,7 +173,7 @@ namespace BatistaFloramar.Controllers
         {
             ViewBag.Title = "Fale com o Pastor | Contato | Igreja Batista Floramar BH";
             ViewBag.MetaDescription = "Entre em contato com a Comunidade Batista Floramar. Envie sua pergunta ao pastor ou solicite informações sobre a igreja em Belo Horizonte.";
-            ViewBag.MetaKeywords = "contato igreja belo horizonte, falar com pastor BH, perguntas bíblicas, contato batista floramar";
+            ViewBag.MetaKeywords = "contato igreja belo horizonte, falar com pastor BH, perguntas Bíblicas, contato batista floramar";
             return View(new PerguntaPastorViewModel());
         }
 
