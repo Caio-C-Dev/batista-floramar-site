@@ -64,11 +64,14 @@
                 <i class="fas fa-calendar-week"></i>
                 <span>Agenda Semanal</span>
             </a>
+            @if (User.Identity?.Name == "AdmCaio")
+            {
             <a href="@Url.Action("Index", "AdminUsuarios")"
                class="@(ViewBag.AdminSection == "usuarios" ? "active" : "")">
                 <i class="fas fa-user-shield"></i>
                 <span>Usuários</span>
             </a>
+            }
             <hr class="admin-nav-divider" />
             <a href="/">
                 <i class="fas fa-globe"></i>

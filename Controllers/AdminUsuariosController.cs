@@ -10,6 +10,8 @@ namespace BatistaFloramar.Controllers
     [Authorize(AuthenticationSchemes = "AdminCookie")]
     public class AdminUsuariosController : Controller
     {
+        private const string AdminPrincipal = "AdmCaio";
+
         private readonly BatistaFloramarDbContext _db;
 
         public AdminUsuariosController(BatistaFloramarDbContext db)
@@ -17,8 +19,22 @@ namespace BatistaFloramar.Controllers
             _db = db;
         }
 
+        /// <summary>Retorna redirect de acesso negado se o usuário logado não for o AdmCaio.</summary>
+        private IActionResult? VerificarAdmCaio()
+        {
+            if (User.Identity?.Name != AdminPrincipal)
+            {
+                TempData["ErrorMessage"] = "Acesso restrito ao administrador principal.";
+                return RedirectToAction("Index", "Admin");
+            }
+            return null;
+        }
+
         public async Task<IActionResult> Index()
         {
+            var acesso = VerificarAdmCaio();
+            if (acesso != null) return acesso;
+
             ViewBag.AdminSection = "usuarios";
             ViewBag.Title = "Usuários";
             var usuarios = await _db.AdminCredenciais
@@ -37,6 +53,9 @@ namespace BatistaFloramar.Controllers
         [HttpGet]
         public IActionResult Criar()
         {
+            var acesso = VerificarAdmCaio();
+            if (acesso != null) return acesso;
+
             ViewBag.AdminSection = "usuarios";
             ViewBag.Title = "Novo Usuário";
             return View(new CriarUsuarioViewModel());
@@ -46,6 +65,9 @@ namespace BatistaFloramar.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Criar(CriarUsuarioViewModel model)
         {
+            var acesso = VerificarAdmCaio();
+            if (acesso != null) return acesso;
+
             ViewBag.AdminSection = "usuarios";
             ViewBag.Title = "Novo Usuário";
 
@@ -82,6 +104,9 @@ namespace BatistaFloramar.Controllers
         [HttpGet]
         public async Task<IActionResult> AlterarSenha(int id)
         {
+            var acesso = VerificarAdmCaio();
+            if (acesso != null) return acesso;
+
             ViewBag.AdminSection = "usuarios";
             ViewBag.Title = "Alterar Senha";
 
@@ -95,6 +120,9 @@ namespace BatistaFloramar.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AlterarSenha(AlterarSenhaViewModel model)
         {
+            var acesso = VerificarAdmCaio();
+            if (acesso != null) return acesso;
+
             ViewBag.AdminSection = "usuarios";
             ViewBag.Title = "Alterar Senha";
 
@@ -122,6 +150,9 @@ namespace BatistaFloramar.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Excluir(int id)
         {
+            var acesso = VerificarAdmCaio();
+            if (acesso != null) return acesso;
+
             var total = await _db.AdminCredenciais.CountAsync();
             if (total <= 1)
             {

@@ -18,7 +18,7 @@
                 {
                     var v = podcasts[i];
                     var thumbUrl = $"https://img.youtube.com/vi/{v.YoutubeVideoId}/mqdefault.jpg";
-                    var desc = v.Descricao.Length > 90 ? v.Descricao.Substring(0, 90).TrimEnd() + "…" : v.Descricao;
+                    var desc = v.Descricao?.Length > 90 ? v.Descricao.Substring(0, 90).TrimEnd() + "…" : v.Descricao;
                     <div class="col-md-4 scroll-reveal delay-@(i + 1)">
                         <div class="podcast-card">
                             <a href="@v.WatchUrl" target="_blank" rel="noopener noreferrer" class="podcast-thumb-wrap">

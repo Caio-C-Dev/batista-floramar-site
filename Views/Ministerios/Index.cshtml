@@ -27,7 +27,7 @@
                                 <p class="mb-0 small text-secondary"><i class="fas fa-user me-1 text-gold"></i>@m.Lideranca</p>
                             </div>
                         </div>
-                        <p class="text-secondary mb-3">@(string.IsNullOrEmpty(m.ResumoBreve) ? m.Descricao.Substring(0, Math.Min(120, m.Descricao.Length)) + "…" : m.ResumoBreve)</p>
+                        <p class="text-secondary mb-3">@(string.IsNullOrEmpty(m.ResumoBreve) ? (m.Descricao != null ? m.Descricao.Substring(0, Math.Min(120, m.Descricao.Length)) + "…" : "") : m.ResumoBreve)</p>
                         <span class="text-gold small fw-semibold">Conhecer ministério <i class="fas fa-arrow-right ms-1"></i></span>
                     </div>
                 </a>

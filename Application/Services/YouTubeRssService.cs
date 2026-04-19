@@ -30,10 +30,16 @@ namespace BatistaFloramar.Application.Services
             if (_cache != null && DateTime.UtcNow < _cacheExpiry)
                 return _cache;
 
+            if (string.IsNullOrWhiteSpace(_channelId) || _channelId == "UCd5R5bNSpiIk2Swx2KWSxlQ")
+                return new List<YouTubeVideo>();
+
             try
             {
                 var url = $"https://www.youtube.com/feeds/videos.xml?channel_id={_channelId}";
-                var xml = await _http.GetStringAsync(url);
+                var response = await _http.GetAsync(url);
+                if (!response.IsSuccessStatusCode)
+                    return _cache ?? new List<YouTubeVideo>();
+                var xml = await response.Content.ReadAsStringAsync();
 
                 XNamespace atom = "http://www.w3.org/2005/Atom";
                 XNamespace yt = "http://www.youtube.com/xml/schemas/2015";

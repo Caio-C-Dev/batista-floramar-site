@@ -23,6 +23,18 @@ namespace BatistaFloramar.Controllers
         {
             ViewBag.Title = "Próximos Eventos";
             ViewBag.AdminSection = "eventos";
+
+            // Desativa automaticamente eventos cuja data já passou
+            var eventosPassados = await _db.Eventos
+                .Where(e => e.Ativo && e.DataEvento < DateTime.Today)
+                .ToListAsync();
+            if (eventosPassados.Any())
+            {
+                foreach (var ev in eventosPassados)
+                    ev.Ativo = false;
+                await _db.SaveChangesAsync();
+            }
+
             var eventos = await _db.Eventos
                 .OrderBy(e => e.DataEvento)
                 .ToListAsync();
