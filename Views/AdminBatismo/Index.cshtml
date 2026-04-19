@@ -1,0 +1,108 @@
+@model IEnumerable<BatistaFloramar.Domain.Entities.SolicitacaoBatismo>
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewBag.Title = "Batismo e Filiação";
+    ViewBag.AdminSection = "batismo";
+    var pendentes = Model.Count(s => !s.Atendido);
+}
+
+@section TopbarActions {
+    @if (pendentes > 0)
+    {
+        <span class="badge-admin" style="background:#1a4a2a;color:#5d8;font-size:.85rem;padding:.4rem .9rem;">
+            <i class="fas fa-clock me-1"></i> @pendentes pendente@(pendentes > 1 ? "s" : "")
+        </span>
+    }
+}
+
+<div class="admin-card">
+    @if (!Model.Any())
+    {
+        <div class="empty-state">
+            <i class="fas fa-water"></i>
+            <p>Nenhuma solicitação de batismo ou filiação ainda.</p>
+        </div>
+    }
+    else
+    {
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Tipo</th>
+                    <th>WhatsApp</th>
+                    <th>E-mail</th>
+                    <th>Mensagem</th>
+                    <th>Data</th>
+                    <th>Status</th>
+                    <th style="width:160px">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var s in Model)
+                {
+                    <tr style="@(!s.Atendido ? "background:rgba(212,175,55,.04)" : "opacity:.7")">
+                        <td><strong>@s.Nome</strong></td>
+                        <td>
+                            @if (s.Tipo == "Batismo")
+                            {
+                                <span class="badge-admin" style="background:#1a2a4a;color:#7ab"><i class="fas fa-water me-1"></i>Batismo</span>
+                            }
+                            else
+                            {
+                                <span class="badge-admin" style="background:#2a1a4a;color:#ab7"><i class="fas fa-church me-1"></i>Filiação</span>
+                            }
+                        </td>
+                        <td>
+                            <a href="https://wa.me/55@(s.WhatsApp.Replace("(","").Replace(")","").Replace(" ","").Replace("-",""))"
+                               target="_blank" rel="noopener noreferrer" style="color:#25d366;">
+                                <i class="fab fa-whatsapp me-1"></i>@s.WhatsApp
+                            </a>
+                        </td>
+                        <td style="font-size:.85rem;">@s.Email</td>
+                        <td style="font-size:.83rem;color:#9aacb8;max-width:200px;">
+                            @if (!string.IsNullOrWhiteSpace(s.Mensagem))
+                            {
+                                <span title="@s.Mensagem">@(s.Mensagem.Length > 60 ? s.Mensagem[..60] + "…" : s.Mensagem)</span>
+                            }
+                            else { <span style="color:#555">—</span> }
+                        </td>
+                        <td style="font-size:.85rem;white-space:nowrap;">@s.DataEnvio.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</td>
+                        <td>
+                            @if (s.Atendido)
+                            {
+                                <span class="badge-admin" style="background:#1a4a2a;color:#5d8;"><i class="fas fa-check me-1"></i>Atendido</span>
+                            }
+                            else
+                            {
+                                <span class="badge-admin" style="background:#4a3010;color:#d4af37;"><i class="fas fa-clock me-1"></i>Pendente</span>
+                            }
+                        </td>
+                        <td>
+                            <div class="d-flex gap-2 flex-wrap">
+                                @if (!s.Atendido)
+                                {
+                                    <form method="post" action="@Url.Action("MarcarAtendido","AdminBatismo")">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@s.Id" />
+                                        <button type="submit" class="btn-admin-sm" title="Marcar como atendido">
+                                            <i class="fas fa-check"></i>
+                                        </button>
+                                    </form>
+                                }
+                                <form method="post" action="@Url.Action("Excluir","AdminBatismo")"
+                                      onsubmit="return confirm('Excluir solicitação de \'@s.Nome\'?')">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@s.Id" />
+                                    <button type="submit" class="btn-admin-sm btn-admin-danger" title="Excluir">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>

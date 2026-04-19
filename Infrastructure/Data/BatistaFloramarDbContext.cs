@@ -22,6 +22,9 @@ namespace BatistaFloramar.Infrastructure.Data
         public DbSet<PalavraDoPastor> PalavrasDoPastor => Set<PalavraDoPastor>();
         public DbSet<SerieMensagem> SeriesMensagens => Set<SerieMensagem>();
         public DbSet<EventoSemanal> EventosSemanais => Set<EventoSemanal>();
+        public DbSet<SolicitacaoBatismo> SolicitacoesBatismo => Set<SolicitacaoBatismo>();
+        public DbSet<GaleriaAlbum> GaleriaAlbuns => Set<GaleriaAlbum>();
+        public DbSet<GaleriaFoto> GaleriaFotos => Set<GaleriaFoto>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -158,6 +161,37 @@ namespace BatistaFloramar.Infrastructure.Data
                 e.Property(x => x.DiaSemana).HasMaxLength(20).IsRequired();
                 e.Property(x => x.Horario).HasMaxLength(30).IsRequired();
                 e.Property(x => x.Descricao).HasMaxLength(500);
+            });
+
+            modelBuilder.Entity<SolicitacaoBatismo>(e =>
+            {
+                e.ToTable("SolicitacoesBatismo");
+                e.HasKey(x => x.Id);
+                e.Property(x => x.Nome).HasMaxLength(150).IsRequired();
+                e.Property(x => x.WhatsApp).HasMaxLength(30).IsRequired();
+                e.Property(x => x.Email).HasMaxLength(180).IsRequired();
+                e.Property(x => x.Tipo).HasMaxLength(30).IsRequired();
+                e.Property(x => x.Mensagem).HasMaxLength(1000);
+            });
+
+            modelBuilder.Entity<GaleriaAlbum>(e =>
+            {
+                e.ToTable("GaleriaAlbuns");
+                e.HasKey(x => x.Id);
+                e.Property(x => x.Nome).HasMaxLength(200).IsRequired();
+                e.Property(x => x.Descricao).HasMaxLength(1000);
+            });
+
+            modelBuilder.Entity<GaleriaFoto>(e =>
+            {
+                e.ToTable("GaleriaFotos");
+                e.HasKey(x => x.Id);
+                e.Property(x => x.CaminhoArquivo).HasMaxLength(500).IsRequired();
+                e.Property(x => x.Legenda).HasMaxLength(300);
+                e.HasOne(x => x.Album)
+                 .WithMany(x => x.Fotos)
+                 .HasForeignKey(x => x.AlbumId)
+                 .OnDelete(DeleteBehavior.Cascade);
             });
         }
     }

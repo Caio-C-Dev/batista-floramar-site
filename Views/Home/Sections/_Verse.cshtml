@@ -3,16 +3,116 @@
     var versiculo = ViewBag.Versiculo as BibleVerseDto;
     var texto = versiculo?.Texto ?? "Confie no Senhor de todo o seu coração e não se apoie em seu próprio entendimento.";
     var referencia = versiculo?.Referencia ?? "Provérbios 3:5 (NVI)";
+    var textoCompleto = $"\"{texto}\" — {referencia}";
+    var whatsappUrl = $"https://wa.me/?text={Uri.EscapeDataString(textoCompleto)}";
 }
 <section class="verse-section">
     <div class="container">
         <div class="verse-banner scroll-reveal">
             <div class="verse-icon"><i class="fas fa-book-open"></i></div>
             <p class="section-eyebrow mb-3">Versículo do Dia</p>
-            <blockquote class="verse-quote">
+            <blockquote class="verse-quote" id="verseText">
                 "@texto"
             </blockquote>
-            <cite class="verse-cite">— @referencia</cite>
+            <cite class="verse-cite" id="verseRef">— @referencia</cite>
+
+            <div class="verse-actions mt-4">
+                <button id="btnCopiarVersiculo" class="verse-action-btn" onclick="copiarVersiculo()" title="Copiar versículo">
+                    <i class="fas fa-copy me-2"></i><span id="copyLabel">Copiar</span>
+                </button>
+                <a href="@whatsappUrl" target="_blank" rel="noopener noreferrer" class="verse-action-btn verse-action-whatsapp" title="Compartilhar no WhatsApp">
+                    <i class="fab fa-whatsapp me-2"></i>WhatsApp
+                </a>
+                <button id="btnShareVersiculo" class="verse-action-btn verse-action-share" onclick="shareVersiculo()" title="Compartilhar" style="display:none;">
+                    <i class="fas fa-share-alt me-2"></i>Compartilhar
+                </button>
+            </div>
         </div>
     </div>
 </section>
+
+<style>
+    .verse-actions {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 0.75rem;
+    }
+    .verse-action-btn {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.55rem 1.25rem;
+        border-radius: 30px;
+        border: 1px solid rgba(212,175,55,.45);
+        background: transparent;
+        color: var(--brand-gold, #d4af37);
+        font-size: 0.9rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background .2s, color .2s, transform .15s;
+        text-decoration: none;
+    }
+    .verse-action-btn:hover {
+        background: var(--brand-gold, #d4af37);
+        color: #0d1b2a;
+        transform: translateY(-2px);
+    }
+    .verse-action-whatsapp {
+        border-color: rgba(37,211,102,.5);
+        color: #25d366;
+    }
+    .verse-action-whatsapp:hover {
+        background: #25d366;
+        color: #fff;
+        border-color: #25d366;
+    }
+    .verse-action-share {
+        border-color: rgba(100,160,255,.4);
+        color: #64a0ff;
+    }
+    .verse-action-share:hover {
+        background: #64a0ff;
+        color: #fff;
+    }
+    #btnCopiarVersiculo.copied {
+        background: #1a4a2a;
+        color: #5d8;
+        border-color: #5d8;
+    }
+</style>
+
+<script>
+    (function () {
+        // Mostrar botão nativo de share se disponível
+        if (navigator.share) {
+            document.getElementById('btnShareVersiculo').style.display = 'inline-flex';
+        }
+    })();
+
+    function copiarVersiculo() {
+        const texto = document.getElementById('verseText').innerText.replace(/\n/g, ' ').trim();
+        const ref = document.getElementById('verseRef').innerText.trim();
+        const full = texto + ' ' + ref;
+        navigator.clipboard.writeText(full).then(() => {
+            const btn = document.getElementById('btnCopiarVersiculo');
+            const label = document.getElementById('copyLabel');
+            btn.classList.add('copied');
+            label.textContent = 'Copiado!';
+            setTimeout(() => {
+                btn.classList.remove('copied');
+                label.textContent = 'Copiar';
+            }, 2000);
+        });
+    }
+
+    function shareVersiculo() {
+        const texto = document.getElementById('verseText').innerText.replace(/\n/g, ' ').trim();
+        const ref = document.getElementById('verseRef').innerText.trim();
+        navigator.share({
+            title: 'Versículo do Dia — Comunidade Batista Floramar',
+            text: texto + ' ' + ref,
+            url: window.location.href
+        }).catch(() => {});
+    }
+</script>
+

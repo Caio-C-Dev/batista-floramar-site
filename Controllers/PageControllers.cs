@@ -11,8 +11,9 @@ namespace BatistaFloramar.Controllers
     {
         public IActionResult Index()
         {
-            ViewBag.Title = "Quem Somos | Igreja Batista Floramar BH";
-            ViewBag.MetaDescription = "Conheça a Comunidade Batista Floramar, igreja bíblica evangélica na zona norte de Belo Horizonte. Nossa história, missão e valores fundamentados na Palavra de Deus.";
+            ViewBag.Title = "Quem Somos | Igreja Batista em Belo Horizonte – Floramar";
+            ViewBag.MetaDescription = "Conheça a Comunidade Batista Floramar, igreja Bíblica evangélica na zona norte de Belo Horizonte. Nossa história, missão e valores fundamentados na Palavra de Deus.";
+            ViewBag.MetaKeywords = "quem somos igreja batista floramar, história igreja belo horizonte, missão igeja batista BH, zona norte belo horizonte";
             return View();
         }
     }
@@ -21,8 +22,9 @@ namespace BatistaFloramar.Controllers
     {
         public IActionResult Index()
         {
-            ViewBag.Title = "Cultos em Belo Horizonte | Igreja Batista Floramar";
-            ViewBag.MetaDescription = "Horários de culto na Comunidade Batista Floramar, Floramar – BH: Domingo 10h e 18h, Quarta-feira 20h. Igreja evangélica batísta perto de você na zona norte de Belo Horizonte.";
+            ViewBag.Title = "Cultos em Belo Horizonte | Horários | Igreja Batista Floramar";
+            ViewBag.MetaDescription = "Horários de culto na Comunidade Batista Floramar, Floramar – BH: Domingo 10h e 18h, Quarta-feira 20h. Igreja evangélica batista perto de você na zona norte de Belo Horizonte.";
+            ViewBag.MetaKeywords = "culto belo horizonte horário, culto domingo BH, culto quarta belo horizonte, horário culto floramar, igreja batista culto BH";
             return View();
         }
     }
@@ -73,8 +75,9 @@ namespace BatistaFloramar.Controllers
 
         public IActionResult Index()
         {
-            ViewBag.Title = "Doação";
+            ViewBag.Title = "Contribua com a Igreja | Doação | Comunidade Batista Floramar BH";
             ViewBag.MetaDescription = "Contribua com a Comunidade Batista Floramar e ajude a sustentar a obra de Deus em Belo Horizonte. Doação via Pix ou cartão.";
+            ViewBag.MetaKeywords = "doação igreja belo horizonte, contribuição igreja batista BH, missão igreja floramar";
             ViewBag.MpPublicKey = _config["MercadoPago:PublicKey"] ?? "";
             return View();
         }
@@ -108,8 +111,9 @@ namespace BatistaFloramar.Controllers
 
         public async Task<IActionResult> Index()
         {
-            ViewBag.Title = "Células de Crescimento em BH | Igreja Batista Floramar";
+            ViewBag.Title = "Células de Crescimento em BH | Grupo Bíblico | Igreja Batista Floramar";
             ViewBag.MetaDescription = "Participe de uma célula de crescimento da Comunidade Batista Floramar em Belo Horizonte. Pequenos grupos de discipulado e estudo bíblico perto de você.";
+            ViewBag.MetaKeywords = "célula de crescimento belo horizonte, pequeno grupo bíblico BH, discipulado belo horizonte, grupo de estudo bíblico floramar, célula batista BH";
             var celulas = await _db.Celulas
                 .Where(c => c.Ativo)
                 .OrderBy(c => c.Ordem)
@@ -130,8 +134,9 @@ namespace BatistaFloramar.Controllers
     {
         public IActionResult Index()
         {
-            ViewBag.Title = "Ao Vivo";
+            ViewBag.Title = "Culto Ao Vivo | Transmissão | Igreja Batista Floramar BH";
             ViewBag.MetaDescription = "Assista ao culto ao vivo da Comunidade Batista Floramar. Transmissões dos cultos de domingo e quarta-feira em Belo Horizonte.";
+            ViewBag.MetaKeywords = "culto ao vivo belo horizonte, Igreja ao vivo BH, culto online batista, transmissão culto floramar";
             return View();
         }
     }
@@ -143,8 +148,9 @@ namespace BatistaFloramar.Controllers
 
         public async Task<IActionResult> Index()
         {
-            ViewBag.Title = "Podcast";
+            ViewBag.Title = "Podcast Bíblico | Mensagens | Comunidade Batista Floramar BH";
             ViewBag.MetaDescription = "Ouça os podcasts da Comunidade Batista Floramar. Mensagens, devoções e ensinos bíblicos para edificar sua fé.";
+            ViewBag.MetaKeywords = "podcast bíblico belo horizonte, podcast evangelico BH, ensino bíblico podcast, mensagem batista BH";
             var videos = await _db.PodcastVideos
                 .Where(v => v.Ativo)
                 .OrderBy(v => v.Ordem)
@@ -165,8 +171,9 @@ namespace BatistaFloramar.Controllers
         [HttpGet]
         public IActionResult Index()
         {
-            ViewBag.Title = "Na Palavra";
-            ViewBag.MetaDescription = "Envie sua pergunta ao pastor da Comunidade Batista Floramar. Tire dúvidas sobre a Bíblia, fé e vida cristã.";
+            ViewBag.Title = "Fale com o Pastor | Contato | Igreja Batista Floramar BH";
+            ViewBag.MetaDescription = "Entre em contato com a Comunidade Batista Floramar. Envie sua pergunta ao pastor ou solicite informações sobre a igreja em Belo Horizonte.";
+            ViewBag.MetaKeywords = "contato igreja belo horizonte, falar com pastor BH, perguntas bíblicas, contato batista floramar";
             return View(new PerguntaPastorViewModel());
         }
 
@@ -221,7 +228,7 @@ namespace BatistaFloramar.Controllers
         public async Task<IActionResult> Index()
         {
             ViewBag.Title = "Palavra do Pastor | Igreja Batista Floramar BH";
-            ViewBag.MetaDescription = "Reflexões e mensagens bíblicas do pastor da Comunidade Batista Floramar em Belo Horizonte. Pregação expositiva séria e acessível para sua vida.";
+            ViewBag.MetaDescription = "Reflexões e mensagens Bíblicas do pastor da Comunidade Batista Floramar em Belo Horizonte. Pregação expositiva séria e acessível para sua vida.";
             var palavras = await _db.PalavrasDoPastor
                 .Where(p => p.Publicado)
                 .OrderByDescending(p => p.DataPublicacao)
@@ -250,7 +257,7 @@ namespace BatistaFloramar.Controllers
         public async Task<IActionResult> Index()
         {
             ViewBag.Title = "Séries de Mensagens Bíblicas | Batista Floramar BH";
-            ViewBag.MetaDescription = "Assista e acompanhe as séries de mensagens bíblicas da Comunidade Batista Floramar em Belo Horizonte. Pregação expositiva séria para seu crescimento espiritual.";
+            ViewBag.MetaDescription = "Assista e acompanhe as séries de mensagens Bíblicas da Comunidade Batista Floramar em Belo Horizonte. Pregação expositiva séria para seu crescimento espiritual.";
             var series = await _db.SeriesMensagens
                 .Where(s => s.Ativo)
                 .OrderBy(s => s.Ordem)

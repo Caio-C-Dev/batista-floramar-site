@@ -46,7 +46,7 @@
                         <div class="min-leader-avatar">
                             @if (!string.IsNullOrEmpty(Model.FotoLider))
                             {
-                                <img src="@Model.FotoLider" alt="@Model.Lideranca" class="min-leader-photo" />
+                                <img src="@Model.FotoLider" alt="@Model.Lideranca – Líerança do ministério @Model.Nome na Comunidade Batista Floramar" class="min-leader-photo" loading="lazy" />
                             }
                             else
                             {
@@ -97,7 +97,7 @@
                         <div class="col-6 col-md-4 col-lg-3">
                             <div class="min-foto-thumb" data-bs-toggle="modal" data-bs-target="#fotoModal"
                                  data-src="@foto.CaminhoArquivo" data-legenda="@foto.Legenda">
-                                <img src="@foto.CaminhoArquivo" alt="@foto.Legenda" />
+                                <img src="@foto.CaminhoArquivo" alt="@(foto.Legenda ?? Model.Nome + " – Comunidade Batista Floramar")" loading="lazy" />
                                 @if (!string.IsNullOrEmpty(foto.Legenda))
                                 {
                                     <div class="min-foto-label">@foto.Legenda</div>

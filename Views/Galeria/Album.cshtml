@@ -1,0 +1,206 @@
+@using BatistaFloramar.Domain.Entities
+@model GaleriaAlbum
+@{
+    Layout = "_Layout";
+    ViewBag.Title = Model.Nome + " | Galeria";
+    ViewBag.FullWidth = true;
+}
+<style>
+    .album-hero {
+        background: linear-gradient(135deg, #0d1b2a 0%, #12243a 100%);
+        padding: 4rem 0 2.5rem;
+        border-bottom: 1px solid rgba(212,175,55,.15);
+    }
+    .album-hero h1 { font-size: clamp(1.6rem,3.5vw,2.4rem); font-weight:700; color:#fff; margin-bottom:.5rem; }
+    .album-hero p { color: #9aacb8; margin-bottom: 0; }
+    .back-link { color: #d4af37; text-decoration: none; font-size:.9rem; display:inline-flex; align-items:center; gap:.4rem; margin-bottom:1rem; }
+    .back-link:hover { color:#f0cc50; }
+
+    .fotos-masonry {
+        columns: 4;
+        column-gap: 1rem;
+        padding: 2.5rem 0;
+    }
+    @@media (max-width: 1199px) { .fotos-masonry { columns: 3; } }
+    @@media (max-width: 767px)  { .fotos-masonry { columns: 2; } }
+    @@media (max-width: 479px)  { .fotos-masonry { columns: 1; } }
+
+    .foto-item {
+        break-inside: avoid;
+        margin-bottom: 1rem;
+        border-radius: 12px;
+        overflow: hidden;
+        cursor: pointer;
+        position: relative;
+    }
+    .foto-item img {
+        width: 100%;
+        display: block;
+        border-radius: 12px;
+        transition: transform .3s, filter .3s;
+    }
+    .foto-item:hover img { transform: scale(1.03); filter: brightness(.8); }
+    .foto-item .foto-overlay {
+        position: absolute; inset: 0;
+        display: flex; align-items: center; justify-content: center;
+        opacity: 0; transition: opacity .25s;
+        background: rgba(0,0,0,.3);
+        border-radius: 12px;
+    }
+    .foto-item:hover .foto-overlay { opacity: 1; }
+    .foto-overlay i { color: #fff; font-size: 2rem; }
+
+    /* Lightbox */
+    .lb-overlay {
+        display: none;
+        position: fixed; inset: 0; z-index: 9999;
+        background: rgba(0,0,0,.94);
+        align-items: center; justify-content: center;
+        padding: 1rem;
+    }
+    .lb-overlay.open { display: flex; }
+    .lb-img-wrap {
+        position: relative;
+        max-width: min(90vw, 1200px);
+        max-height: 90vh;
+        display: flex; align-items: center; justify-content: center;
+    }
+    .lb-overlay img {
+        max-width: 100%; max-height: 88vh;
+        border-radius: 10px;
+        object-fit: contain;
+        box-shadow: 0 20px 60px rgba(0,0,0,.7);
+    }
+    .lb-btn {
+        position: fixed; top: 50%; transform: translateY(-50%);
+        background: rgba(212,175,55,.15); border: 1px solid rgba(212,175,55,.3);
+        color: #d4af37; border-radius: 50%; width: 48px; height: 48px;
+        display: flex; align-items: center; justify-content: center;
+        cursor: pointer; font-size: 1.2rem; transition: background .2s;
+        z-index: 10000;
+    }
+    .lb-btn:hover { background: rgba(212,175,55,.35); }
+    .lb-prev { left: 1rem; }
+    .lb-next { right: 1rem; }
+    .lb-close {
+        position: fixed; top: 1rem; right: 1.25rem;
+        background: rgba(255,255,255,.1); border: none;
+        color: #fff; border-radius: 50%; width: 44px; height: 44px;
+        display: flex; align-items: center; justify-content: center;
+        cursor: pointer; font-size: 1.2rem; z-index: 10000;
+        transition: background .2s;
+    }
+    .lb-close:hover { background: rgba(255,0,0,.3); }
+    .lb-caption {
+        position: fixed; bottom: 1.2rem; left: 50%; transform: translateX(-50%);
+        background: rgba(0,0,0,.65); color: #d4af37; border-radius: 20px;
+        padding: .4rem 1.2rem; font-size: .88rem; white-space: nowrap;
+        z-index: 10000;
+    }
+    .lb-counter {
+        position: fixed; top: 1rem; left: 50%; transform: translateX(-50%);
+        background: rgba(0,0,0,.6); color: #9aacb8; border-radius: 20px;
+        padding: .3rem 1rem; font-size: .85rem; z-index: 10000;
+    }
+</style>
+
+<div class="album-hero">
+    <div class="container">
+        <a href="/Galeria" class="back-link"><i class="fas fa-arrow-left"></i>Todos os álbuns</a>
+        <h1>@Model.Nome</h1>
+        <p>
+            <i class="fas fa-calendar-alt me-1" style="color:#d4af37;"></i>
+            @Model.Data.ToString("dd 'de' MMMM 'de' yyyy", new System.Globalization.CultureInfo("pt-BR"))
+            &nbsp;·&nbsp;
+            <i class="fas fa-camera me-1" style="color:#d4af37;"></i>@Model.Fotos.Count foto@(Model.Fotos.Count != 1 ? "s" : "")
+        </p>
+        @if (!string.IsNullOrWhiteSpace(Model.Descricao))
+        {
+            <p class="mt-2" style="color:#c8d8e4;">@Model.Descricao</p>
+        }
+    </div>
+</div>
+
+<div class="container">
+    @if (!Model.Fotos.Any())
+    {
+        <div class="text-center py-5">
+            <i class="fas fa-images" style="font-size:3rem;color:#4a5a7a;display:block;margin-bottom:1rem;"></i>
+            <p style="color:#9aacb8;">Nenhuma foto neste álbum ainda.</p>
+        </div>
+    }
+    else
+    {
+        <div class="fotos-masonry">
+            @for (int i = 0; i < Model.Fotos.Count; i++)
+            {
+                var foto = Model.Fotos[i];
+                <div class="foto-item scroll-reveal" onclick="abrirLightbox(@i)" data-index="@i">
+                    <img src="@foto.CaminhoArquivo" alt="@(foto.Legenda ?? Model.Nome)" loading="lazy" />
+                    <div class="foto-overlay"><i class="fas fa-expand-alt"></i></div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+<!-- Lightbox -->
+<div class="lb-overlay" id="lightbox" onclick="fecharLightboxFora(event)">
+    <button class="lb-close" onclick="fecharLightbox()" aria-label="Fechar"><i class="fas fa-times"></i></button>
+    <button class="lb-btn lb-prev" onclick="mudarFoto(-1)" aria-label="Anterior"><i class="fas fa-chevron-left"></i></button>
+    <button class="lb-btn lb-next" onclick="mudarFoto(1)" aria-label="Próxima"><i class="fas fa-chevron-right"></i></button>
+    <span class="lb-counter" id="lbCounter"></span>
+    <div class="lb-img-wrap">
+        <img id="lbImg" src="" alt="" />
+    </div>
+    <div class="lb-caption" id="lbCaption" style="display:none;"></div>
+</div>
+
+@section Scripts {
+<script>
+    const fotos = [
+        @foreach (var f in Model.Fotos)
+        {
+            <text>{ src: "@f.CaminhoArquivo", caption: "@(f.Legenda ?? "")" },</text>
+        }
+    ];
+    let cur = 0;
+
+    function abrirLightbox(idx) {
+        cur = idx;
+        mostrar();
+        document.getElementById('lightbox').classList.add('open');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function fecharLightbox() {
+        document.getElementById('lightbox').classList.remove('open');
+        document.body.style.overflow = '';
+    }
+
+    function fecharLightboxFora(e) {
+        if (e.target === document.getElementById('lightbox')) fecharLightbox();
+    }
+
+    function mudarFoto(dir) {
+        cur = (cur + dir + fotos.length) % fotos.length;
+        mostrar();
+    }
+
+    function mostrar() {
+        const f = fotos[cur];
+        document.getElementById('lbImg').src = f.src;
+        document.getElementById('lbCounter').textContent = (cur + 1) + ' / ' + fotos.length;
+        const cap = document.getElementById('lbCaption');
+        if (f.caption) { cap.textContent = f.caption; cap.style.display = 'block'; }
+        else cap.style.display = 'none';
+    }
+
+    document.addEventListener('keydown', (e) => {
+        if (!document.getElementById('lightbox').classList.contains('open')) return;
+        if (e.key === 'ArrowRight') mudarFoto(1);
+        if (e.key === 'ArrowLeft')  mudarFoto(-1);
+        if (e.key === 'Escape')     fecharLightbox();
+    });
+</script>
+}

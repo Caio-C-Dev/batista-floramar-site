@@ -23,14 +23,42 @@
                 <div class="contact-card">
                     <div class="contact-icon"><i class="fas fa-map-marker-alt"></i></div>
                     <h5>Endereço</h5>
-                    <p>R. José Lima de Almeida, 59 — Jardim Guanabara, BH/MG</p>
+                    <p>R. José Lima de Almeida, 59 — Floramar, BH/MG</p>
                 </div>
             </div>
         </div>
-        <div class="text-center mt-5">
-            <a href="https://wa.me/5531992898901" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-lg">
-                <i class="fab fa-whatsapp me-2"></i> Chamar no WhatsApp
-            </a>
+
+        <!-- Mapa -->
+        <div class="mapa-section scroll-reveal mt-5">
+            <div class="mapa-wrap">
+                <iframe
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3751.3!2d-43.9502!3d-19.8423!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2sRua+Jos%C3%A9+Lima+de+Almeida%2C+59%2C+Floramar%2C+Belo+Horizonte!5e0!3m2!1spt!2sbr!4v1"
+                    width="100%" height="380" style="border:0;border-radius:16px;display:block;filter:brightness(.9) contrast(1.05);"
+                    allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+                    title="Localização da Comunidade Batista Floramar em Belo Horizonte">
+                </iframe>
+            </div>
+            <div class="mapa-ctas text-center mt-4 d-flex flex-wrap justify-content-center gap-3">
+                <a href="https://www.google.com/maps/dir/?api=1&destination=Rua+Jos%C3%A9+Lima+de+Almeida,+59,+Floramar,+Belo+Horizonte,+MG"
+                   target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-lg">
+                    <i class="fas fa-route me-2"></i> Como Chegar
+                </a>
+                <a href="https://wa.me/5531992898901?text=Olá!%20Gostaria%20de%20saber%20mais%20sobre%20a%20igreja."
+                   target="_blank" rel="noopener noreferrer" class="btn btn-outline-hero btn-lg">
+                    <i class="fab fa-whatsapp me-2"></i> Falar no WhatsApp
+                </a>
+                <a href="/Visita" class="btn btn-outline-hero btn-lg">
+                    <i class="fas fa-calendar-check me-2"></i> Planejar Visita
+                </a>
+                <a href="/Contato/Batismo" class="btn btn-outline-hero btn-lg">
+                    <i class="fas fa-water me-2"></i> Batismo &amp; Filiação
+                </a>
+            </div>
         </div>
     </div>
 </section>
+
+<style>
+    .mapa-wrap { border-radius: 16px; overflow: hidden; box-shadow: 0 8px 32px rgba(0,0,0,.4); }
+</style>
+

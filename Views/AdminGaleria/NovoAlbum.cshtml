@@ -1,0 +1,36 @@
+@using BatistaFloramar.Domain.Entities
+@model GaleriaAlbum
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewBag.Title = "Novo Álbum";
+    ViewBag.AdminSection = "galeria";
+}
+
+<div class="admin-card" style="max-width:600px;">
+    <form method="post" asp-action="NovoAlbum">
+        @Html.AntiForgeryToken()
+
+        <div class="mb-4">
+            <label class="form-label-admin">Nome do álbum *</label>
+            <input asp-for="Nome" class="form-control-admin" placeholder="Ex: Culto de Páscoa 2026" />
+            <span asp-validation-for="Nome" class="text-danger" style="font-size:.82rem;"></span>
+        </div>
+
+        <div class="mb-4">
+            <label class="form-label-admin">Descrição (opcional)</label>
+            <textarea asp-for="Descricao" class="form-control-admin" rows="3" placeholder="Descreva este álbum..."></textarea>
+        </div>
+
+        <div class="mb-4">
+            <label class="form-label-admin">Data do evento *</label>
+            <input asp-for="Data" type="date" class="form-control-admin" />
+        </div>
+
+        <div class="d-flex gap-3">
+            <button type="submit" class="btn-admin btn-admin-success">
+                <i class="fas fa-plus me-1"></i> Criar álbum
+            </button>
+            <a href="@Url.Action("Index")" class="btn-admin btn-admin-outline">Cancelar</a>
+        </div>
+    </form>
+</div>

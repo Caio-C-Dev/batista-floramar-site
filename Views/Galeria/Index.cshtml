@@ -1,0 +1,111 @@
+@using BatistaFloramar.Domain.Entities
+@model List<GaleriaAlbum>
+@{
+    Layout = "_Layout";
+    ViewBag.Title = "Galeria | Comunidade Batista Floramar";
+    ViewBag.FullWidth = true;
+}
+<style>
+    .galeria-hero {
+        background: linear-gradient(135deg, var(--bg-primary,#0d1b2a) 0%, #12243a 100%);
+        padding: 5rem 0 3rem;
+        text-align: center;
+        border-bottom: 1px solid rgba(212,175,55,.15);
+    }
+    .galeria-hero h1 { font-size: clamp(1.8rem,4vw,2.8rem); font-weight: 700; color: #fff; margin-bottom: .75rem; }
+    .galeria-hero p { color: var(--text-muted-section,#9aacb8); max-width: 540px; margin: 0 auto; }
+
+    .galeria-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1.5rem;
+        padding: 3rem 0;
+    }
+    .album-card {
+        border-radius: 16px;
+        overflow: hidden;
+        background: var(--card-bg,#1a2844);
+        border: 1px solid var(--card-border,rgba(212,175,55,.15));
+        text-decoration: none;
+        display: block;
+        transition: transform .25s, box-shadow .25s;
+    }
+    .album-card:hover { transform: translateY(-5px); box-shadow: 0 14px 36px rgba(0,0,0,.45); }
+    .album-thumb {
+        position: relative;
+        height: 200px;
+        overflow: hidden;
+        background: #1a2844;
+    }
+    .album-thumb img { width:100%; height:100%; object-fit:cover; transition: transform .35s; }
+    .album-card:hover .album-thumb img { transform: scale(1.06); }
+    .album-thumb-placeholder {
+        width:100%; height:100%;
+        display: flex; align-items: center; justify-content: center;
+        background: #1a2844;
+    }
+    .album-thumb-count {
+        position: absolute;
+        bottom: .6rem; right: .6rem;
+        background: rgba(0,0,0,.7);
+        color: #d4af37;
+        border-radius: 20px;
+        padding: .25rem .7rem;
+        font-size: .8rem;
+        font-weight: 600;
+    }
+    .album-body { padding: 1.2rem 1.25rem; }
+    .album-nome { color: #fff; font-weight: 700; font-size: 1.05rem; margin-bottom: .3rem; }
+    .album-desc { color: #9aacb8; font-size: .85rem; margin-bottom: .5rem; }
+    .album-data { color: #d4af37; font-size: .82rem; font-weight: 500; }
+</style>
+
+<div class="galeria-hero">
+    <div class="container">
+        <span class="section-eyebrow">Nossa história em imagens</span>
+        <h1>Galeria de Fotos</h1>
+        <p>Momentos especiais da nossa comunidade — cultos, eventos, batismos e muito mais.</p>
+    </div>
+</div>
+
+<div class="container">
+    @if (!Model.Any())
+    {
+        <div class="text-center py-5">
+            <i class="fas fa-images" style="font-size:3.5rem;color:#4a5a7a;margin-bottom:1.2rem;display:block;"></i>
+            <p style="color:#9aacb8;">Nenhum álbum publicado ainda. Volte em breve!</p>
+        </div>
+    }
+    else
+    {
+        <div class="galeria-grid">
+            @foreach (var album in Model)
+            {
+                var capa = album.Fotos.FirstOrDefault()?.CaminhoArquivo;
+                <a href="@Url.Action("Album","Galeria", new {id = album.Id})" class="album-card scroll-reveal">
+                    <div class="album-thumb">
+                        @if (!string.IsNullOrEmpty(capa))
+                        {
+                            <img src="@capa" alt="@album.Nome" loading="lazy" />
+                        }
+                        else
+                        {
+                            <div class="album-thumb-placeholder">
+                                <i class="fas fa-images" style="font-size:2.5rem;color:#4a5a7a;"></i>
+                            </div>
+                        }
+                        <span class="album-thumb-count"><i class="fas fa-camera me-1"></i>@album.Fotos.Count</span>
+                    </div>
+                    <div class="album-body">
+                        <div class="album-nome">@album.Nome</div>
+                        @if (!string.IsNullOrWhiteSpace(album.Descricao))
+                        {
+                            <div class="album-desc">@(album.Descricao.Length > 80 ? album.Descricao[..80] + "…" : album.Descricao)</div>
+                        }
+                        <div class="album-data"><i class="fas fa-calendar-alt me-1"></i>@album.Data.ToString("MMMM yyyy", new System.Globalization.CultureInfo("pt-BR"))</div>
+                    </div>
+                </a>
+            }
+        </div>
+    }
+</div>

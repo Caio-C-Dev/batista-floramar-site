@@ -57,7 +57,7 @@ namespace BatistaFloramar.Migrations
                 UPDATE Ministerios SET Slug = 'batismo',     ResumoBreve = 'Preparando e celebrando o passo público da fé.'                                                  WHERE Nome IN ('Ensino','Batismo');
                 UPDATE Ministerios SET Slug = 'acao-social', ResumoBreve = 'Expressando o amor de Cristo em ações concretas na comunidade.'                                  WHERE Nome = 'Ação Social';
                 UPDATE Ministerios SET Slug = 'missoes',     ResumoBreve = 'Levando o Evangelho ao Brasil e às nações.'                                                      WHERE Nome = 'Missões';
-                UPDATE Ministerios SET Slug = 'familia',     ResumoBreve = 'Fortalecendo lares e relacionamentos com base bíblica.'                                          WHERE Nome = 'Família';
+                UPDATE Ministerios SET Slug = 'familia',     ResumoBreve = 'Fortalecendo lares e relacionamentos com base Bíblica.'                                          WHERE Nome = 'Família';
                 UPDATE Ministerios SET Slug = 'midia',       ResumoBreve = 'Comunicando a mensagem da igreja com criatividade e alcance.'                                    WHERE Nome IN ('Comunicação','Mídia');
                 UPDATE Ministerios SET Slug = 'na-palavra',  ResumoBreve = 'Vídeos, podcasts, gravações e entrevistas da igreja.'                                            WHERE Nome = 'Na Palavra';
                 UPDATE Ministerios SET Slug = 'diaconato',   ResumoBreve = 'Cuidando da igreja e recebendo cada visitante com boas-vindas.'                                  WHERE Nome = 'Diaconato';

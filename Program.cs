@@ -101,7 +101,32 @@ if (app.Environment.IsProduction())
     });
 }
 
-app.UseStaticFiles();
+// Arquivos estáticos com cache longo para CSS, JS e imagens (Core Web Vitals)
+app.UseStaticFiles(new StaticFileOptions
+{
+    OnPrepareResponse = ctx =>
+    {
+        var path = ctx.File.Name;
+        var headers = ctx.Context.Response.Headers;
+        if (path.EndsWith(".css") || path.EndsWith(".js") ||
+            path.EndsWith(".woff2") || path.EndsWith(".woff") || path.EndsWith(".ttf"))
+        {
+            // CSS/JS versionados pelo asp-append-version — cache de 1 ano
+            headers.CacheControl = "public, max-age=31536000, immutable";
+        }
+        else if (path.EndsWith(".png") || path.EndsWith(".jpg") || path.EndsWith(".jpeg") ||
+                 path.EndsWith(".webp") || path.EndsWith(".svg") || path.EndsWith(".ico"))
+        {
+            // Imagens — cache de 7 dias
+            headers.CacheControl = "public, max-age=604800";
+        }
+        else if (path.EndsWith(".xml") || path.EndsWith(".txt"))
+        {
+            // sitemap.xml e robots.txt — sem cache agressivo
+            headers.CacheControl = "public, max-age=3600";
+        }
+    }
+});
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
@@ -132,6 +157,35 @@ using (var scope = app.Services.CreateScope())
         // Adiciona colunas novas em tabelas existentes (EnsureCreated não faz isso)
         await db.Database.ExecuteSqlRawAsync(@"
             ALTER TABLE ""AdminCredenciais"" ADD COLUMN IF NOT EXISTS ""Role"" VARCHAR(100) NULL;
+        ");
+        await db.Database.ExecuteSqlRawAsync(@"
+            CREATE TABLE IF NOT EXISTS ""SolicitacoesBatismo"" (
+                ""Id"" SERIAL PRIMARY KEY,
+                ""Nome"" VARCHAR(150) NOT NULL,
+                ""WhatsApp"" VARCHAR(30) NOT NULL,
+                ""Email"" VARCHAR(180) NOT NULL,
+                ""Tipo"" VARCHAR(30) NOT NULL DEFAULT 'Batismo',
+                ""Mensagem"" VARCHAR(1000),
+                ""DataEnvio"" TIMESTAMP NOT NULL,
+                ""Atendido"" BOOLEAN NOT NULL DEFAULT FALSE
+            )
+        ");
+        await db.Database.ExecuteSqlRawAsync(@"
+            CREATE TABLE IF NOT EXISTS ""GaleriaAlbuns"" (
+                ""Id"" SERIAL PRIMARY KEY,
+                ""Nome"" VARCHAR(200) NOT NULL,
+                ""Descricao"" VARCHAR(1000),
+                ""Data"" TIMESTAMP NOT NULL,
+                ""CriadoEm"" TIMESTAMP NOT NULL
+            )
+        ");
+        await db.Database.ExecuteSqlRawAsync(@"
+            CREATE TABLE IF NOT EXISTS ""GaleriaFotos"" (
+                ""Id"" SERIAL PRIMARY KEY,
+                ""CaminhoArquivo"" VARCHAR(500) NOT NULL,
+                ""Legenda"" VARCHAR(300),
+                ""AlbumId"" INTEGER NOT NULL REFERENCES ""GaleriaAlbuns""(""Id"") ON DELETE CASCADE
+            )
         ");
     }
     else

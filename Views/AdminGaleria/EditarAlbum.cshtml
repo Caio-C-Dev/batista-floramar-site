@@ -1,0 +1,97 @@
+@using BatistaFloramar.Domain.Entities
+@model GaleriaAlbum
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewBag.Title = "Editar Álbum";
+    ViewBag.AdminSection = "galeria";
+}
+
+@section TopbarActions {
+    <a href="@Url.Action("Index")" class="btn-admin btn-admin-outline">
+        <i class="fas fa-arrow-left"></i> Voltar
+    </a>
+}
+
+<div class="row g-4">
+    <!-- Dados do álbum -->
+    <div class="col-lg-5">
+        <div class="admin-card">
+            <h3 style="color:#fff;font-size:1.1rem;margin-bottom:1.5rem;">
+                <i class="fas fa-edit me-2" style="color:var(--admin-accent);"></i>Dados do álbum
+            </h3>
+            <form method="post" asp-action="EditarAlbum" asp-route-id="@Model.Id" enctype="multipart/form-data">
+                @Html.AntiForgeryToken()
+
+                <div class="mb-3">
+                    <label class="form-label-admin">Nome *</label>
+                    <input asp-for="Nome" class="form-control-admin" />
+                    <span asp-validation-for="Nome" class="text-danger" style="font-size:.82rem;"></span>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label-admin">Descrição</label>
+                    <textarea asp-for="Descricao" class="form-control-admin" rows="3"></textarea>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label-admin">Data</label>
+                    <input asp-for="Data" type="date" class="form-control-admin" />
+                </div>
+
+                <hr style="border-color:rgba(255,255,255,.1);margin:1.5rem 0;" />
+
+                <div class="mb-4">
+                    <label class="form-label-admin">
+                        <i class="fas fa-upload me-1" style="color:var(--admin-accent);"></i>Adicionar fotos
+                    </label>
+                    <input type="file" name="fotos" multiple accept="image/*" class="form-control-admin"
+                           style="padding:.5rem;" />
+                    <small style="color:#9aacb8;font-size:.8rem;">Selecione uma ou várias fotos de uma vez.</small>
+                </div>
+
+                <button type="submit" class="btn-admin btn-admin-success w-100">
+                    <i class="fas fa-save me-1"></i> Salvar alterações
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Fotos do álbum -->
+    <div class="col-lg-7">
+        <div class="admin-card">
+            <h3 style="color:#fff;font-size:1.1rem;margin-bottom:1.5rem;">
+                <i class="fas fa-images me-2" style="color:var(--admin-accent);"></i>
+                Fotos (@Model.Fotos.Count)
+            </h3>
+
+            @if (!Model.Fotos.Any())
+            {
+                <div class="empty-state" style="padding:2rem;">
+                    <i class="fas fa-camera" style="font-size:2rem;"></i>
+                    <p>Nenhuma foto ainda. Use o formulário ao lado para adicionar.</p>
+                </div>
+            }
+            else
+            {
+                <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:.75rem;">
+                    @foreach (var foto in Model.Fotos)
+                    {
+                        <div style="position:relative;border-radius:10px;overflow:hidden;aspect-ratio:1;">
+                            <img src="@foto.CaminhoArquivo" alt="foto"
+                                 style="width:100%;height:100%;object-fit:cover;display:block;" loading="lazy" />
+                            <form method="post" action="@Url.Action("ExcluirFoto")"
+                                  style="position:absolute;top:.35rem;right:.35rem;"
+                                  onsubmit="return confirm('Excluir esta foto?')">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="fotoId" value="@foto.Id" />
+                                <input type="hidden" name="albumId" value="@Model.Id" />
+                                <button type="submit"
+                                        style="background:rgba(180,0,0,.8);border:none;color:#fff;border-radius:6px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.8rem;">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </form>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+</div>

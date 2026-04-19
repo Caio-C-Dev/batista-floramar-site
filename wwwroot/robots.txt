@@ -11,5 +11,9 @@ Disallow: /AdminMinisterios/
 Disallow: /AdminPalavra/
 Disallow: /AdminPodcasts/
 Disallow: /AdminSeries/
+Disallow: /AdminBatismo/
+Disallow: /AdminGaleria/
+Disallow: /AdminUsuarios/
+Disallow: /WeatherForecast/
 
 Sitemap: https://www.batistafloramar.com.br/sitemap.xml
