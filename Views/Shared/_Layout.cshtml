@@ -404,21 +404,27 @@
             const els = document.querySelectorAll('.scroll-reveal');
             if (!els.length) return;
 
-            // Fallback: garante que elementos já visíveis no carregamento aparecem
-            // mesmo se o IntersectionObserver disparar antes do CSS estar pronto
-            function revealAll() {
-                els.forEach(el => el.classList.add('visible'));
+            function reveal(el) { el.classList.add('visible'); }
+
+            // Revela imediatamente elementos já visíveis no viewport ao carregar
+            // (sem isso, pointer-events: none bloquearia cliques no primeiro frame)
+            function revealInViewport() {
+                els.forEach(function (el) {
+                    var r = el.getBoundingClientRect();
+                    if (r.top < window.innerHeight && r.bottom > 0) reveal(el);
+                });
             }
+            revealInViewport();
 
             if (!('IntersectionObserver' in window)) {
-                revealAll();
+                els.forEach(reveal);
                 return;
             }
 
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
-                        entry.target.classList.add('visible');
+                        reveal(entry.target);
                         observer.unobserve(entry.target);
                     }
                 });
@@ -427,13 +433,7 @@
             els.forEach(el => observer.observe(el));
 
             // Segurança: após 2s revela tudo que ainda não foi revelado
-            setTimeout(() => {
-                els.forEach(el => {
-                    if (!el.classList.contains('visible')) {
-                        el.classList.add('visible');
-                    }
-                });
-            }, 2000);
+            setTimeout(() => { els.forEach(el => { if (!el.classList.contains('visible')) reveal(el); }); }, 2000);
         })();
 
         // Navbar scroll-shrink

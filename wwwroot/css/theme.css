@@ -31,12 +31,25 @@ a, button, [role="button"], input, select, textarea, label,
 
 /* Área mínima de toque (44×44px recomendado pela Apple/Google) */
 @media (max-width: 991.98px) {
-  /* NÃO forçar display em .btn — Bootstrap usa inline-block e funciona corretamente.
-     Forçar inline-flex quebraria nav-links no menu colapsado (deixariam de ser block/full-width). */
+  /* .btn: inline-flex é OBRIGATÓRIO no iOS Safari.
+     Com inline-block + min-height, o iOS não expande a área de toque;  
+     com inline-flex a área clícavel corresponde ao tamanho visual real. */
   .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     min-height: 44px;
   }
-  .nav-link, .dropdown-item {
+  /* nav-link e dropdown-item: usar flex (não inline-flex) para manter
+     largura total no menu colapsado do Bootstrap */
+  .nav-link {
+    display: flex;
+    align-items: center;
+    min-height: 44px;
+  }
+  .dropdown-item {
+    display: flex;
+    align-items: center;
     min-height: 44px;
   }
   .float-nav-btn,
@@ -162,7 +175,13 @@ input,
 textarea,
 select {
   border-radius: var(--radius);
-  transition: all var(--transition-fast);
+  /* Nunca usar transition:all — causa drift de toque em mobile */
+  transition:
+    background-color var(--transition-fast),
+    color var(--transition-fast),
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast),
+    opacity var(--transition-fast);
 }
 
 button:focus,
@@ -874,26 +893,33 @@ textarea {
 
 .scroll-reveal {
   opacity: 0;
-  transform: translateY(28px);
+  transform: translateY(20px);
   transition:
-    opacity 0.65s cubic-bezier(0.4, 0, 0.2, 1),
-    transform 0.65s cubic-bezier(0.4, 0, 0.2, 1);
-  /* Never block pointer events even while hidden */
-  pointer-events: auto;
+    opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  /*
+   * IMPORTANTE: pointer-events: none enquanto o elemento está invisível.
+   * Um elemento opacity:0 com translateY(+Npx) tem a área de toque
+   * deslocada N pixels abaixo do esperado, bloqueando botões abaixo dele.
+   * Só ativar pointer-events quando o elemento estiver visível (.visible).
+   */
+  pointer-events: none;
 }
 
-/* Reduced motion: skip animation but keep visible */
+/* Reduced motion: pular animação, manter visível e interativo */
 @media (prefers-reduced-motion: reduce) {
   .scroll-reveal {
     opacity: 1;
     transform: none;
     transition: none;
+    pointer-events: auto; /* visível → deve ser clicável */
   }
 }
 
 .scroll-reveal.visible {
   opacity: 1;
   transform: translateY(0);
+  pointer-events: auto;
 }
 
 .scroll-reveal.delay-1 {
@@ -1046,6 +1072,7 @@ textarea {
     rgba(11, 11, 15, 0.78) 0%,
     rgba(21, 33, 69, 0.64) 100%
   );
+  pointer-events: none; /* overlay decorativo não deve bloquear cliques */
 }
 
 .hero-section::after {
