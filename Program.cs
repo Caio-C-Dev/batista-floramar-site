@@ -127,6 +127,7 @@ app.UseStaticFiles(new StaticFileOptions
         }
     }
 });
+app.UseStatusCodePagesWithReExecute("/erro/{0}");
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();

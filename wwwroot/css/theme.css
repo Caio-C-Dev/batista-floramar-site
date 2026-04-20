@@ -207,6 +207,39 @@ button {
   padding: 0 1.25rem;
 }
 
+/* ============================================================
+   SAFE AREA (iPhone notch / Dynamic Island / Android cutout)
+   viewport-fit=cover ativa env() — sem isso os valores são 0.
+   ============================================================ */
+.main-navbar {
+  /* Padding extra no topo apenas quando há sensor/notch */
+  padding-top: calc(0.65rem + env(safe-area-inset-top, 0px));
+}
+
+/* Quando o menu colapsado está aberto em iPhone, o dropdown fica
+   atrás do notch se não houver padding */
+@supports (padding-top: env(safe-area-inset-top)) {
+  .main-navbar.scrolled {
+    padding-top: calc(0.35rem + env(safe-area-inset-top, 0px));
+  }
+}
+
+/* Botões flutuantes: não podem ficar atrás da barra inferior do iOS */
+.whatsapp-float {
+  bottom: calc(2rem + env(safe-area-inset-bottom, 0px));
+}
+.float-nav {
+  bottom: calc(2rem + env(safe-area-inset-bottom, 0px));
+}
+@@media (max-width: 767px) {
+  .whatsapp-float {
+    bottom: calc(1.25rem + env(safe-area-inset-bottom, 0px));
+  }
+  .float-nav {
+    bottom: calc(1.25rem + env(safe-area-inset-bottom, 0px));
+  }
+}
+
 .main-navbar {
   position: relative;
   z-index: 1100;
