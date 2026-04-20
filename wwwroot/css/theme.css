@@ -31,16 +31,32 @@ a, button, [role="button"], input, select, textarea, label,
 
 /* Área mínima de toque (44×44px recomendado pela Apple/Google) */
 @media (max-width: 991.98px) {
-  .btn, .nav-link, .dropdown-item {
+  /* NÃO forçar display em .btn — Bootstrap usa inline-block e funciona corretamente.
+     Forçar inline-flex quebraria nav-links no menu colapsado (deixariam de ser block/full-width). */
+  .btn {
     min-height: 44px;
-    display: inline-flex;
-    align-items: center;
+  }
+  .nav-link, .dropdown-item {
+    min-height: 44px;
   }
   .float-nav-btn,
   .whatsapp-float {
     min-width: 48px;
     min-height: 48px;
   }
+}
+
+/* Ícones Font Awesome e SVG dentro de elementos clicáveis nunca devem interceptar toques.
+   O evento passa sempre para o <a> ou <button> pai. */
+a > i, a > svg,
+button > i, button > svg,
+.btn > i, .btn > svg,
+.nav-link > i, .nav-link > svg,
+.dropdown-item > i, .dropdown-item > svg,
+.float-nav-link > i, .float-nav-link > svg,
+.float-nav-btn > i, .float-nav-btn > svg,
+.whatsapp-float > i, .whatsapp-float > svg {
+  pointer-events: none;
 }
 
 

@@ -20,9 +20,9 @@
                 <button id="btnCopiarVersiculo" class="verse-action-btn" onclick="copiarVersiculo()" title="Copiar versículo">
                     <i class="fas fa-copy me-2"></i><span id="copyLabel">Copiar</span>
                 </button>
-                <a href="@whatsappUrl" target="_blank" rel="noopener noreferrer" class="verse-action-btn verse-action-whatsapp" title="Compartilhar no WhatsApp">
+                <button onclick="shareWhatsapp()" class="verse-action-btn verse-action-whatsapp" title="Compartilhar no WhatsApp">
                     <i class="fab fa-whatsapp me-2"></i>WhatsApp
-                </a>
+                </button>
                 <button id="btnShareVersiculo" class="verse-action-btn verse-action-share" onclick="shareVersiculo()" title="Compartilhar" style="display:none;">
                     <i class="fas fa-share-alt me-2"></i>Compartilhar
                 </button>
@@ -115,6 +115,14 @@
                 label.textContent = 'Copiar';
             }, 2000);
         });
+    }
+
+    function shareWhatsapp() {
+        const texto = document.getElementById('verseText').innerText.replace(/\n/g, ' ').trim();
+        const ref = document.getElementById('verseRef').innerText.trim();
+        const full = '"' + texto + '" \u2014 ' + ref;
+        // window.location.href é a forma mais confiável de abrir o app no celular
+        window.location.href = 'https://wa.me/?text=' + encodeURIComponent(full);
     }
 
     function shareVersiculo() {
