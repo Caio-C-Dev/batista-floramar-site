@@ -755,7 +755,7 @@ textarea {
   padding-top: 1rem;
 }
 
-/* --- Bot�o de navega��o flutuante ------------------------------- */
+/* --- Botão de navegação flutuante ------------------------------- */
 .float-nav {
   position: fixed;
   bottom: 2rem;
@@ -765,6 +765,9 @@ textarea {
   flex-direction: column;
   align-items: flex-end;
   gap: 0.5rem;
+  /* O container flexível cresce para cima e pode bloquear cliques em toda
+     a altura. pointer-events: none no pai — só os filhos interativos têm auto. */
+  pointer-events: none;
 }
 
 .float-nav-btn {
@@ -780,6 +783,7 @@ textarea {
   display: flex;
   align-items: center;
   justify-content: center;
+  pointer-events: auto; /* botão sempre clicável */
   transition:
     transform 0.2s,
     box-shadow 0.2s;
@@ -812,7 +816,7 @@ textarea {
 .float-nav-menu.open {
   transform: scale(1);
   opacity: 1;
-  pointer-events: all;
+  pointer-events: auto; /* menu aberto é interativo */
 }
 
 .float-nav-link {
