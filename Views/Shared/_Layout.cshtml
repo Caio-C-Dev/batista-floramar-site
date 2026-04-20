@@ -401,6 +401,20 @@
 
         // Scroll-reveal: observa elementos com classe .scroll-reveal
         (function () {
+            const els = document.querySelectorAll('.scroll-reveal');
+            if (!els.length) return;
+
+            // Fallback: garante que elementos já visíveis no carregamento aparecem
+            // mesmo se o IntersectionObserver disparar antes do CSS estar pronto
+            function revealAll() {
+                els.forEach(el => el.classList.add('visible'));
+            }
+
+            if (!('IntersectionObserver' in window)) {
+                revealAll();
+                return;
+            }
+
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
@@ -408,8 +422,18 @@
                         observer.unobserve(entry.target);
                     }
                 });
-            }, { threshold: 0.12 });
-            document.querySelectorAll('.scroll-reveal').forEach(el => observer.observe(el));
+            }, { threshold: 0.08, rootMargin: '0px 0px -20px 0px' });
+
+            els.forEach(el => observer.observe(el));
+
+            // Segurança: após 2s revela tudo que ainda não foi revelado
+            setTimeout(() => {
+                els.forEach(el => {
+                    if (!el.classList.contains('visible')) {
+                        el.classList.add('visible');
+                    }
+                });
+            }, 2000);
         })();
 
         // Navbar scroll-shrink

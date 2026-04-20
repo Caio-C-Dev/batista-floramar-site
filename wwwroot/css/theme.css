@@ -21,8 +21,29 @@
 }
 
 /* ============================================================
-   HEART CELEBRATION OVERLAY
+   MOBILE TAP: elimina delay de 300ms e garante área mínima de toque
    ============================================================ */
+a, button, [role="button"], input, select, textarea, label,
+.btn, .nav-link, .dropdown-item, .float-nav-btn, .float-nav-link,
+.whatsapp-float, .btn-nav-visit, .btn-nav-pastor, .btn-nav-contact {
+  touch-action: manipulation;
+}
+
+/* Área mínima de toque (44×44px recomendado pela Apple/Google) */
+@media (max-width: 991.98px) {
+  .btn, .nav-link, .dropdown-item {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
+  .float-nav-btn,
+  .whatsapp-float {
+    min-width: 48px;
+    min-height: 48px;
+  }
+}
+
+
 .heart-overlay {
   position: fixed;
   inset: 0;
@@ -841,6 +862,17 @@ textarea {
   transition:
     opacity 0.65s cubic-bezier(0.4, 0, 0.2, 1),
     transform 0.65s cubic-bezier(0.4, 0, 0.2, 1);
+  /* Never block pointer events even while hidden */
+  pointer-events: auto;
+}
+
+/* Reduced motion: skip animation but keep visible */
+@media (prefers-reduced-motion: reduce) {
+  .scroll-reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
 }
 
 .scroll-reveal.visible {
@@ -1015,13 +1047,13 @@ textarea {
     rgba(11, 18, 36, 0.88) 85%,
     #0b1224 100%
   );
-  z-index: 2;
+  z-index: 1;
   pointer-events: none;
 }
 
 .hero-overlay {
   position: relative;
-  z-index: 1;
+  z-index: 3;
   width: 100%;
   padding: 8rem 0 5rem;
 }

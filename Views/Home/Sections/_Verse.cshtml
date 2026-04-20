@@ -41,7 +41,8 @@
     .verse-action-btn {
         display: inline-flex;
         align-items: center;
-        padding: 0.55rem 1.25rem;
+        justify-content: center;
+        padding: 0.6rem 1.4rem;
         border-radius: 30px;
         border: 1px solid rgba(212,175,55,.45);
         background: transparent;
@@ -49,8 +50,19 @@
         font-size: 0.9rem;
         font-weight: 500;
         cursor: pointer;
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: rgba(212,175,55,.2);
         transition: background .2s, color .2s, transform .15s;
         text-decoration: none;
+        /* garante área de toque mínima */
+        min-height: 44px;
+        min-width: 44px;
+        position: relative;
+        z-index: 1;
+    }
+    /* Ícones não bloqueiam o toque — evento passa para o botão pai */
+    .verse-action-btn i {
+        pointer-events: none;
     }
     .verse-action-btn:hover {
         background: var(--brand-gold, #d4af37);
