@@ -78,6 +78,7 @@ namespace BatistaFloramar.Controllers
             celula.DiaSemana = model.DiaSemana;
             celula.Horario = model.Horario;
             celula.Lideres = model.Lideres;
+            celula.LiderNome = string.IsNullOrWhiteSpace(model.LiderNome) ? null : model.LiderNome.Trim();
             celula.Contato = model.Contato;
             celula.Endereco = model.Endereco;
             celula.Descricao = model.Descricao;

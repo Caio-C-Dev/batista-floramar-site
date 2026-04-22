@@ -25,6 +25,9 @@ namespace BatistaFloramar.Infrastructure.Data
         public DbSet<SolicitacaoBatismo> SolicitacoesBatismo => Set<SolicitacaoBatismo>();
         public DbSet<GaleriaAlbum> GaleriaAlbuns => Set<GaleriaAlbum>();
         public DbSet<GaleriaFoto> GaleriaFotos => Set<GaleriaFoto>();
+        public DbSet<Integrante> Integrantes => Set<Integrante>();
+        public DbSet<Presenca> Presencas => Set<Presenca>();
+        public DbSet<PresencaDetalhe> PresencasDetalhes => Set<PresencaDetalhe>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -47,6 +50,7 @@ namespace BatistaFloramar.Infrastructure.Data
                 e.HasKey(x => x.Id);
                 e.Property(x => x.Nome).HasMaxLength(150).IsRequired();
                 e.Property(x => x.Lideres).HasMaxLength(200);
+                e.Property(x => x.LiderNome).HasMaxLength(150);
                 e.Property(x => x.Endereco).HasMaxLength(300);
                 e.Property(x => x.Contato).HasMaxLength(50);
                 e.Property(x => x.Horario).HasMaxLength(30).IsRequired();
@@ -192,6 +196,43 @@ namespace BatistaFloramar.Infrastructure.Data
                  .WithMany(x => x.Fotos)
                  .HasForeignKey(x => x.AlbumId)
                  .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            modelBuilder.Entity<Integrante>(e =>
+            {
+                e.ToTable("Integrantes");
+                e.HasKey(x => x.Id);
+                e.Property(x => x.Nome).HasMaxLength(150).IsRequired();
+                e.HasOne(x => x.Celula)
+                 .WithMany(x => x.Integrantes)
+                 .HasForeignKey(x => x.CelulaId)
+                 .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            modelBuilder.Entity<Presenca>(e =>
+            {
+                e.ToTable("Presencas");
+                e.HasKey(x => x.Id);
+                e.Property(x => x.Tipo).HasConversion<string>().HasMaxLength(30);
+                e.HasOne(x => x.Celula)
+                 .WithMany()
+                 .HasForeignKey(x => x.CelulaId)
+                 .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            modelBuilder.Entity<PresencaDetalhe>(e =>
+            {
+                e.ToTable("PresencasDetalhes");
+                e.HasKey(x => x.Id);
+                e.Property(x => x.Justificativa).HasMaxLength(500);
+                e.HasOne(x => x.Presenca)
+                 .WithMany(x => x.Detalhes)
+                 .HasForeignKey(x => x.PresencaId)
+                 .OnDelete(DeleteBehavior.Cascade);
+                e.HasOne(x => x.Integrante)
+                 .WithMany(x => x.Detalhes)
+                 .HasForeignKey(x => x.IntegranteId)
+                 .OnDelete(DeleteBehavior.Restrict);
             });
         }
     }

@@ -43,8 +43,13 @@
                 <span asp-validation-for="Horario" class="field-validation-error"></span>
             </div>
             <div class="col-md-6">
-                <label asp-for="Lideres">Líder(es)</label>
+                <label asp-for="Lideres">Líder(es) <small class="text-muted">(exibição pública)</small></label>
                 <input asp-for="Lideres" class="form-control" />
+            </div>
+            <div class="col-md-6">
+                <label asp-for="LiderNome">Nome do líder <small class="text-muted">(para login na Área dos Líderes)</small></label>
+                <input asp-for="LiderNome" class="form-control" placeholder="Ex.: João" />
+                <div class="form-text" style="color:var(--admin-text-muted);">O líder usará este nome como senha (primeira letra maiúscula).</div>
             </div>
             <div class="col-md-6">
                 <label asp-for="Contato">Contato</label>

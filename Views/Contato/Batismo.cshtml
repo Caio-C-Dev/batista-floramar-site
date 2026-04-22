@@ -2,6 +2,7 @@
 @{
     Layout = "_Layout";
     ViewBag.Title = "Batismo e Filiação | Igreja Batista Floramar BH";
+    ViewBag.FullWidth = true;
 }
 
 <script type="application/ld+json">
@@ -23,82 +24,67 @@
 </script>
 <style>
     .batismo-hero {
-        background: linear-gradient(135deg, var(--bg-primary, #0d1b2a) 0%, #12243a 100%);
+        background: radial-gradient(ellipse at top, var(--bg-tertiary) 0%, var(--bg-primary) 60%);
         padding: 5rem 0 3rem;
         text-align: center;
-        border-bottom: 1px solid rgba(212,175,55,.15);
+        border-bottom: 1px solid var(--brand-gold-border);
+        position: relative;
+        overflow: hidden;
     }
-    .batismo-hero .section-eyebrow { margin-bottom: .5rem; display: block; }
-    .batismo-hero h1 { font-size: clamp(1.8rem, 4vw, 2.8rem); font-weight: 700; color: #fff; margin-bottom: 1rem; }
-    .batismo-hero p { color: var(--text-muted-section, #9aacb8); max-width: 600px; margin: 0 auto; }
+    .batismo-hero::before {
+        content: '';
+        position: absolute; inset: 0;
+        background: radial-gradient(ellipse 60% 40% at 50% 100%, var(--brand-gold-light) 0%, transparent 70%);
+    }
+    .batismo-hero .section-eyebrow { position: relative; margin-bottom: .5rem; display: block; }
+    .batismo-hero h1 { font-size: clamp(1.8rem, 4vw, 2.8rem); font-weight: 700; color: var(--text-primary); margin-bottom: 1rem; position: relative; }
+    .batismo-hero p { color: var(--text-secondary); max-width: 600px; margin: 0 auto; position: relative; }
 
     .batismo-tipos { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
     .tipo-card {
         flex: 1; min-width: 140px;
-        border: 2px solid rgba(212,175,55,.25);
-        border-radius: 14px;
-        padding: 1.2rem 1rem;
+        border: 1px solid rgba(255,255,255,.1);
+        border-radius: calc(var(--radius) * 1.2);
+        padding: 1.4rem 1rem;
         text-align: center;
         cursor: pointer;
-        transition: border-color .2s, background .2s;
-        background: var(--card-bg, #1a2844);
+        transition: border-color var(--transition-fast), background var(--transition-fast), transform var(--transition-fast);
+        background: var(--bg-tertiary);
     }
+    .tipo-card:hover { transform: translateY(-3px); }
     .tipo-card input[type=radio] { display: none; }
     .tipo-card:has(input:checked),
     .tipo-card.selected {
-        border-color: var(--brand-gold, #d4af37);
-        background: rgba(212,175,55,.1);
+        border-color: var(--brand-gold-border);
+        background: var(--brand-gold-light);
     }
-    .tipo-card i { font-size: 1.7rem; color: var(--brand-gold, #d4af37); margin-bottom: .5rem; display: block; }
-    .tipo-card span { color: #fff; font-weight: 600; font-size: .95rem; }
-    .tipo-card small { display: block; color: #9aacb8; font-size: .8rem; margin-top: .2rem; }
+    .tipo-card i { font-size: 1.8rem; color: var(--brand-gold); margin-bottom: .6rem; display: block; }
+    .tipo-card span { color: var(--text-primary); font-weight: 700; font-size: .95rem; }
+    .tipo-card small { display: block; color: var(--text-secondary); font-size: .8rem; margin-top: .2rem; }
 
+    .batismo-form-wrap {
+        background: var(--bg-secondary);
+        padding: 4rem 0;
+    }
     .batismo-form-card {
-        background: var(--card-bg, #1a2844);
-        border: 1px solid rgba(212,175,55,.18);
-        border-radius: 18px;
+        background: var(--bg-tertiary);
+        border: 1px solid rgba(255,255,255,.07);
+        border-radius: calc(var(--radius) * 1.5);
         padding: 2.5rem;
         max-width: 680px;
         margin: 0 auto;
     }
-    .form-label-custom { color: #c8d8e4; font-weight: 500; margin-bottom: .4rem; display: block; font-size: .9rem; }
-    .form-control-custom {
-        width: 100%;
-        background: rgba(255,255,255,.05);
-        border: 1px solid rgba(212,175,55,.2);
-        border-radius: 10px;
-        padding: .7rem 1rem;
-        color: #fff;
-        font-size: .95rem;
-        transition: border-color .2s;
-    }
-    .form-control-custom:focus { outline: none; border-color: var(--brand-gold, #d4af37); background: rgba(255,255,255,.07); }
-    .form-control-custom::placeholder { color: #5a6a7a; }
     .batismo-info-strip {
-        background: rgba(212,175,55,.07);
-        border-left: 4px solid var(--brand-gold, #d4af37);
-        border-radius: 0 10px 10px 0;
+        background: var(--brand-gold-light);
+        border-left: 3px solid var(--brand-gold);
+        border-radius: 0 var(--radius) var(--radius) 0;
         padding: 1rem 1.25rem;
-        margin-bottom: 2.5rem;
+        margin-bottom: 2rem;
         max-width: 680px;
         margin-left: auto;
         margin-right: auto;
     }
-    .batismo-info-strip p { margin: 0; color: #c8d8e4; font-size: .92rem; }
-    .alert-success-custom {
-        background: #1a4a2a;
-        border: 1px solid #2a8a4a;
-        color: #5ddd80;
-        border-radius: 12px;
-        padding: 1.2rem 1.5rem;
-        margin-bottom: 1.5rem;
-        display: flex;
-        align-items: center;
-        gap: .75rem;
-        max-width: 680px;
-        margin-left: auto;
-        margin-right: auto;
-    }
+    .batismo-info-strip p { margin: 0; color: var(--text-secondary); font-size: .92rem; }
 </style>
 
 <div class="batismo-hero">
@@ -109,30 +95,29 @@
     </div>
 </div>
 
-<div class="py-5">
+<div class="batismo-form-wrap">
     <div class="container">
-
         @if (TempData["SuccessMessage"] != null)
         {
-            <div class="alert-success-custom">
+            <div class="d-flex align-items-center gap-2 mb-4 p-3" style="max-width:680px;margin:0 auto 1.5rem;background:rgba(22,163,74,.12);border:1px solid rgba(22,163,74,.3);color:#4ade80;border-radius:var(--radius);">
                 <i class="fas fa-check-circle fa-lg"></i>
                 <span>@TempData["SuccessMessage"]</span>
             </div>
         }
 
         <div class="batismo-info-strip">
-            <p><i class="fas fa-info-circle me-2" style="color:var(--brand-gold)"></i>Após enviar o formulário, nossa equipe pastoral entrará em contato via WhatsApp ou e-mail para dar os próximos passos com você.</p>
+            <p><i class="fas fa-info-circle me-2 text-gold"></i>Após enviar o formulário, nossa equipe pastoral entrará em contato via WhatsApp ou e-mail para dar os próximos passos com você.</p>
         </div>
 
         <div class="batismo-form-card">
-            <h3 class="mb-4" style="color:#fff;font-size:1.3rem;">Preencha seus dados</h3>
+            <h3 class="mb-4" style="font-size:1.2rem;">Preencha seus dados</h3>
 
             <form method="post" asp-action="Batismo" asp-controller="Contato" novalidate>
                 @Html.AntiForgeryToken()
 
                 <!-- Tipo -->
                 <div class="mb-4">
-                    <label class="form-label-custom">Tenho interesse em:</label>
+                    <label class="form-label">Tenho interesse em:</label>
                     <div class="batismo-tipos" id="tiposContainer">
                         <label class="tipo-card @(Model.Tipo == "Batismo" ? "selected" : "")">
                             <input type="radio" name="Tipo" value="Batismo" @(Model.Tipo == "Batismo" ? "checked" : "") onchange="selectTipo(this)" />
@@ -152,29 +137,29 @@
 
                 <!-- Nome -->
                 <div class="mb-3">
-                    <label class="form-label-custom" for="Nome">Nome completo *</label>
-                    <input asp-for="Nome" class="form-control-custom" id="Nome" placeholder="Seu nome completo" />
+                    <label class="form-label" for="Nome">Nome completo *</label>
+                    <input asp-for="Nome" class="form-control" id="Nome" placeholder="Seu nome completo" />
                     <span asp-validation-for="Nome" class="text-danger" style="font-size:.82rem;"></span>
                 </div>
 
                 <!-- WhatsApp -->
                 <div class="mb-3">
-                    <label class="form-label-custom" for="WhatsApp">WhatsApp *</label>
-                    <input asp-for="WhatsApp" class="form-control-custom" id="WhatsApp" placeholder="(31) 99999-9999" />
+                    <label class="form-label" for="WhatsApp">WhatsApp *</label>
+                    <input asp-for="WhatsApp" class="form-control" id="WhatsApp" placeholder="(31) 99999-9999" />
                     <span asp-validation-for="WhatsApp" class="text-danger" style="font-size:.82rem;"></span>
                 </div>
 
                 <!-- Email -->
                 <div class="mb-3">
-                    <label class="form-label-custom" for="Email">E-mail *</label>
-                    <input asp-for="Email" type="email" class="form-control-custom" id="Email" placeholder="seu@email.com" />
+                    <label class="form-label" for="Email">E-mail *</label>
+                    <input asp-for="Email" type="email" class="form-control" id="Email" placeholder="seu@email.com" />
                     <span asp-validation-for="Email" class="text-danger" style="font-size:.82rem;"></span>
                 </div>
 
                 <!-- Mensagem -->
                 <div class="mb-4">
-                    <label class="form-label-custom" for="Mensagem">Mensagem (opcional)</label>
-                    <textarea asp-for="Mensagem" class="form-control-custom" id="Mensagem" rows="4"
+                    <label class="form-label" for="Mensagem">Mensagem (opcional)</label>
+                    <textarea asp-for="Mensagem" class="form-control" id="Mensagem" rows="4"
                               placeholder="Conte um pouco sobre você ou deixe uma mensagem para nossa equipe..."></textarea>
                     <span asp-validation-for="Mensagem" class="text-danger" style="font-size:.82rem;"></span>
                 </div>

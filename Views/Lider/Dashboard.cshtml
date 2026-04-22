@@ -1,0 +1,218 @@
+@model BatistaFloramar.Models.LiderDashboardViewModel
+@{
+    ViewBag.Title = "Dashboard – Área dos Líderes";
+    Layout = "_Layout";
+}
+
+<div class="page-card">
+    <!-- Cabeçalho -->
+    <div class="page-header d-flex flex-wrap align-items-center justify-content-between gap-3">
+        <div>
+            <span class="section-eyebrow">Área dos Líderes</span>
+            <h1 class="page-title mb-1" style="font-size:1.8rem;">
+                <i class="fas fa-users me-2 text-gold"></i>@Model.NomeCelula
+            </h1>
+            <p class="text-secondary mb-0">Líder: <strong class="text-white">@Model.NomeLider</strong></p>
+        </div>
+        <a href="/Lider/Logout" class="btn btn-outline-secondary btn-sm">
+                <i class="fas fa-sign-out-alt me-1"></i>Sair
+            </a>
+    </div>
+
+    <!-- Alertas de feedback -->
+    @if (TempData["Sucesso"] != null)
+    {
+        <div class="alert alert-success d-flex align-items-center gap-2 mt-3" role="alert">
+            <i class="fas fa-check-circle"></i>
+            <span>@TempData["Sucesso"]</span>
+        </div>
+    }
+    @if (TempData["Erro"] != null)
+    {
+        <div class="alert alert-danger d-flex align-items-center gap-2 mt-3" role="alert">
+            <i class="fas fa-exclamation-circle"></i>
+            <span>@TempData["Erro"]</span>
+        </div>
+    }
+
+    <!-- Ações rápidas -->
+    <div class="row g-3 mt-1">
+        <div class="col-6 col-md-3">
+            <a href="@Url.Action("Presenca", "Lider")" class="section-card text-center d-block p-3 text-decoration-none h-100">
+                <i class="fas fa-clipboard-check text-gold" style="font-size:2rem;"></i>
+                <p class="mt-2 mb-0 fw-semibold text-white">Registrar Presença</p>
+            </a>
+        </div>
+        <div class="col-6 col-md-3">
+            <a href="@Url.Action("Historico", "Lider")" class="section-card text-center d-block p-3 text-decoration-none h-100">
+                <i class="fas fa-history text-gold" style="font-size:2rem;"></i>
+                <p class="mt-2 mb-0 fw-semibold text-white">Histórico</p>
+            </a>
+        </div>
+    </div>
+
+    <!-- Integrantes -->
+    <div class="section-card mt-4">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+            <h2 class="text-gold mb-0">
+                <i class="fas fa-users me-2"></i>Integrantes
+                <span class="badge ms-2" style="background:#c9a227;color:#000;font-size:.8rem;">@Model.Integrantes.Count</span>
+            </h2>
+            <button class="btn btn-primary btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#formAdicionarIntegrante">
+                <i class="fas fa-plus me-1"></i>Adicionar
+            </button>
+        </div>
+
+        <!-- Form adicionar integrante (colapsável) -->
+        <div class="collapse mb-3" id="formAdicionarIntegrante">
+            <div class="section-card" style="background:#1a2240;">
+                <form asp-action="AdicionarIntegrante" asp-controller="Lider" method="post">
+                    @Html.AntiForgeryToken()
+                    <div class="row g-2 align-items-end">
+                        <div class="col-12 col-sm-6">
+                            <label class="form-label text-white small">Nome</label>
+                            <input type="text" name="Nome" class="form-control"
+                                   style="background:#0b1224;border-color:#2e3a5c;color:#fff;"
+                                   placeholder="Nome completo" required maxlength="150" />
+                        </div>
+                        <div class="col-12 col-sm-4">
+                            <div class="form-check mt-3">
+                                <input type="checkbox" name="Visitante" value="true" id="chkVisitante" class="form-check-input" />
+                                <label for="chkVisitante" class="form-check-label text-secondary">Visitante</label>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-2">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="fas fa-save"></i>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        @if (!Model.Integrantes.Any())
+        {
+            <p class="text-secondary text-center py-3">Nenhum integrante cadastrado ainda.</p>
+        }
+        else
+        {
+            <div class="list-group list-group-flush">
+                @foreach (var integrante in Model.Integrantes)
+                {
+                    <div class="list-group-item d-flex align-items-center justify-content-between gap-2 px-0 py-3"
+                         style="background:transparent;border-color:#2e3a5c;">
+                        <div>
+                            <span class="text-white fw-semibold">@integrante.Nome</span>
+                            @if (integrante.Visitante)
+                            {
+                                <span class="badge ms-2" style="background:#2e3a5c;color:#c9a227;font-size:.7rem;">Visitante</span>
+                            }
+                            @if (integrante.PercentualPresenca.HasValue)
+                            {
+                                var pct = integrante.PercentualPresenca.Value;
+                                var cor = pct >= 75 ? "#27c9a2" : pct >= 50 ? "#c9a227" : "#e74c3c";
+                                <span class="ms-2 small" style="color:@cor">@pct%</span>
+                            }
+                        </div>
+                        <button type="button" class="btn btn-sm btn-outline-danger"
+                                onclick="confirmarRemocao(@integrante.Id, '@Html.Raw(integrante.Nome.Replace("'", "\\'"))')">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+
+    <!-- Modal confirmar remoção de integrante -->
+    <div class="modal fade" id="modalRemover" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="background:#1a2240;border:1px solid #2e3a5c;">
+                <div class="modal-header" style="border-color:#2e3a5c;">
+                    <h5 class="modal-title text-white">
+                        <i class="fas fa-trash me-2 text-danger"></i>Remover integrante
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="text-white mb-1">Tem certeza que deseja remover:</p>
+                    <p class="fw-semibold text-gold fs-5 mb-0" id="modalNomeIntegrante"></p>
+                    <p class="text-secondary small mt-2 mb-0">O histórico de presença será preservado.</p>
+                </div>
+                <div class="modal-footer" style="border-color:#2e3a5c;">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <form asp-action="RemoverIntegrante" asp-controller="Lider" method="post" id="formRemover" class="d-inline">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" id="removerIntegranteId" />
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-trash me-1"></i>Remover
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Últimas presenças -->
+    @if (Model.UltimasPresencas.Any())
+    {
+        <div class="section-card mt-4">
+            <h2 class="text-gold mb-3">
+                <i class="fas fa-calendar-check me-2"></i>Últimas Reuniões
+            </h2>
+            <div class="table-responsive">
+                <table class="table table-dark table-hover mb-0" style="--bs-table-bg:transparent;">
+                    <thead>
+                        <tr style="color:#c9a227;">
+                            <th>Data</th>
+                            <th>Tipo</th>
+                            <th>Presentes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var p in Model.UltimasPresencas)
+                        {
+                            <tr>
+                                <td class="text-white">@p.Data.ToString("dd/MM/yyyy")</td>
+                                <td class="text-secondary">
+                                    @(p.Tipo switch {
+                                        "Normal" => "Normal",
+                                        "NaoHoveCelula" => "Não houve",
+                                        "CelulaLivre" => "Célula livre",
+                                        _ => p.Tipo
+                                    })
+                                </td>
+                                <td>
+                                    @if (p.TotalIntegrantes > 0)
+                                    {
+                                        <span class="text-white">@p.TotalPresentes / @p.TotalIntegrantes</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-secondary">—</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="text-end mt-2">
+                <a href="@Url.Action("Historico", "Lider")" class="text-gold small">
+                    Ver todo o histórico <i class="fas fa-arrow-right ms-1"></i>
+                </a>
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+<script>
+    function confirmarRemocao(id, nome) {
+        document.getElementById('removerIntegranteId').value = id;
+        document.getElementById('modalNomeIntegrante').textContent = nome;
+        new bootstrap.Modal(document.getElementById('modalRemover')).show();
+    }
+</script>
+}

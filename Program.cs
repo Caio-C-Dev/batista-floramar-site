@@ -1,10 +1,27 @@
 ﻿using BatistaFloramar.Infrastructure.Data;
 using Microsoft.AspNetCore.Http.Extensions;
+using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
+using System.IO.Compression;
 
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Compressão Brotli + Gzip para HTML, JSON, CSS, JS
+builder.Services.AddResponseCompression(options =>
+{
+    options.EnableForHttps = true;
+    options.Providers.Add<BrotliCompressionProvider>();
+    options.Providers.Add<GzipCompressionProvider>();
+    options.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(new[]
+    {
+        "text/html", "text/css", "application/javascript",
+        "application/json", "image/svg+xml", "text/plain"
+    });
+});
+builder.Services.Configure<BrotliCompressionProviderOptions>(o => o.Level = CompressionLevel.Fastest);
+builder.Services.Configure<GzipCompressionProviderOptions>(o => o.Level = CompressionLevel.Fastest);
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddEndpointsApiExplorer();
@@ -38,6 +55,14 @@ builder.Services.AddAuthentication("AdminCookie")
         options.AccessDeniedPath = "/Admin/Login";
         options.ExpireTimeSpan = TimeSpan.FromHours(8);
         options.Cookie.HttpOnly = true;
+    })
+    .AddCookie("LiderCookie", options =>
+    {
+        options.LoginPath = "/Lider/Login";
+        options.AccessDeniedPath = "/Lider/Login";
+        options.ExpireTimeSpan = TimeSpan.FromHours(12);
+        options.Cookie.HttpOnly = true;
+        options.Cookie.Name = "LiderSession";
     });
 
 var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
@@ -102,6 +127,7 @@ if (app.Environment.IsProduction())
 }
 
 // Arquivos estáticos com cache longo para CSS, JS e imagens (Core Web Vitals)
+app.UseResponseCompression();
 app.UseStaticFiles(new StaticFileOptions
 {
     OnPrepareResponse = ctx =>
@@ -186,6 +212,37 @@ using (var scope = app.Services.CreateScope())
                 ""CaminhoArquivo"" VARCHAR(500) NOT NULL,
                 ""Legenda"" VARCHAR(300),
                 ""AlbumId"" INTEGER NOT NULL REFERENCES ""GaleriaAlbuns""(""Id"") ON DELETE CASCADE
+            )
+        ");
+        await db.Database.ExecuteSqlRawAsync(@"
+            ALTER TABLE ""Celulas"" ADD COLUMN IF NOT EXISTS ""LiderNome"" VARCHAR(150) NULL;
+        ");
+        await db.Database.ExecuteSqlRawAsync(@"
+            CREATE TABLE IF NOT EXISTS ""Integrantes"" (
+                ""Id"" SERIAL PRIMARY KEY,
+                ""Nome"" VARCHAR(150) NOT NULL,
+                ""CelulaId"" INTEGER NOT NULL REFERENCES ""Celulas""(""Id"") ON DELETE CASCADE,
+                ""Ativo"" BOOLEAN NOT NULL DEFAULT TRUE,
+                ""Visitante"" BOOLEAN NOT NULL DEFAULT FALSE,
+                ""DataIngresso"" TIMESTAMP NOT NULL
+            )
+        ");
+        await db.Database.ExecuteSqlRawAsync(@"
+            CREATE TABLE IF NOT EXISTS ""Presencas"" (
+                ""Id"" SERIAL PRIMARY KEY,
+                ""Data"" TIMESTAMP NOT NULL,
+                ""CelulaId"" INTEGER NOT NULL REFERENCES ""Celulas""(""Id"") ON DELETE CASCADE,
+                ""Tipo"" VARCHAR(30) NOT NULL DEFAULT 'Normal',
+                ""CriadoEm"" TIMESTAMP NOT NULL
+            )
+        ");
+        await db.Database.ExecuteSqlRawAsync(@"
+            CREATE TABLE IF NOT EXISTS ""PresencasDetalhes"" (
+                ""Id"" SERIAL PRIMARY KEY,
+                ""PresencaId"" INTEGER NOT NULL REFERENCES ""Presencas""(""Id"") ON DELETE CASCADE,
+                ""IntegranteId"" INTEGER NOT NULL REFERENCES ""Integrantes""(""Id"") ON DELETE RESTRICT,
+                ""Presente"" BOOLEAN NOT NULL DEFAULT FALSE,
+                ""Justificativa"" VARCHAR(500)
             )
         ");
     }

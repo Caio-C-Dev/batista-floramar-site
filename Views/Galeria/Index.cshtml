@@ -7,57 +7,53 @@
 }
 <style>
     .galeria-hero {
-        background: linear-gradient(135deg, var(--bg-primary,#0d1b2a) 0%, #12243a 100%);
+        background: radial-gradient(ellipse at top, var(--bg-tertiary) 0%, var(--bg-primary) 60%);
         padding: 5rem 0 3rem;
         text-align: center;
-        border-bottom: 1px solid rgba(212,175,55,.15);
+        border-bottom: 1px solid var(--brand-gold-border);
+        position: relative; overflow: hidden;
     }
-    .galeria-hero h1 { font-size: clamp(1.8rem,4vw,2.8rem); font-weight: 700; color: #fff; margin-bottom: .75rem; }
-    .galeria-hero p { color: var(--text-muted-section,#9aacb8); max-width: 540px; margin: 0 auto; }
+    .galeria-hero::before {
+        content: ''; position: absolute; inset: 0;
+        background: radial-gradient(ellipse 60% 40% at 50% 100%, var(--brand-gold-light) 0%, transparent 70%);
+    }
+    .galeria-hero h1 { font-size: clamp(1.8rem,4vw,2.8rem); font-weight: 700; color: var(--text-primary); margin-bottom: .75rem; position: relative; }
+    .galeria-hero .section-eyebrow { position: relative; }
+    .galeria-hero p { color: var(--text-secondary); max-width: 540px; margin: 0 auto; position: relative; }
 
     .galeria-grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-        gap: 1.5rem;
-        padding: 3rem 0;
+        gap: 1.25rem;
+        margin-top: 1.5rem;
     }
     .album-card {
-        border-radius: 16px;
+        border-radius: calc(var(--radius,12px) * 1.1);
         overflow: hidden;
-        background: var(--card-bg,#1a2844);
-        border: 1px solid var(--card-border,rgba(212,175,55,.15));
+        background: rgba(255,255,255,.03);
+        border: 1px solid rgba(255,255,255,.08);
         text-decoration: none;
         display: block;
-        transition: transform .25s, box-shadow .25s;
+        transition: transform .25s, box-shadow .25s, border-color .25s;
     }
-    .album-card:hover { transform: translateY(-5px); box-shadow: 0 14px 36px rgba(0,0,0,.45); }
-    .album-thumb {
-        position: relative;
-        height: 200px;
-        overflow: hidden;
-        background: #1a2844;
+    .album-card:hover {
+        transform: translateY(-6px);
+        box-shadow: var(--shadow-hover, 0 14px 36px rgba(0,0,0,.45));
+        border-color: var(--brand-gold-border, rgba(230,193,90,.45));
     }
+    .album-thumb { position: relative; height: 200px; overflow: hidden; background: rgba(255,255,255,.04); }
     .album-thumb img { width:100%; height:100%; object-fit:cover; transition: transform .35s; }
     .album-card:hover .album-thumb img { transform: scale(1.06); }
-    .album-thumb-placeholder {
-        width:100%; height:100%;
-        display: flex; align-items: center; justify-content: center;
-        background: #1a2844;
-    }
+    .album-thumb-placeholder { width:100%; height:100%; display:flex; align-items:center; justify-content:center; }
     .album-thumb-count {
-        position: absolute;
-        bottom: .6rem; right: .6rem;
-        background: rgba(0,0,0,.7);
-        color: #d4af37;
-        border-radius: 20px;
-        padding: .25rem .7rem;
-        font-size: .8rem;
-        font-weight: 600;
+        position: absolute; bottom:.6rem; right:.6rem;
+        background: rgba(0,0,0,.7); color: var(--brand-gold);
+        border-radius: 20px; padding:.25rem .7rem; font-size:.8rem; font-weight:600;
     }
     .album-body { padding: 1.2rem 1.25rem; }
-    .album-nome { color: #fff; font-weight: 700; font-size: 1.05rem; margin-bottom: .3rem; }
-    .album-desc { color: #9aacb8; font-size: .85rem; margin-bottom: .5rem; }
-    .album-data { color: #d4af37; font-size: .82rem; font-weight: 500; }
+    .album-nome { color: var(--text-primary); font-weight:700; font-size:1.05rem; margin-bottom:.3rem; }
+    .album-desc { color: var(--text-secondary); font-size:.85rem; margin-bottom:.5rem; }
+    .album-data { color: var(--brand-gold); font-size:.82rem; font-weight:500; }
 </style>
 
 <div class="galeria-hero">
@@ -68,12 +64,13 @@
     </div>
 </div>
 
-<div class="container">
+<div class="py-5">
+    <div class="container">
     @if (!Model.Any())
     {
         <div class="text-center py-5">
-            <i class="fas fa-images" style="font-size:3.5rem;color:#4a5a7a;margin-bottom:1.2rem;display:block;"></i>
-            <p style="color:#9aacb8;">Nenhum álbum publicado ainda. Volte em breve!</p>
+            <i class="fas fa-images" style="font-size:3.5rem;color:var(--text-secondary);margin-bottom:1.2rem;display:block;"></i>
+            <p class="text-secondary">Nenhum álbum publicado ainda. Volte em breve!</p>
         </div>
     }
     else
@@ -91,7 +88,7 @@
                         else
                         {
                             <div class="album-thumb-placeholder">
-                                <i class="fas fa-images" style="font-size:2.5rem;color:#4a5a7a;"></i>
+                                <i class="fas fa-images" style="font-size:2.5rem;color:var(--text-secondary);"></i>
                             </div>
                         }
                         <span class="album-thumb-count"><i class="fas fa-camera me-1"></i>@album.Fotos.Count</span>
@@ -108,4 +105,5 @@
             }
         </div>
     }
+    </div>
 </div>

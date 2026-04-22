@@ -21,6 +21,23 @@
 }
 
 /* ============================================================
+   SCROLL SUAVE + EVITAR LAYOUT SHIFT
+   ============================================================ */
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+/* Evita CLS: reserva espaço para imagens sem dimensões declaradas */
+img {
+  max-width: 100%;
+  height: auto;
+  /* Melhor suporte a deferência de decode pra não travar o main thread */
+  content-visibility: auto;
+}
+
+/* ============================================================
    MOBILE TAP: elimina delay de 300ms e garante área mínima de toque
    ============================================================ */
 a, button, [role="button"], input, select, textarea, label,
@@ -1322,10 +1339,13 @@ textarea {
   display: none !important;
 }
 
-.btn-nav-visit:hover {
-  opacity: 0.9 !important;
+.btn-nav-visit:hover,
+.main-navbar .nav-item .btn-nav-visit:hover,
+.main-navbar .nav-item .btn-nav-visit:focus {
+  background: linear-gradient(135deg, #e6c15a 0%, #c9a63c 100%) !important;
   color: #0e0e0e !important;
   box-shadow: 0 0 20px rgba(230, 193, 90, 0.5) !important;
+  opacity: 0.92 !important;
 }
 
 .btn-nav-contact {
