@@ -16,40 +16,43 @@
 
     <div class="row row-cols-1 row-cols-md-3 g-4 mt-2">
         <div class="col">
-            <div class="section-card h-100 text-center">
+            <div class="section-card donation-select-card h-100 text-center" onclick="selectDonacao('doacao', this)">
+                <span class="selected-badge">SELECIONADO</span>
                 <div class="about-pillar-icon-lg"><i class="fas fa-heart"></i></div>
                 <h3>Doação</h3>
                 <p class="text-secondary">Oferta geral para ajudar a comunidade a manter seus projetos e ministérios.</p>
-                <a href="#pix" class="btn btn-primary w-100 mt-3">
-                    <i class="fas fa-qrcode me-2"></i> Contribuir via PIX
-                </a>
+                <button type="button" class="donation-select-btn">
+                    <i class="fas fa-qrcode"></i> Contribuir via PIX
+                </button>
             </div>
         </div>
         <div class="col">
-            <div class="section-card h-100 text-center">
+            <div class="section-card donation-select-card h-100 text-center" onclick="selectDonacao('dizimo', this)">
+                <span class="selected-badge">SELECIONADO</span>
                 <div class="about-pillar-icon-lg"><i class="fas fa-percentage"></i></div>
                 <h3>Dízimo</h3>
                 <p class="text-secondary">Contribuição mensal para sustentar o ministério e o trabalho da igreja.</p>
-                <a href="#pix" class="btn btn-primary w-100 mt-3">
-                    <i class="fas fa-qrcode me-2"></i> Contribuir via PIX
-                </a>
+                <button type="button" class="donation-select-btn">
+                    <i class="fas fa-qrcode"></i> Contribuir via PIX
+                </button>
             </div>
         </div>
         <div class="col">
-            <div class="section-card h-100 text-center">
+            <div class="section-card donation-select-card h-100 text-center" onclick="selectDonacao('oferta', this)">
+                <span class="selected-badge">SELECIONADO</span>
                 <div class="about-pillar-icon-lg"><i class="fas fa-gift"></i></div>
                 <h3>Oferta</h3>
                 <p class="text-secondary">Oferta especial de gratidão para momentos de bênção e celebração.</p>
-                <a href="#pix" class="btn btn-primary w-100 mt-3">
-                    <i class="fas fa-qrcode me-2"></i> Contribuir via PIX
-                </a>
+                <button type="button" class="donation-select-btn">
+                    <i class="fas fa-qrcode"></i> Contribuir via PIX
+                </button>
             </div>
         </div>
     </div>
 
     <div class="row g-4 mt-2" id="pix">
         <div class="col-md-6">
-            <div class="section-card h-100 text-center">
+            <div class="section-card h-100 text-center" id="pix-card">
                 <h3><i class="fas fa-qrcode me-2 text-gold"></i>PIX</h3>
                 <p class="text-secondary mb-3">Escaneie o QR Code ou copie a chave CNPJ abaixo para contribuir instantaneamente.</p>
                 <img src="~/images/qr_code.png"
@@ -79,3 +82,32 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+<script>
+    function selectDonacao(type, card) {
+        // Remove selected state from all cards
+        document.querySelectorAll('.donation-select-card').forEach(function (c) {
+            c.classList.remove('selected');
+        });
+        // Mark this card as selected
+        card.classList.add('selected');
+
+        // Smooth scroll to PIX section
+        var pixSection = document.getElementById('pix');
+        if (pixSection) {
+            pixSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        // Highlight the PIX card briefly
+        var pixCard = document.getElementById('pix-card');
+        if (pixCard) {
+            pixCard.classList.remove('pix-section-highlight');
+            // Force reflow to restart animation
+            void pixCard.offsetWidth;
+            pixCard.classList.add('pix-section-highlight');
+            setTimeout(function () { pixCard.classList.remove('pix-section-highlight'); }, 1700);
+        }
+    }
+</script>
+}

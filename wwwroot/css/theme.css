@@ -600,6 +600,140 @@ button {
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
+/* ============================================================
+   PLACEHOLDER CONTRAST — legible on all dark backgrounds
+   ============================================================ */
+::placeholder {
+  color: rgba(176, 176, 176, 0.7) !important;
+  opacity: 1 !important;
+}
+
+/* ============================================================
+   BTN-BACK — ghost/outline back button (premium style)
+   ============================================================ */
+.btn-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.45rem 1rem;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: var(--radius);
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-decoration: none !important;
+  line-height: 1;
+  transition:
+    border-color var(--transition-fast),
+    color var(--transition-fast),
+    background-color var(--transition-fast),
+    box-shadow var(--transition-fast);
+}
+
+.btn-back:hover {
+  border-color: var(--brand-gold-border);
+  color: var(--brand-gold);
+  background-color: var(--brand-gold-light);
+  box-shadow: 0 0 16px rgba(230, 193, 90, 0.12);
+}
+
+.btn-back i {
+  font-size: 0.8rem;
+  transition: transform var(--transition-fast);
+}
+
+.btn-back:hover i {
+  transform: translateX(-3px);
+}
+
+/* ============================================================
+   DONATION SELECT CARDS — interactive selection state
+   ============================================================ */
+.donation-select-card {
+  cursor: pointer;
+  position: relative;
+  transition:
+    transform var(--transition-smooth),
+    box-shadow var(--transition-smooth),
+    border-color var(--transition-smooth);
+}
+
+.donation-select-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-hover);
+  border-color: rgba(230, 193, 90, 0.3);
+}
+
+.donation-select-card.selected {
+  border-color: var(--brand-gold-border) !important;
+  background-color: rgba(230, 193, 90, 0.06) !important;
+  box-shadow: 0 0 28px rgba(230, 193, 90, 0.18);
+  transform: translateY(-4px);
+}
+
+.donation-select-card .donation-select-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  margin-top: 0.75rem;
+  padding: 0.65rem 1rem;
+  background: transparent;
+  border: 1px solid rgba(230, 193, 90, 0.35);
+  border-radius: var(--radius);
+  color: var(--brand-gold);
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition:
+    background-color var(--transition-fast),
+    border-color var(--transition-fast),
+    color var(--transition-fast);
+}
+
+.donation-select-card .donation-select-btn:hover,
+.donation-select-card.selected .donation-select-btn {
+  background-color: var(--brand-gold);
+  border-color: var(--brand-gold);
+  color: var(--bg-primary);
+}
+
+.donation-select-card .selected-badge {
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--brand-gold);
+  color: var(--bg-primary);
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.2rem 0.65rem;
+  border-radius: 999px;
+  letter-spacing: 0.06em;
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.donation-select-card.selected .selected-badge {
+  opacity: 1;
+}
+
+/* PIX section highlight pulse on selection */
+@keyframes pixHighlight {
+  0%   { box-shadow: 0 0 0 rgba(230, 193, 90, 0); border-color: rgba(255,255,255,.08); }
+  30%  { box-shadow: 0 0 0 6px rgba(230, 193, 90, 0.22), 0 0 40px rgba(230, 193, 90, 0.18); border-color: var(--brand-gold-border); }
+  70%  { box-shadow: 0 0 0 3px rgba(230, 193, 90, 0.12), 0 0 24px rgba(230, 193, 90, 0.1); border-color: var(--brand-gold-border); }
+  100% { box-shadow: 0 0 0 rgba(230, 193, 90, 0); border-color: rgba(255,255,255,.08); }
+}
+
+.pix-section-highlight {
+  animation: pixHighlight 1.6s ease forwards;
+}
+
 .section-card,
 .video-card {
   background-color: rgba(255, 255, 255, 0.03);
