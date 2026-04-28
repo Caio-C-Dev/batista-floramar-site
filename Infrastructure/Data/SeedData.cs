@@ -203,7 +203,16 @@ namespace BatistaFloramar.Infrastructure.Data
 
         private static async Task BackfillSlugsAsync(BatistaFloramarDbContext db)
         {
-            // Backfill PalavraDoPastor slugs for records created before slug was introduced
+            // Guard: if the Slug column hasn't been created yet (migration pending), skip silently.
+            try
+            {
+                _ = await db.PalavrasDoPastor.Select(p => p.Slug).FirstOrDefaultAsync();
+            }
+            catch
+            {
+                return;
+            }
+
             var palavrasSemSlug = await db.PalavrasDoPastor
                 .Where(p => p.Slug == null || p.Slug == "")
                 .ToListAsync();
@@ -216,7 +225,6 @@ namespace BatistaFloramar.Infrastructure.Data
                 p.Slug = conflito ? $"{slug}-{p.Id}" : slug;
             }
 
-            // Backfill SerieMensagem slugs
             var seriesSemSlug = await db.SeriesMensagens
                 .Where(s => s.Slug == null || s.Slug == "")
                 .ToListAsync();
