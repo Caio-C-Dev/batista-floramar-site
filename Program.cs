@@ -218,6 +218,30 @@ using (var scope = app.Services.CreateScope())
             ALTER TABLE ""Celulas"" ADD COLUMN IF NOT EXISTS ""LiderNome"" VARCHAR(150) NULL;
         ");
         await db.Database.ExecuteSqlRawAsync(@"
+            ALTER TABLE ""PalavrasDoPastor"" ADD COLUMN IF NOT EXISTS ""Slug"" VARCHAR(320);
+        ");
+        await db.Database.ExecuteSqlRawAsync(@"
+            ALTER TABLE ""SeriesMensagens"" ADD COLUMN IF NOT EXISTS ""Slug"" VARCHAR(220);
+        ");
+        await db.Database.ExecuteSqlRawAsync(@"
+            UPDATE ""PalavrasDoPastor""
+            SET ""Slug"" = LOWER(REPLACE(REPLACE(REPLACE(""Titulo"", ' ', '-'), '/', '-'), '.', ''))
+                          || '-' || CAST(""Id"" AS TEXT)
+            WHERE ""Slug"" IS NULL OR ""Slug"" = '';
+        ");
+        await db.Database.ExecuteSqlRawAsync(@"
+            UPDATE ""SeriesMensagens""
+            SET ""Slug"" = LOWER(REPLACE(REPLACE(REPLACE(""Nome"", ' ', '-'), '/', '-'), '.', ''))
+                          || '-' || CAST(""Id"" AS TEXT)
+            WHERE ""Slug"" IS NULL OR ""Slug"" = '';
+        ");
+        await db.Database.ExecuteSqlRawAsync(@"
+            CREATE UNIQUE INDEX IF NOT EXISTS ""IX_PalavrasDoPastor_Slug"" ON ""PalavrasDoPastor"" (""Slug"");
+        ");
+        await db.Database.ExecuteSqlRawAsync(@"
+            CREATE UNIQUE INDEX IF NOT EXISTS ""IX_SeriesMensagens_Slug"" ON ""SeriesMensagens"" (""Slug"");
+        ");
+        await db.Database.ExecuteSqlRawAsync(@"
             CREATE TABLE IF NOT EXISTS ""Integrantes"" (
                 ""Id"" SERIAL PRIMARY KEY,
                 ""Nome"" VARCHAR(150) NOT NULL,
