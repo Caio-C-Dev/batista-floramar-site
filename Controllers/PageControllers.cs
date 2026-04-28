@@ -258,6 +258,7 @@ namespace BatistaFloramar.Controllers
                 ? (_plain.Length > 160 ? _plain[..157] + "..." : _plain)
                 : string.Format("Leia a mensagem ‘{0}’ do pastor da Comunidade Batista Floramar.", palavra.Titulo);
             ViewBag.CanonicalUrl = string.Format("https://www.batistafloramar.com.br/PalavraDoPastor/Detalhe/{0}", palavra.Slug);
+            ViewBag.OgType = "article";
 
             // Resolve og:image: featured image → first <img> in content → site default
             string? ogImg = null;

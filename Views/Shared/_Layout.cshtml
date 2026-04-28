@@ -47,16 +47,18 @@
     <link rel="icon" type="image/png" sizes="512x512" href="~/images/church-logo.png" />
 
     <!-- Open Graph (WhatsApp, Facebook, LinkedIn) -->
-    <meta property="og:type"        content="website" />
-    <meta property="og:locale"      content="pt_BR" />
-    <meta property="og:site_name"   content="Comunidade Batista Floramar" />
-    <meta property="og:title"       content="@pageTitle" />
-    <meta property="og:description" content="@pageDescription" />
-    <meta property="og:url"         content="@canonicalUrl" />
-    <meta property="og:image"       content="@ogImage" />
-    <meta property="og:image:width"  content="@ogImageWidth" />
-    <meta property="og:image:height" content="@ogImageHeight" />
-    <meta property="og:image:alt"   content="Comunidade Batista Floramar – Igreja em Floramar, Belo Horizonte" />
+    <meta property="og:type"             content="@(ViewBag.OgType as string ?? "website")" />
+    <meta property="og:locale"           content="pt_BR" />
+    <meta property="og:site_name"        content="Comunidade Batista Floramar" />
+    <meta property="og:title"            content="@pageTitle" />
+    <meta property="og:description"      content="@pageDescription" />
+    <meta property="og:url"              content="@canonicalUrl" />
+    <meta property="og:image"            content="@ogImage" />
+    <meta property="og:image:secure_url" content="@ogImage" />
+    <meta property="og:image:width"      content="@ogImageWidth" />
+    <meta property="og:image:height"     content="@ogImageHeight" />
+    <meta property="og:image:type"       content="image/jpeg" />
+    <meta property="og:image:alt"        content="@pageTitle" />
 
     <!-- Twitter Card -->
     <meta name="twitter:card"        content="summary_large_image" />
