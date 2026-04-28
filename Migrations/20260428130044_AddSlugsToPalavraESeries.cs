@@ -14,75 +14,51 @@ namespace BatistaFloramar.Migrations
 
             if (pg)
             {
-                // PostgreSQL — idempotent: ADD COLUMN IF NOT EXISTS, CREATE INDEX IF NOT EXISTS
+                migrationBuilder.Sql(@"ALTER TABLE ""SeriesMensagens"" ADD COLUMN IF NOT EXISTS ""Slug"" VARCHAR(220);");
+                migrationBuilder.Sql(@"ALTER TABLE ""PalavrasDoPastor"" ADD COLUMN IF NOT EXISTS ""Slug"" VARCHAR(320);");
 
-                migrationBuilder.Sql(@"
-                    ALTER TABLE ""SeriesMensagens"" ADD COLUMN IF NOT EXISTS ""Slug"" VARCHAR(220);
-                ");
-
-                migrationBuilder.Sql(@"
-                    ALTER TABLE ""PalavrasDoPastor"" ADD COLUMN IF NOT EXISTS ""Slug"" VARCHAR(320);
-                ");
-
-                // Backfill rows that have no slug yet (null or empty string)
+                // Backfill: simple replace of spaces with hyphens + id suffix for uniqueness.
+                // The application-level SlugHelper will regenerate proper slugs when records are edited.
                 migrationBuilder.Sql(@"
                     UPDATE ""SeriesMensagens""
-                    SET ""Slug"" = LOWER(
-                        REGEXP_REPLACE(
-                            REGEXP_REPLACE(""Nome"", '[^a-zA-Z0-9\s]', '', 'g'),
-                        '\s+', '-', 'g'))
-                        || '-' || CAST(""Id"" AS TEXT)
+                    SET ""Slug"" = LOWER(REPLACE(REPLACE(REPLACE(""Nome"", ' ', '-'), '/', '-'), '.', ''))
+                                  || '-' || CAST(""Id"" AS TEXT)
                     WHERE ""Slug"" IS NULL OR ""Slug"" = '';
                 ");
 
                 migrationBuilder.Sql(@"
                     UPDATE ""PalavrasDoPastor""
-                    SET ""Slug"" = LOWER(
-                        REGEXP_REPLACE(
-                            REGEXP_REPLACE(""Titulo"", '[^a-zA-Z0-9\s]', '', 'g'),
-                        '\s+', '-', 'g'))
-                        || '-' || CAST(""Id"" AS TEXT)
+                    SET ""Slug"" = LOWER(REPLACE(REPLACE(REPLACE(""Titulo"", ' ', '-'), '/', '-'), '.', ''))
+                                  || '-' || CAST(""Id"" AS TEXT)
                     WHERE ""Slug"" IS NULL OR ""Slug"" = '';
                 ");
 
                 migrationBuilder.Sql(@"ALTER TABLE ""SeriesMensagens"" ALTER COLUMN ""Slug"" SET NOT NULL;");
                 migrationBuilder.Sql(@"ALTER TABLE ""PalavrasDoPastor"" ALTER COLUMN ""Slug"" SET NOT NULL;");
 
-                migrationBuilder.Sql(@"
-                    CREATE UNIQUE INDEX IF NOT EXISTS ""IX_SeriesMensagens_Slug""
-                    ON ""SeriesMensagens"" (""Slug"");
-                ");
-
-                migrationBuilder.Sql(@"
-                    CREATE UNIQUE INDEX IF NOT EXISTS ""IX_PalavrasDoPastor_Slug""
-                    ON ""PalavrasDoPastor"" (""Slug"");
-                ");
+                migrationBuilder.Sql(@"CREATE UNIQUE INDEX IF NOT EXISTS ""IX_SeriesMensagens_Slug"" ON ""SeriesMensagens"" (""Slug"");");
+                migrationBuilder.Sql(@"CREATE UNIQUE INDEX IF NOT EXISTS ""IX_PalavrasDoPastor_Slug"" ON ""PalavrasDoPastor"" (""Slug"");");
             }
             else
             {
-                // SQL Server — idempotent via sys.columns / sys.indexes checks
-
+                // SQL Server
                 migrationBuilder.Sql(@"
-                    IF NOT EXISTS (SELECT 1 FROM sys.columns
-                        WHERE object_id = OBJECT_ID(N'SeriesMensagens') AND name = N'Slug')
-                    ALTER TABLE [SeriesMensagens] ADD [Slug] NVARCHAR(220) NULL;
+                    IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID(N'SeriesMensagens') AND name = N'Slug')
+                        ALTER TABLE [SeriesMensagens] ADD [Slug] NVARCHAR(220) NULL;
                 ");
-
                 migrationBuilder.Sql(@"
-                    IF NOT EXISTS (SELECT 1 FROM sys.columns
-                        WHERE object_id = OBJECT_ID(N'PalavrasDoPastor') AND name = N'Slug')
-                    ALTER TABLE [PalavrasDoPastor] ADD [Slug] NVARCHAR(320) NULL;
+                    IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID(N'PalavrasDoPastor') AND name = N'Slug')
+                        ALTER TABLE [PalavrasDoPastor] ADD [Slug] NVARCHAR(320) NULL;
                 ");
 
                 migrationBuilder.Sql(@"
                     UPDATE [SeriesMensagens]
-                    SET [Slug] = LOWER(REPLACE([Nome], ' ', '-')) + '-' + CAST([Id] AS NVARCHAR(20))
+                    SET [Slug] = LOWER(REPLACE(REPLACE([Nome], ' ', '-'), '.', '')) + '-' + CAST([Id] AS NVARCHAR(20))
                     WHERE [Slug] IS NULL OR [Slug] = '';
                 ");
-
                 migrationBuilder.Sql(@"
                     UPDATE [PalavrasDoPastor]
-                    SET [Slug] = LOWER(REPLACE([Titulo], ' ', '-')) + '-' + CAST([Id] AS NVARCHAR(20))
+                    SET [Slug] = LOWER(REPLACE(REPLACE([Titulo], ' ', '-'), '.', '')) + '-' + CAST([Id] AS NVARCHAR(20))
                     WHERE [Slug] IS NULL OR [Slug] = '';
                 ");
 
@@ -90,15 +66,12 @@ namespace BatistaFloramar.Migrations
                 migrationBuilder.Sql(@"ALTER TABLE [PalavrasDoPastor] ALTER COLUMN [Slug] NVARCHAR(320) NOT NULL;");
 
                 migrationBuilder.Sql(@"
-                    IF NOT EXISTS (SELECT 1 FROM sys.indexes
-                        WHERE object_id = OBJECT_ID(N'SeriesMensagens') AND name = N'IX_SeriesMensagens_Slug')
-                    CREATE UNIQUE INDEX [IX_SeriesMensagens_Slug] ON [SeriesMensagens] ([Slug]);
+                    IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE object_id = OBJECT_ID(N'SeriesMensagens') AND name = N'IX_SeriesMensagens_Slug')
+                        CREATE UNIQUE INDEX [IX_SeriesMensagens_Slug] ON [SeriesMensagens] ([Slug]);
                 ");
-
                 migrationBuilder.Sql(@"
-                    IF NOT EXISTS (SELECT 1 FROM sys.indexes
-                        WHERE object_id = OBJECT_ID(N'PalavrasDoPastor') AND name = N'IX_PalavrasDoPastor_Slug')
-                    CREATE UNIQUE INDEX [IX_PalavrasDoPastor_Slug] ON [PalavrasDoPastor] ([Slug]);
+                    IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE object_id = OBJECT_ID(N'PalavrasDoPastor') AND name = N'IX_PalavrasDoPastor_Slug')
+                        CREATE UNIQUE INDEX [IX_PalavrasDoPastor_Slug] ON [PalavrasDoPastor] ([Slug]);
                 ");
             }
         }
