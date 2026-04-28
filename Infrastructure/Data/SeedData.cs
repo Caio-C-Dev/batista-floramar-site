@@ -51,10 +51,38 @@ namespace BatistaFloramar.Infrastructure.Data
 
         private static async Task SeedMinisteriosAsync(BatistaFloramarDbContext db)
         {
+            // Remove duplicatas criadas via admin (slug diferente do canônico)
+            var canonicalJovens = await db.Ministerios.FirstOrDefaultAsync(m => m.Slug == "jovens");
+            if (canonicalJovens != null)
+            {
+                var duplicatas = await db.Ministerios
+                    .Where(m => m.Id != canonicalJovens.Id && m.Nome.Contains("Jovens"))
+                    .ToListAsync();
+                if (duplicatas.Any()) { db.Ministerios.RemoveRange(duplicatas); await db.SaveChangesAsync(); }
+            }
+
+            var canonicalLibras = await db.Ministerios.FirstOrDefaultAsync(m => m.Slug == "libras");
+            if (canonicalLibras != null)
+            {
+                var duplicatas = await db.Ministerios
+                    .Where(m => m.Id != canonicalLibras.Id && (m.Nome.Contains("Surdo") || m.Nome.Contains("Libras")))
+                    .ToListAsync();
+                if (duplicatas.Any()) { db.Ministerios.RemoveRange(duplicatas); await db.SaveChangesAsync(); }
+            }
+
             // Upsert por slug — seguro para re-executar
             var ministeriosData = new[]
             {
-                new Ministerio { Nome = "Jovens", Slug = "jovens", ResumoBreve = "Culto de Jovens e ações de impacto para a juventude.", Descricao = "O Culto de Jovens da Comunidade Batista Floramar é um espaço vibrante de crescimento espiritual, conexão e propósito. Toda semana os jovens se reúnem para louvar, estudar a Palavra e viver ações de impacto social na comunidade. Este ministério existe para que cada jovem descubra seu chamado e sirva com seus dons.", Lideranca = "Wellington e Mônica", WhatsApp = "5531985339161", Icone = "fas fa-bolt", Ordem = 1 },
+                new Ministerio {
+                    Nome = "Jovens e Adolescentes",
+                    Slug = "jovens",
+                    ResumoBreve = "Culto de Jovens e Adolescentes e ações de impacto para a juventude.",
+                    Descricao = "O Culto de Jovens e Adolescentes da Comunidade Batista Floramar é um espaço vibrante de crescimento espiritual, conexão e propósito. Toda semana os jovens e adolescentes se reúnem para louvar, estudar a Palavra e viver ações de impacto social na comunidade. Este ministério existe para que cada jovem descubra seu chamado e sirva com seus dons.",
+                    Lideranca = "Wellington e Mônica",
+                    WhatsApp = "5531985339161",
+                    Icone = "fas fa-bolt",
+                    Ordem = 1
+                },
                 new Ministerio { Nome = "Kids", Slug = "kids", ResumoBreve = "Cuidando das crianças e bebês com amor enquanto os pais participam do culto.", Descricao = "O Ministério Kids cuida das crianças e bebês da comunidade durante os cultos dominicais, para que os pais possam participar plenamente do momento de adoração. Nossas professoras voluntárias são comprometidas, treinadas e cheias de amor — garantindo um ambiente seguro, divertido e repleto da Palavra de Deus para os pequenos.", Lideranca = "Poliana", Icone = "fas fa-child", Ordem = 2 },
                 new Ministerio { Nome = "Louvor", Slug = "louvor", ResumoBreve = "Liderando a congregação na adoração através da música.", Descricao = "O Ministério de Louvor da Comunidade Batista Floramar existe para conduzir a congregação à presença de Deus através da música e da adoração. Em todos os cultos e eventos da igreja, nossa equipe de músicos e vocalistas se dedica a exaltar o nome do Senhor com excelência e unção, criando um ambiente de encontro genuíno com Deus.", Lideranca = "Débora e Samuel", FotoLider = "/images/ministerios/lideres/LiderLouvor.jpeg", Icone = "fas fa-music", Ordem = 3 },
                 new Ministerio { Nome = "Batismo", Slug = "batismo", ResumoBreve = "Preparando e celebrando o passo público da fé.", Descricao = "O Ministério de Batismo acompanha e prepara cada crente que decide dar o passo público da fé, seguindo o ensinamento bíblico de Cristo. Por meio de encontros de instrução, estudo da Palavra e acolhimento pessoal, nosso objetivo é que cada batizando compreenda o significado deste ato e inicie sua caminhada cristã com fundamento sólido.", Lideranca = "Lucas César e Cleide", Icone = "fas fa-water", Ordem = 4 },
@@ -65,7 +93,15 @@ namespace BatistaFloramar.Infrastructure.Data
                 new Ministerio { Nome = "Na Palavra", Slug = "na-palavra", ResumoBreve = "Vídeos, podcasts, gravações e entrevistas da igreja.", Descricao = "O Ministério Na Palavra reúne e produz os conteúdos audiovisuais da Comunidade Batista Floramar: vídeos de pregações, podcasts devocionais, gravações de cultos e entrevistas com pastores e líderes. Nosso objetivo é que a Palavra de Deus alcance cada vez mais pessoas — onde quer que estejam.", Lideranca = "Ildson e Renara", FotoLider = "/images/ministerios/lideres/LiderNaPalavra.jpeg", Icone = "fas fa-podcast", Ordem = 9 },
                 new Ministerio { Nome = "Diaconato", Slug = "diaconato", ResumoBreve = "Cuidando da Igreja e recebendo cada visitante com boas-vindas.", Descricao = "O Diaconato serve à Comunidade Batista Floramar cuidando das necessidades práticas da congregação, da organização dos cultos e eventos, e do acolhimento de cada pessoa que entra pela porta da igreja. Nossa equipe do Receptivo é responsável pelas Boas-Vindas — garantindo que nenhum visitante se sinta invisível. Servir é nossa vocação.", Lideranca = "Josi e Cleiton", FotoLider = "/images/ministerios/lideres/LiderDiaconato.jpeg", Icone = "fas fa-hand-holding-heart", Ordem = 10 },
                 new Ministerio { Nome = "Dança", Slug = "danca", ResumoBreve = "Adorando a Deus no palco através da dança profética.", Descricao = "O Ministério de Dança da Comunidade Batista Floramar leva a adoração a outro nível — através do movimento, da expressão corporal e da dança profética no palco, especialmente durante os momentos de louvor. Nosso grupo de dança complementa a adoração coletiva, glorificando a Deus com todo o corpo como instrumento.", Lideranca = "Thaty", Icone = "fas fa-star", Ordem = 11 },
-                new Ministerio { Nome = "Libras", Slug = "libras", ResumoBreve = "Garantindo acessibilidade com intérprete de Libras todo domingo à noite.", Descricao = "O Ministério de Libras da Comunidade Batista Floramar garante que nenhuma pessoa surda fique sem acesso ao Evangelho. Todo domingo à noite, nosso intérprete está presente no culto, traduzindo em Língua Brasileira de Sinais para que surdos e deficientes auditivos possam participar plenamente do momento de adoração e da pregação da Palavra. Inclusão é um valor do Reino.", Lideranca = "Vanessa", Icone = "fas fa-hands", Ordem = 12 },
+                new Ministerio {
+                    Nome = "Libras",
+                    Slug = "libras",
+                    ResumoBreve = "Garantindo acessibilidade com intérprete de Libras todo domingo à noite.",
+                    Descricao = "O Ministério com surdos da Comunidade Batista Floramar garante que nenhuma pessoa surda fique sem acesso ao Evangelho. Todo domingo à noite, nosso intérprete está presente no culto, traduzindo em Língua Brasileira de Sinais para que os deficientes auditivos possam participar plenamente do momento de adoração e da pregação da Palavra. Inclusão é um valor do Reino.",
+                    Lideranca = "Vanessa",
+                    Icone = "fas fa-hands",
+                    Ordem = 12
+                },
                 new Ministerio { Nome = "Intercessão", Slug = "intercessao", ResumoBreve = "Um ministério dedicado à oração que sustenta toda a obra de Deus na igreja.", Descricao = "O Ministério de Intercessão da Comunidade Batista Floramar é o alicerce espiritual de toda a obra da igreja. São homens e mulheres comprometidos com a oração constante — intercedendo pela congregação, pelas famílias, pelos líderes, pelos perdidos e pelas nações. Cremos que toda grande obra de Deus começa e é sustentada pelo joelho dobrado diante do Pai.", Lideranca = "Maria Helena", Icone = "fas fa-pray", Ordem = 13 },
             };
 
@@ -153,7 +189,7 @@ namespace BatistaFloramar.Infrastructure.Data
                 new EventoSemanal { DiaSemana = "Segunda",  Titulo = "Seminário Teológico",   Horario = "19h30", Descricao = "Estudo aprofundado das Escrituras para os leigos, vocacionados, chamado pastoral e ministros.",  Ativo = true, Ordem = 1 },
                 new EventoSemanal { DiaSemana = "Terça",    Titulo = "Terça da Oração",       Horario = "19h",   Descricao = "Momento de intercessão coletiva na presença de Deus.",                                            Ativo = true, Ordem = 1 },
                 new EventoSemanal { DiaSemana = "Quarta",   Titulo = "Culto de Família",      Horario = "20h",   Descricao = "Culto de oração em família e pregação temática das Escrituras.",                                   Ativo = true, Ordem = 1 },
-                new EventoSemanal { DiaSemana = "Sexta",    Titulo = "Culto de Jovens",       Horario = "20h",   Descricao = "Espaço vibrante de crescimento espiritual e conexão para os jovens.",                              Ativo = true, Ordem = 1 },
+                new EventoSemanal { DiaSemana = "Sexta",    Titulo = "Culto de Jovens e Adolescentes", Horario = "20h",   Descricao = "Espaço vibrante de crescimento espiritual e conexão para os jovens e adolescentes.",                              Ativo = true, Ordem = 1 },
                 new EventoSemanal { DiaSemana = "Sábado",   Titulo = "Bazar Solidário",       Horario = "09h",   Descricao = "Todo primeiro sábado do mês.",                                                                     Ativo = true, Ordem = 1 },
                 new EventoSemanal { DiaSemana = "Sábado",   Titulo = "Curso de Libras",       Horario = "17h",   Descricao = "Curso de Língua Brasileira de Sinais para membros e amigos da comunidade.",                        Ativo = true, Ordem = 2 },
                 new EventoSemanal { DiaSemana = "Sábado",   Titulo = "Futebol",               Horario = "17h30", Descricao = "Confraternização e integração através do esporte.",                                                 Ativo = true, Ordem = 3 },

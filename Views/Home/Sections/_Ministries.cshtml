@@ -3,7 +3,7 @@
     var ministerios = ViewBag.Ministerios as IEnumerable<Ministerio>;
     var items = ministerios?.Where(m => m.Ativo).OrderBy(m => m.Ordem).ToList()
                 ?? new List<Ministerio> {
-                    new() { Nome="Jovens",    Icone="fas fa-bolt",   Slug="jovens",   ResumoBreve="Culto de Jovens e acoes de impacto para a juventude." },
+                    new() { Nome="Jovens e Adolescentes", Icone="fas fa-bolt", Slug="jovens", ResumoBreve="Culto de Jovens e Adolescentes e acoes de impacto para a juventude." },
                     new() { Nome="Kids",      Icone="fas fa-child",  Slug="kids",     ResumoBreve="Cuidando das criancas com amor e carinho." },
                     new() { Nome="Louvor",    Icone="fas fa-music",  Slug="louvor",   ResumoBreve="Adoracao e musica para glorificar a Deus." },
                     new() { Nome="Batismo",   Icone="fas fa-water",  Slug="batismo",  ResumoBreve="Celebrando o passo publico da fe." },

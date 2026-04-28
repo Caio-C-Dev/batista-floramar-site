@@ -5,7 +5,8 @@
     bool temMapa = celulasComMapa.Count > 0;
 }
 <section class="cells-section" id="celulas">
-    <div class="container">
+    <div id="cells-galaxy-bg" aria-hidden="true"></div>
+    <div class="container cells-section-inner">
         <div class="cells-content">
             <div class="cells-icon">
                 <i class="fas fa-home"></i>
@@ -100,5 +101,29 @@
             </script>
         }
     </div>
+
+    <script type="module">
+        import { initGalaxy } from '/js/galaxy.js';
+        (function () {
+            var el = document.getElementById('cells-galaxy-bg');
+            if (!el) return;
+            if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+            initGalaxy(el, {
+                mouseRepulsion: true,
+                mouseInteraction: false,
+                density: 0.7,
+                glowIntensity: 0.2,
+                saturation: 0,
+                hueShift: 190,
+                twinkleIntensity: 0.3,
+                rotationSpeed: 0,
+                repulsionStrength: 2,
+                autoCenterRepulsion: 0,
+                starSpeed: 0.6,
+                speed: 1,
+                transparent: true,
+            });
+        })();
+    </script>
 </section>
 

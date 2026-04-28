@@ -46,8 +46,15 @@ namespace BatistaFloramar.Controllers
             if (User.FindFirstValue("CelulaId") != null)
                 return RedirectToAction("Dashboard");
 
+            // Erros vindos do POST (padrão PRG)
+            if (TempData["LoginErro"] is string erro)
+                ModelState.AddModelError(string.Empty, erro);
+
             ViewBag.ReturnUrl = returnUrl;
-            return View(new LiderLoginViewModel());
+            return View(new LiderLoginViewModel
+            {
+                NomeCelula = TempData["LoginNomeCelula"] as string ?? string.Empty
+            });
         }
 
         [HttpPost]
@@ -55,7 +62,11 @@ namespace BatistaFloramar.Controllers
         public async Task<IActionResult> Login(LiderLoginViewModel model, string? returnUrl = null)
         {
             if (!ModelState.IsValid)
-                return View(model);
+            {
+                TempData["LoginErro"] = "Preencha todos os campos obrigatórios.";
+                TempData["LoginNomeCelula"] = model.NomeCelula;
+                return RedirectToAction("Login", new { returnUrl });
+            }
 
             var nomeCelula = model.NomeCelula.Trim();
             var senhaDigitada = CapitalizarPrimeira(model.NomeLider);
@@ -66,8 +77,9 @@ namespace BatistaFloramar.Controllers
 
             if (celula == null || string.IsNullOrWhiteSpace(celula.LiderNome))
             {
-                ModelState.AddModelError(string.Empty, "Célula ou líder não encontrado. Verifique os dados informados.");
-                return View(model);
+                TempData["LoginErro"] = "Célula ou líder não encontrado. Verifique os dados informados.";
+                TempData["LoginNomeCelula"] = model.NomeCelula;
+                return RedirectToAction("Login", new { returnUrl });
             }
 
             // MVP: verifica se nome digitado (primeira letra maiúscula) bate com LiderNome cadastrado
@@ -75,8 +87,9 @@ namespace BatistaFloramar.Controllers
             var senhaCorreta = CapitalizarPrimeira(celula.LiderNome);
             if (senhaDigitada != senhaCorreta)
             {
-                ModelState.AddModelError(string.Empty, "Célula ou líder não encontrado. Verifique os dados informados.");
-                return View(model);
+                TempData["LoginErro"] = "Célula ou líder não encontrado. Verifique os dados informados.";
+                TempData["LoginNomeCelula"] = model.NomeCelula;
+                return RedirectToAction("Login", new { returnUrl });
             }
 
             var claims = new List<Claim>

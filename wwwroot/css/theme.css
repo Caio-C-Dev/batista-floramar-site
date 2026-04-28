@@ -1232,6 +1232,18 @@ textarea {
   z-index: 1;
 }
 
+#sobre::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 280px;
+  background: linear-gradient(to bottom, transparent 0%, var(--bg-secondary) 100%);
+  pointer-events: none;
+  z-index: 1;
+}
+
 .section-dark {
   background-color: var(--bg-secondary);
 }
@@ -1568,6 +1580,36 @@ textarea {
   height: 100%;
   transition: all var(--transition-smooth);
   box-shadow: 0 4px 18px rgba(0, 0, 0, 0.25);
+  position: relative;
+  overflow: hidden;
+}
+
+.about-pillar::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    -30deg,
+    hsla(0, 0%, 0%, 0) 60%,
+    rgba(255, 255, 255, 0.28) 70%,
+    hsla(0, 0%, 0%, 0) 80%,
+    hsla(0, 0%, 0%, 0) 100%
+  );
+  background-size: 300% 300%, 100% 100%;
+  background-repeat: no-repeat;
+  background-position: -100% -100%, 0 0;
+  transition: 800ms ease;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.about-pillar:hover::before {
+  background-position: 100% 100%, 0 0;
+}
+
+.about-pillar > * {
+  position: relative;
+  z-index: 2;
 }
 
 .about-pillar:hover {

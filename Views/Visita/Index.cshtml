@@ -50,7 +50,29 @@
         text-align: center;
         transition: transform var(--transition-smooth), box-shadow var(--transition-smooth), border-color var(--transition-smooth);
         height: 100%;
+        position: relative;
+        overflow: hidden;
     }
+    .visita-card::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+            -30deg,
+            hsla(0,0%,0%,0) 60%,
+            rgba(255,255,255,0.28) 70%,
+            hsla(0,0%,0%,0) 80%,
+            hsla(0,0%,0%,0) 100%
+        );
+        background-size: 300% 300%, 100% 100%;
+        background-repeat: no-repeat;
+        background-position: -100% -100%, 0 0;
+        transition: 800ms ease;
+        pointer-events: none;
+        z-index: 1;
+    }
+    .visita-card:hover::before { background-position: 100% 100%, 0 0; }
+    .visita-card > * { position: relative; z-index: 2; }
     .visita-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-hover); border-color: var(--brand-gold-border); }
     .visita-card-icon {
         width: 66px; height: 66px; margin: 0 auto 1rem;
