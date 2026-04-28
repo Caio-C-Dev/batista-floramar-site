@@ -20,7 +20,7 @@
                     var excerpt = System.Text.RegularExpressions.Regex.Replace(p.Conteudo, "<.*?>", "");
                     excerpt = excerpt.Length > 90 ? excerpt.Substring(0, 90).TrimEnd() + "…" : excerpt;
                     <div class="col-md-4 scroll-reveal delay-@(i + 1)">
-                        <a href="/PalavraDoPastor/Detalhe/@p.Id" class="palavra-preview-card">
+                        <a href="/PalavraDoPastor/Detalhe/@p.Slug" class="palavra-preview-card">
                             <div class="palavra-preview-img">
                                 @if (!string.IsNullOrEmpty(p.ImagemDestaque))
                                 {

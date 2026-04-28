@@ -1,4 +1,5 @@
 using BatistaFloramar.Domain.Entities;
+using BatistaFloramar.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 
 namespace BatistaFloramar.Infrastructure.Data
@@ -16,6 +17,7 @@ namespace BatistaFloramar.Infrastructure.Data
             await SeedPodcastsAsync(db);
             await SeedMinisterioFotosAsync(db);
             await SeedEventosSemanaisAsync(db);
+            await BackfillSlugsAsync(db);
         }
 
         private static async Task SeedCredenciaisAsync(BatistaFloramarDbContext db)
@@ -197,6 +199,38 @@ namespace BatistaFloramar.Infrastructure.Data
                 new EventoSemanal { DiaSemana = "Domingo",  Titulo = "Culto da Noite",        Horario = "18h",   Descricao = "Culto de adoração e aprofundamento na pregação expositiva — com intérprete de libras presencial.", Ativo = true, Ordem = 2 }
             );
             await db.SaveChangesAsync();
+        }
+
+        private static async Task BackfillSlugsAsync(BatistaFloramarDbContext db)
+        {
+            // Backfill PalavraDoPastor slugs for records created before slug was introduced
+            var palavrasSemSlug = await db.PalavrasDoPastor
+                .Where(p => p.Slug == null || p.Slug == "")
+                .ToListAsync();
+
+            foreach (var p in palavrasSemSlug)
+            {
+                var slug = SlugHelper.Gerar(p.Titulo);
+                var conflito = await db.PalavrasDoPastor
+                    .AnyAsync(x => x.Slug == slug && x.Id != p.Id);
+                p.Slug = conflito ? $"{slug}-{p.Id}" : slug;
+            }
+
+            // Backfill SerieMensagem slugs
+            var seriesSemSlug = await db.SeriesMensagens
+                .Where(s => s.Slug == null || s.Slug == "")
+                .ToListAsync();
+
+            foreach (var s in seriesSemSlug)
+            {
+                var slug = SlugHelper.Gerar(s.Nome);
+                var conflito = await db.SeriesMensagens
+                    .AnyAsync(x => x.Slug == slug && x.Id != s.Id);
+                s.Slug = conflito ? $"{slug}-{s.Id}" : slug;
+            }
+
+            if (palavrasSemSlug.Any() || seriesSemSlug.Any())
+                await db.SaveChangesAsync();
         }
     }
 }

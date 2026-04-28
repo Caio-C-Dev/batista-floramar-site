@@ -1,4 +1,4 @@
-using BatistaFloramar.Application.Services;
+﻿using BatistaFloramar.Application.Services;
 using BatistaFloramar.Domain.Entities;
 using BatistaFloramar.Infrastructure.Data;
 using BatistaFloramar.Models;
@@ -236,19 +236,39 @@ namespace BatistaFloramar.Controllers
             return View(palavras);
         }
 
-        public async Task<IActionResult> Detalhe(int id)
+        public async Task<IActionResult> Detalhe(string id)
         {
             var palavra = await _db.PalavrasDoPastor
-                .FirstOrDefaultAsync(p => p.Id == id && p.Publicado);
+                .FirstOrDefaultAsync(p => p.Slug == id && p.Publicado);
+
+            // Fallback: numeric ID for old links
+            if (palavra == null && int.TryParse(id, out var legacyId))
+                palavra = await _db.PalavrasDoPastor
+                    .FirstOrDefaultAsync(p => p.Id == legacyId && p.Publicado);
+
             if (palavra == null) return NotFound();
+
+            // Redirect to canonical slug URL if accessed via numeric ID
+            if (id != palavra.Slug)
+                return RedirectToActionPermanent(nameof(Detalhe), new { id = palavra.Slug });
+
             ViewBag.Title = palavra.Titulo;
-            ViewBag.MetaDescription = !string.IsNullOrWhiteSpace(palavra.Conteudo)
-                ? palavra.Conteudo.Length > 160 ? palavra.Conteudo[..157] + "..." : palavra.Conteudo
-                : $"Leia a mensagem \u2018{palavra.Titulo}\u2019 do pastor da Comunidade Batista Floramar.";
+            var _plain = System.Text.RegularExpressions.Regex.Replace(palavra.Conteudo ?? string.Empty, "<.*?>", string.Empty);
+            ViewBag.MetaDescription = _plain.Length > 0
+                ? (_plain.Length > 160 ? _plain[..157] + "..." : _plain)
+                : string.Format("Leia a mensagem ‘{0}’ do pastor da Comunidade Batista Floramar.", palavra.Titulo);
+            ViewBag.CanonicalUrl = string.Format("https://www.batistafloramar.com.br/PalavraDoPastor/Detalhe/{0}", palavra.Slug);
+            if (!string.IsNullOrEmpty(palavra.ImagemDestaque))
+            {
+                ViewBag.OgImage = palavra.ImagemDestaque.StartsWith("http")
+                    ? palavra.ImagemDestaque
+                    : "https://www.batistafloramar.com.br" + palavra.ImagemDestaque;
+                ViewBag.OgImageWidth  = "1200";
+                ViewBag.OgImageHeight = "630";
+            }
             return View(palavra);
         }
     }
-
     public class SeriesController : Controller
     {
         private readonly BatistaFloramarDbContext _db;
@@ -266,15 +286,24 @@ namespace BatistaFloramar.Controllers
             return View(series);
         }
 
-        public async Task<IActionResult> Detalhe(int id)
+        public async Task<IActionResult> Detalhe(string id)
         {
             var serie = await _db.SeriesMensagens
-                .FirstOrDefaultAsync(s => s.Id == id && s.Ativo);
+                .FirstOrDefaultAsync(s => s.Slug == id && s.Ativo);
+
+            if (serie == null && int.TryParse(id, out var legacyId))
+                serie = await _db.SeriesMensagens
+                    .FirstOrDefaultAsync(s => s.Id == legacyId && s.Ativo);
+
             if (serie == null) return NotFound();
+
+            if (id != serie.Slug)
+                return RedirectToActionPermanent(nameof(Detalhe), new { id = serie.Slug });
+
             ViewBag.Title = serie.Nome;
             ViewBag.MetaDescription = !string.IsNullOrWhiteSpace(serie.Descricao)
                 ? serie.Descricao.Length > 160 ? serie.Descricao[..157] + "..." : serie.Descricao
-                : $"Série de mensagens \u2018{serie.Nome}\u2019 da Comunidade Batista Floramar.";
+                : $"Série de mensagens '{serie.Nome}' da Comunidade Batista Floramar.";
             return View(serie);
         }
     }

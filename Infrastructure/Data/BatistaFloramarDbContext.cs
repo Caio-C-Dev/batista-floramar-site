@@ -141,6 +141,8 @@ namespace BatistaFloramar.Infrastructure.Data
             {
                 e.ToTable("PalavrasDoPastor");
                 e.HasKey(x => x.Id);
+                e.Property(x => x.Slug).HasMaxLength(320).IsRequired().HasDefaultValue("");
+                e.HasIndex(x => x.Slug).IsUnique();
                 e.Property(x => x.Titulo).HasMaxLength(300).IsRequired();
                 e.Property(x => x.Conteudo).IsRequired();
                 e.Property(x => x.AutorNome).HasMaxLength(150).IsRequired();
@@ -151,6 +153,8 @@ namespace BatistaFloramar.Infrastructure.Data
             {
                 e.ToTable("SeriesMensagens");
                 e.HasKey(x => x.Id);
+                e.Property(x => x.Slug).HasMaxLength(220).IsRequired().HasDefaultValue("");
+                e.HasIndex(x => x.Slug).IsUnique();
                 e.Property(x => x.Nome).HasMaxLength(200).IsRequired();
                 e.Property(x => x.PlaylistId).HasMaxLength(100).IsRequired();
                 e.Property(x => x.Descricao).HasMaxLength(1000);

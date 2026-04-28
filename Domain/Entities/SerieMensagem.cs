@@ -3,6 +3,7 @@ namespace BatistaFloramar.Domain.Entities
     public class SerieMensagem
     {
         public int Id { get; set; }
+        public string Slug { get; set; } = string.Empty;
         public string Nome { get; set; } = string.Empty;
         public string PlaylistId { get; set; } = string.Empty;
         public string? Descricao { get; set; }

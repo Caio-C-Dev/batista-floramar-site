@@ -1,4 +1,5 @@
 using BatistaFloramar.Domain.Entities;
+using BatistaFloramar.Infrastructure;
 using BatistaFloramar.Infrastructure.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -54,6 +55,8 @@ namespace BatistaFloramar.Controllers
             if (capa != null && capa.Length > 0)
                 model.ImagemCapa = await SalvarCapaAsync(capa);
 
+            model.Slug = await SlugHelper.GerarUnicoAsync(model.Nome, null,
+                async (s, _) => await _db.SeriesMensagens.AnyAsync(x => x.Slug == s));
             model.CriadoEm = DateTime.UtcNow;
             model.Ativo = true;
             _db.SeriesMensagens.Add(model);
@@ -95,6 +98,8 @@ namespace BatistaFloramar.Controllers
             }
 
             serie.Nome = model.Nome;
+            serie.Slug = await SlugHelper.GerarUnicoAsync(model.Nome, serie.Id,
+                async (s, excId) => await _db.SeriesMensagens.AnyAsync(x => x.Slug == s && x.Id != excId));
             serie.PlaylistId = model.PlaylistId;
             serie.Descricao = model.Descricao;
             serie.Ativo = model.Ativo;

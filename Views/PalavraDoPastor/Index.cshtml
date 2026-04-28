@@ -25,11 +25,14 @@
         <div class="row row-cols-1 row-cols-md-2 g-4 mt-2">
             @foreach (var p in Model)
             {
+                var shareUrl = "https://www.batistafloramar.com.br/PalavraDoPastor/Detalhe/" + p.Slug;
+                var shareWa  = "https://wa.me/?text=" + Uri.EscapeDataString(p.Titulo + " — " + shareUrl);
                 <div class="col">
-                    <a href="/PalavraDoPastor/Detalhe/@p.Id" class="text-decoration-none">
-                        <div class="section-card h-100" style="transition:transform .2s,box-shadow .2s;cursor:pointer;"
-                             onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 8px 24px rgba(0,0,0,.4)'"
-                             onmouseout="this.style.transform='';this.style.boxShadow=''">
+                    <div class="section-card h-100 palavra-index-card"
+                         onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 8px 24px rgba(0,0,0,.4)'"
+                         onmouseout="this.style.transform='';this.style.boxShadow=''">
+
+                        <a href="/PalavraDoPastor/Detalhe/@p.Slug" class="text-decoration-none d-block">
                             @if (!string.IsNullOrEmpty(p.ImagemDestaque))
                             {
                                 <img src="@p.ImagemDestaque" alt="@p.Titulo"
@@ -48,10 +51,168 @@
                             </div>
                             <h3 style="color:#fff;font-size:1.1rem;margin:0 0 .5rem;line-height:1.35;">@p.Titulo</h3>
                             <p class="text-secondary small mb-0"><i class="fas fa-user me-1 text-gold"></i>@p.AutorNome</p>
+                        </a>
+
+                        <div class="palavra-share-row">
+                            <span class="text-secondary" style="font-size:.75rem;">Compartilhar:</span>
+
+                            @if (true) /* native share — shown/hidden via JS */
+                            {
+                                <button class="pcard-share-btn btn-share-native-card"
+                                        data-url="@shareUrl"
+                                        data-title="@p.Titulo"
+                                        title="Compartilhar"
+                                        onclick="compartilharNativoCard(this)">
+                                    <i class="fas fa-share-alt"></i>
+                                </button>
+                            }
+
+                            <a class="pcard-share-btn pcard-share-wa"
+                               href="@shareWa"
+                               target="_blank" rel="noopener noreferrer"
+                               title="Compartilhar no WhatsApp">
+                                <i class="fab fa-whatsapp"></i>
+                            </a>
+
+                            <button class="pcard-share-btn"
+                                    data-url="@shareUrl"
+                                    title="Copiar link"
+                                    onclick="copiarLinkCard(this)">
+                                <i class="fas fa-link"></i>
+                            </button>
                         </div>
-                    </a>
+                    </div>
                 </div>
             }
         </div>
     }
 </div>
+
+<div id="share-toast-list" class="share-toast-list" aria-live="polite"></div>
+
+<style>
+    .palavra-index-card {
+        display: flex;
+        flex-direction: column;
+        transition: transform .2s, box-shadow .2s;
+        cursor: default;
+    }
+
+    .palavra-index-card > a {
+        flex: 1;
+        cursor: pointer;
+    }
+
+    .palavra-share-row {
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+        padding-top: .85rem;
+        margin-top: .85rem;
+        border-top: 1px solid rgba(255,255,255,.07);
+        flex-wrap: wrap;
+    }
+
+    .pcard-share-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: rgba(255,255,255,.06);
+        border: 1px solid rgba(255,255,255,.12);
+        color: #c8d8e8;
+        font-size: .82rem;
+        cursor: pointer;
+        text-decoration: none;
+        transition: background .18s, border-color .18s, color .18s;
+        flex-shrink: 0;
+    }
+
+    .pcard-share-btn:hover {
+        background: rgba(230,193,90,.14);
+        border-color: rgba(230,193,90,.4);
+        color: #e6c15a;
+    }
+
+    .pcard-share-wa {
+        color: #4cda7a;
+        border-color: rgba(76,218,122,.25);
+        background: rgba(76,218,122,.08);
+    }
+
+    .pcard-share-wa:hover {
+        background: rgba(76,218,122,.18);
+        border-color: rgba(76,218,122,.5);
+        color: #4cda7a;
+    }
+
+    .share-toast-list {
+        position: fixed;
+        bottom: 1.5rem;
+        left: 50%;
+        transform: translateX(-50%) translateY(1rem);
+        background: #1e2e4e;
+        color: #c8d8e8;
+        border: 1px solid rgba(230,193,90,.3);
+        border-radius: 10px;
+        padding: .6rem 1.25rem;
+        font-size: .85rem;
+        font-weight: 600;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity .25s, transform .25s;
+        z-index: 9999;
+        white-space: nowrap;
+    }
+
+    .share-toast-list.show {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+</style>
+
+<script>
+    /* Oculta botão nativo em cards onde Web Share API não está disponível */
+    if (!navigator.share) {
+        document.querySelectorAll('.btn-share-native-card').forEach(function (b) {
+            b.style.display = 'none';
+        });
+    }
+
+    function mostrarToastLista(msg) {
+        var t = document.getElementById('share-toast-list');
+        t.textContent = msg;
+        t.classList.add('show');
+        setTimeout(function () { t.classList.remove('show'); }, 2500);
+    }
+
+    function compartilharNativoCard(btn) {
+        if (!navigator.share) return;
+        var url   = btn.getAttribute('data-url');
+        var title = btn.getAttribute('data-title');
+        navigator.share({
+            title: title,
+            text: 'Leia "' + title + '" — Palavra do Pastor | Comunidade Batista Floramar',
+            url: url
+        }).catch(function () {});
+    }
+
+    function copiarLinkCard(btn) {
+        var url = btn.getAttribute('data-url');
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(url).then(function () {
+                mostrarToastLista('✓ Link copiado!');
+            });
+        } else {
+            var el = document.createElement('textarea');
+            el.value = url;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+            mostrarToastLista('✓ Link copiado!');
+        }
+    }
+</script>

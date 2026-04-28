@@ -34,9 +34,112 @@
         @Html.Raw(Model.Conteudo)
     </div>
 
-    <div class="mt-4 pt-2" style="border-top:1px solid #1e2e4e;">
+    <div class="mt-4 pt-3 d-flex align-items-center justify-content-between flex-wrap gap-3" style="border-top:1px solid #1e2e4e;">
         <a href="/PalavraDoPastor" class="btn-back">
             <i class="fas fa-arrow-left"></i> Ver todas as palavras
         </a>
+
+        <div class="d-flex align-items-center gap-2">
+            <span class="text-secondary small me-1">Compartilhar:</span>
+
+            <button id="btn-share-native" class="btn-share-pill" title="Compartilhar" onclick="compartilharNativo()">
+                <i class="fas fa-share-alt"></i><span class="btn-share-label">Compartilhar</span>
+            </button>
+
+            <a id="btn-share-whatsapp" class="btn-share-pill btn-share-wa" target="_blank" rel="noopener noreferrer"
+               href="https://wa.me/?text=@Uri.EscapeDataString(Model.Titulo + " — " + "https://www.batistafloramar.com.br/PalavraDoPastor/Detalhe/" + Model.Slug)"
+               title="Compartilhar no WhatsApp">
+                <i class="fab fa-whatsapp"></i><span class="btn-share-label">WhatsApp</span>
+            </a>
+
+            <button id="btn-copy-link" class="btn-share-pill" title="Copiar link" onclick="copiarLink()">
+                <i class="fas fa-link"></i><span class="btn-share-label">Copiar link</span>
+            </button>
+        </div>
     </div>
+
+    <div id="share-toast" class="share-toast" aria-live="polite"></div>
 </div>
+
+<style>
+    .btn-share-pill {
+        display: inline-flex; align-items: center; gap: .45rem;
+        background: rgba(255,255,255,.06);
+        border: 1px solid rgba(255,255,255,.12);
+        color: #c8d8e8;
+        border-radius: 999px;
+        padding: .4rem .95rem;
+        font-size: .82rem; font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+        transition: background .18s, border-color .18s, color .18s;
+        white-space: nowrap;
+    }
+    .btn-share-pill:hover {
+        background: rgba(230,193,90,.14);
+        border-color: rgba(230,193,90,.4);
+        color: #e6c15a;
+    }
+    .btn-share-wa { color: #4cda7a; border-color: rgba(76,218,122,.25); background: rgba(76,218,122,.08); }
+    .btn-share-wa:hover { background: rgba(76,218,122,.18); border-color: rgba(76,218,122,.5); color: #4cda7a; }
+
+    .share-toast {
+        position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%) translateY(1rem);
+        background: #1e2e4e; color: #c8d8e8;
+        border: 1px solid rgba(230,193,90,.3);
+        border-radius: 10px; padding: .6rem 1.25rem;
+        font-size: .85rem; font-weight: 600;
+        opacity: 0; pointer-events: none;
+        transition: opacity .25s, transform .25s;
+        z-index: 9999; white-space: nowrap;
+    }
+    .share-toast.show {
+        opacity: 1; transform: translateX(-50%) translateY(0);
+    }
+
+    @@media (max-width: 480px) {
+        .btn-share-label { display: none; }
+        .btn-share-pill { padding: .4rem .7rem; }
+    }
+</style>
+
+<script>
+    var _shareUrl  = 'https://www.batistafloramar.com.br/PalavraDoPastor/Detalhe/@Model.Slug';
+    var _shareTitle = '@Html.Raw(Model.Titulo.Replace("'", "\\'"))';
+    var _shareText  = 'Leia "@Html.Raw(Model.Titulo.Replace("'", "\\'"))" — Palavra do Pastor | Comunidade Batista Floramar';
+
+    /* Oculta botão nativo se API indisponível */
+    if (!navigator.share) {
+        document.getElementById('btn-share-native').style.display = 'none';
+    }
+
+    function mostrarToast(msg) {
+        var t = document.getElementById('share-toast');
+        t.textContent = msg;
+        t.classList.add('show');
+        setTimeout(function () { t.classList.remove('show'); }, 2500);
+    }
+
+    function compartilharNativo() {
+        if (navigator.share) {
+            navigator.share({ title: _shareTitle, text: _shareText, url: _shareUrl })
+                .catch(function () {});
+        }
+    }
+
+    function copiarLink() {
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(_shareUrl).then(function () {
+                mostrarToast('✓ Link copiado!');
+            });
+        } else {
+            var el = document.createElement('textarea');
+            el.value = _shareUrl;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+            mostrarToast('✓ Link copiado!');
+        }
+    }
+</script>

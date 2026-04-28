@@ -1,4 +1,5 @@
 using BatistaFloramar.Domain.Entities;
+using BatistaFloramar.Infrastructure;
 using BatistaFloramar.Infrastructure.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -57,6 +58,8 @@ namespace BatistaFloramar.Controllers
             if (imagem != null && imagem.Length > 0)
                 model.ImagemDestaque = await SalvarImagemAsync(imagem);
 
+            model.Slug = await SlugHelper.GerarUnicoAsync(model.Titulo, null,
+                async (s, _) => await _db.PalavrasDoPastor.AnyAsync(p => p.Slug == s));
             model.CriadoEm = DateTime.UtcNow;
             _db.PalavrasDoPastor.Add(model);
             await _db.SaveChangesAsync();
@@ -97,6 +100,8 @@ namespace BatistaFloramar.Controllers
             }
 
             palavra.Titulo = model.Titulo;
+            palavra.Slug = await SlugHelper.GerarUnicoAsync(model.Titulo, palavra.Id,
+                async (s, excId) => await _db.PalavrasDoPastor.AnyAsync(p => p.Slug == s && p.Id != excId));
             palavra.Conteudo = model.Conteudo;
             palavra.Tipo = model.Tipo;
             palavra.AutorNome = model.AutorNome;

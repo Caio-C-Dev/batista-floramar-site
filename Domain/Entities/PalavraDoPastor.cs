@@ -5,6 +5,7 @@ namespace BatistaFloramar.Domain.Entities
     public class PalavraDoPastor
     {
         public int Id { get; set; }
+        public string Slug { get; set; } = string.Empty;
         public string Titulo { get; set; } = string.Empty;
         public string Conteudo { get; set; } = string.Empty;
         public TipoPalavra Tipo { get; set; } = TipoPalavra.Devocional;

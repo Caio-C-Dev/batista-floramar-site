@@ -26,7 +26,7 @@
             @foreach (var s in Model)
             {
                 <div class="col">
-                    <a href="@Url.Action("Detalhe", "Series", new { id = s.Id })"
+                    <a href="@Url.Action("Detalhe", "Series", new { id = s.Slug })"
                        class="text-decoration-none">
                         <div class="section-card h-100 p-0 overflow-hidden"
                              style="transition:transform .25s,box-shadow .25s;cursor:pointer;"
