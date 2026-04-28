@@ -258,11 +258,32 @@ namespace BatistaFloramar.Controllers
                 ? (_plain.Length > 160 ? _plain[..157] + "..." : _plain)
                 : string.Format("Leia a mensagem ‘{0}’ do pastor da Comunidade Batista Floramar.", palavra.Titulo);
             ViewBag.CanonicalUrl = string.Format("https://www.batistafloramar.com.br/PalavraDoPastor/Detalhe/{0}", palavra.Slug);
+
+            // Resolve og:image: featured image → first <img> in content → site default
+            string? ogImg = null;
             if (!string.IsNullOrEmpty(palavra.ImagemDestaque))
             {
-                ViewBag.OgImage = palavra.ImagemDestaque.StartsWith("http")
+                ogImg = palavra.ImagemDestaque.StartsWith("http")
                     ? palavra.ImagemDestaque
                     : "https://www.batistafloramar.com.br" + palavra.ImagemDestaque;
+            }
+            else
+            {
+                var srcMatch = System.Text.RegularExpressions.Regex.Match(
+                    palavra.Conteudo ?? string.Empty,
+                    @"<img[^>]+src=[""’]([^""’]+)[""’]",
+                    System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+                if (srcMatch.Success)
+                {
+                    var src = srcMatch.Groups[1].Value;
+                    ogImg = src.StartsWith("http")
+                        ? src
+                        : "https://www.batistafloramar.com.br" + src;
+                }
+            }
+            if (ogImg != null)
+            {
+                ViewBag.OgImage       = ogImg;
                 ViewBag.OgImageWidth  = "1200";
                 ViewBag.OgImageHeight = "630";
             }
