@@ -42,7 +42,7 @@ img {
    ============================================================ */
 a, button, [role="button"], input, select, textarea, label,
 .btn, .nav-link, .dropdown-item, .float-nav-btn, .float-nav-link,
-.whatsapp-float, .btn-nav-visit, .btn-nav-pastor, .btn-nav-contact {
+.whatsapp-float, .btn-nav-visit, .btn-nav-pastor, .btn-nav-palavra, .btn-nav-contact {
   touch-action: manipulation;
 }
 
@@ -1551,6 +1551,41 @@ textarea {
 @media (max-width: 991.98px) {
   .nav-item:has(.btn-nav-pastor) {
     margin-top: 0.6rem;
+  }
+}
+
+/* ── Palavra do Pastor CTA button ───────────────── */
+.btn-nav-palavra {
+  background: linear-gradient(135deg, rgba(138,170,255,.15) 0%, rgba(100,140,255,.08) 100%) !important;
+  color: #8aaeff !important;
+  padding: 0.42rem 1.2rem !important;
+  border-radius: 999px !important;
+  border: 1px solid rgba(138,170,255,.4) !important;
+  font-weight: 600 !important;
+  font-size: .875rem !important;
+  transition: background .22s, box-shadow .22s, border-color .22s, color .22s !important;
+}
+
+.btn-nav-palavra::after { display: none !important; }
+
+.btn-nav-palavra i { color: #8aaeff !important; }
+
+.navbar .nav-item .btn-nav-palavra:hover,
+.navbar .nav-item .btn-nav-palavra:focus {
+  background: linear-gradient(135deg, rgba(138,170,255,.28) 0%, rgba(100,140,255,.18) 100%) !important;
+  color: #aac4ff !important;
+  border-color: rgba(138,170,255,.7) !important;
+  box-shadow: 0 0 16px rgba(138,170,255,.25) !important;
+}
+
+.navbar .nav-item .btn-nav-palavra:hover i,
+.navbar .nav-item .btn-nav-palavra:focus i {
+  color: #aac4ff !important;
+}
+
+@media (max-width: 991.98px) {
+  .nav-item:has(.btn-nav-palavra) {
+    margin-top: 0.5rem;
   }
 }
 
