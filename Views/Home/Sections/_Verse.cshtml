@@ -33,6 +33,12 @@
 
             <!-- Canvas oculto usado para gerar a imagem do versículo (dimensões setadas via JS) -->
             <canvas id="verseCanvas" style="display:none;"></canvas>
+
+            <!-- Toast de feedback (sucesso/erro) -->
+            <div id="verseToast" class="verse-toast" role="status" aria-live="polite">
+                <i class="verse-toast-icon fas fa-circle-info"></i>
+                <span class="verse-toast-msg"></span>
+            </div>
         </div>
     </div>
 </section>
@@ -106,6 +112,49 @@
         color: #5d8;
         border-color: #5d8;
     }
+
+    /* ── Toast personalizado padrão site ── */
+    .verse-toast {
+        position: fixed;
+        left: 50%;
+        bottom: 1.75rem;
+        transform: translate(-50%, 1rem);
+        display: inline-flex;
+        align-items: center;
+        gap: .65rem;
+        padding: .8rem 1.4rem;
+        max-width: 90vw;
+        background: linear-gradient(135deg, #1a2540 0%, #0f1a30 100%);
+        color: #f0e6c8;
+        border: 1px solid rgba(212,175,55,.45);
+        border-radius: 12px;
+        box-shadow: 0 12px 32px rgba(0,0,0,.55), 0 0 18px rgba(212,175,55,.18);
+        font-size: .92rem;
+        font-weight: 500;
+        z-index: 10000;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity .28s ease, transform .28s ease;
+    }
+    .verse-toast.show {
+        opacity: 1;
+        transform: translate(-50%, 0);
+    }
+    .verse-toast.error {
+        border-color: rgba(255,120,120,.55);
+        box-shadow: 0 12px 32px rgba(0,0,0,.55), 0 0 18px rgba(255,120,120,.25);
+        color: #ffd9d9;
+    }
+    .verse-toast.success {
+        border-color: rgba(120,220,150,.55);
+        color: #d6f5e0;
+    }
+    .verse-toast-icon {
+        font-size: 1.1rem;
+        color: var(--brand-gold, #d4af37);
+    }
+    .verse-toast.error .verse-toast-icon { color: #ff7d7d; }
+    .verse-toast.success .verse-toast-icon { color: #6fdc8c; }
 </style>
 
 <script>
@@ -115,6 +164,39 @@
             document.getElementById('btnShareVersiculo').style.display = 'inline-flex';
         }
     })();
+
+    /* Pré-carrega template assim que script roda (cache no browser).
+       Sem isso, await dentro do click handler estoura o user gesture do navigator.share. */
+    let _verseTemplate = null;
+    (function _preloadTemplate() {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = () => { _verseTemplate = img; };
+        img.src = '/images/versiculo-template.jpg';
+    })();
+
+    /* Toast de feedback (padrão visual do site) */
+    let _toastTimer = null;
+    function mostrarToastVersiculo(msg, tipo) {
+        const t = document.getElementById('verseToast');
+        if (!t) return;
+        const icon = t.querySelector('.verse-toast-icon');
+        const span = t.querySelector('.verse-toast-msg');
+        t.classList.remove('error', 'success');
+        if (tipo === 'error') {
+            t.classList.add('error');
+            icon.className = 'verse-toast-icon fas fa-triangle-exclamation';
+        } else if (tipo === 'success') {
+            t.classList.add('success');
+            icon.className = 'verse-toast-icon fas fa-circle-check';
+        } else {
+            icon.className = 'verse-toast-icon fas fa-circle-info';
+        }
+        span.textContent = msg;
+        t.classList.add('show');
+        if (_toastTimer) clearTimeout(_toastTimer);
+        _toastTimer = setTimeout(() => t.classList.remove('show'), 3500);
+    }
 
     function copiarVersiculo() {
         const texto = document.getElementById('verseText').innerText.replace(/\n/g, ' ').trim();
@@ -188,15 +270,17 @@
         padPct:    0.045   // padding interno relativo à largura do canvas
     };
 
-    async function _gerarImagemVersiculo() {
+    function _gerarImagemVersiculoSync() {
         const canvas = document.getElementById('verseCanvas');
         const ctx = canvas.getContext('2d');
 
         const texto = document.getElementById('verseText').innerText.replace(/\n/g, ' ').replace(/^"|"$/g, '').trim();
         const ref = document.getElementById('verseRef').innerText.replace(/^—\s*/, '').trim();
 
-        // Carrega template e dimensiona canvas pra match exato
-        const tpl = await _loadImg('/images/versiculo-template.jpg');
+        if (!_verseTemplate) {
+            throw new Error('Template ainda carregando. Tente novamente em 1 segundo.');
+        }
+        const tpl = _verseTemplate;
         canvas.width = tpl.width;
         canvas.height = tpl.height;
         ctx.drawImage(tpl, 0, 0, tpl.width, tpl.height);
@@ -253,6 +337,10 @@
         ctx.fillStyle = '#a37a1c';
         ctx.fillText('— ' + ref, cx, y);
 
+        return canvas;
+    }
+
+    function _canvasToBlob(canvas) {
         return new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.92));
     }
 
@@ -260,10 +348,13 @@
         const btn = document.getElementById('btnShareImagem');
         const lbl = document.getElementById('imageLabel');
         const original = lbl.textContent;
-        lbl.textContent = 'Gerando...';
-        btn.disabled = true;
+
         try {
-            const blob = await _gerarImagemVersiculo();
+            // Renderiza canvas SYNC (template já pré-carregado) — preserva user gesture
+            const canvas = _gerarImagemVersiculoSync();
+
+            // toBlob é assíncrono mas curto — Chrome/Safari mantêm gesture nesse intervalo
+            const blob = await _canvasToBlob(canvas);
             const file = new File([blob], 'versiculo-do-dia.jpg', { type: 'image/jpeg' });
 
             if (navigator.canShare && navigator.canShare({ files: [file] })) {
@@ -273,6 +364,7 @@
                     text: 'Versículo do Dia — Comunidade Batista Floramar\nbatistafloramar.com.br'
                 });
             } else {
+                // Desktop sem Web Share files: download
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
@@ -281,16 +373,22 @@
                 a.click();
                 document.body.removeChild(a);
                 URL.revokeObjectURL(url);
+                mostrarToastVersiculo('Imagem baixada! Verifique sua pasta de downloads.', 'success');
             }
-            lbl.textContent = original;
         } catch (e) {
-            console.error('Erro ao gerar imagem do versículo:', e);
-            lbl.textContent = 'Erro';
-            alert('Não foi possível gerar a imagem.\n\nDetalhes: ' + (e && e.message ? e.message : e) +
-                  '\n\nVerifique se /images/versiculo-template.jpg existe.');
-            setTimeout(() => { lbl.textContent = original; }, 2500);
-        } finally {
-            btn.disabled = false;
+            // AbortError = usuário fechou dialog de share — ignora silencioso
+            if (e && e.name === 'AbortError') return;
+            console.error('Erro imagem versículo:', e);
+
+            let msg = 'Não foi possível gerar a imagem do versículo. Tente novamente.';
+            if (e && e.message) {
+                if (e.message.indexOf('Template') >= 0) {
+                    msg = 'Aguarde um instante — a imagem ainda está carregando.';
+                } else if (e.message.indexOf('user gesture') >= 0) {
+                    msg = 'Toque no botão novamente para compartilhar.';
+                }
+            }
+            mostrarToastVersiculo(msg, 'error');
         }
     }
 </script>
