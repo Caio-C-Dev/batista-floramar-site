@@ -23,10 +23,16 @@
                 <button onclick="shareWhatsapp()" class="verse-action-btn verse-action-whatsapp" title="Compartilhar no WhatsApp">
                     <i class="fab fa-whatsapp me-2"></i>WhatsApp
                 </button>
+                <button id="btnShareImagem" class="verse-action-btn verse-action-image" onclick="compartilharImagemVersiculo()" title="Compartilhar como imagem">
+                    <i class="fas fa-image me-2"></i><span id="imageLabel">Imagem</span>
+                </button>
                 <button id="btnShareVersiculo" class="verse-action-btn verse-action-share" onclick="shareVersiculo()" title="Compartilhar" style="display:none;">
                     <i class="fas fa-share-alt me-2"></i>Compartilhar
                 </button>
             </div>
+
+            <!-- Canvas oculto usado para gerar a imagem do versículo (dimensões setadas via JS) -->
+            <canvas id="verseCanvas" style="display:none;"></canvas>
         </div>
     </div>
 </section>
@@ -86,6 +92,15 @@
         background: #64a0ff;
         color: #fff;
     }
+    .verse-action-image {
+        border-color: rgba(180,140,255,.45);
+        color: #b48cff;
+    }
+    .verse-action-image:hover {
+        background: #b48cff;
+        color: #1a0d2e;
+        border-color: #b48cff;
+    }
     #btnCopiarVersiculo.copied {
         background: #1a4a2a;
         color: #5d8;
@@ -133,6 +148,150 @@
             text: texto + ' ' + ref,
             url: window.location.href
         }).catch(() => {});
+    }
+
+    /* ─── Gerador de imagem do versículo (Canvas 1080x1080) ─── */
+    function _loadImg(src) {
+        return new Promise((resolve, reject) => {
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
+            img.onload = () => resolve(img);
+            img.onerror = reject;
+            img.src = src;
+        });
+    }
+
+    function _wrapText(ctx, text, maxWidth) {
+        const words = text.split(/\s+/);
+        const lines = [];
+        let line = '';
+        for (let i = 0; i < words.length; i++) {
+            const test = line ? line + ' ' + words[i] : words[i];
+            if (ctx.measureText(test).width > maxWidth && line) {
+                lines.push(line);
+                line = words[i];
+            } else {
+                line = test;
+            }
+        }
+        if (line) lines.push(line);
+        return lines;
+    }
+
+    /* Caixa central (cream/dourada) na imagem template — coordenadas relativas (0-1)
+       calibradas pela posição do quadro decorativo. Texto é renderizado dentro com padding. */
+    const VERSE_BOX = {
+        leftPct:   0.165,
+        topPct:    0.305,
+        rightPct:  0.835,
+        bottomPct: 0.890,
+        padPct:    0.045   // padding interno relativo à largura do canvas
+    };
+
+    async function _gerarImagemVersiculo() {
+        const canvas = document.getElementById('verseCanvas');
+        const ctx = canvas.getContext('2d');
+
+        const texto = document.getElementById('verseText').innerText.replace(/\n/g, ' ').replace(/^"|"$/g, '').trim();
+        const ref = document.getElementById('verseRef').innerText.replace(/^—\s*/, '').trim();
+
+        // Carrega template e dimensiona canvas pra match exato
+        const tpl = await _loadImg('/images/versiculo-template.jpg');
+        canvas.width = tpl.width;
+        canvas.height = tpl.height;
+        ctx.drawImage(tpl, 0, 0, tpl.width, tpl.height);
+
+        const W = canvas.width, H = canvas.height;
+
+        // Caixa central de texto
+        const boxL = W * VERSE_BOX.leftPct;
+        const boxT = H * VERSE_BOX.topPct;
+        const boxR = W * VERSE_BOX.rightPct;
+        const boxB = H * VERSE_BOX.bottomPct;
+        const pad  = W * VERSE_BOX.padPct;
+        const innerL = boxL + pad;
+        const innerR = boxR - pad;
+        const innerT = boxT + pad;
+        const innerB = boxB - pad;
+        const innerW = innerR - innerL;
+        const innerH = innerB - innerT;
+        const cx = (boxL + boxR) / 2;
+
+        // Auto-fit: começa fonte grande, reduz até caber em altura
+        ctx.fillStyle = '#1a2540';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'top';
+
+        const refSize = Math.round(W * 0.026);   // referência ~3% width
+        const refLineH = Math.round(refSize * 1.3);
+        const gap = Math.round(refSize * 1.2);
+
+        let fontSize = Math.round(W * 0.055);
+        let lines, lineH, totalH;
+        while (fontSize > 14) {
+            ctx.font = '600 ' + fontSize + 'px Georgia, "Times New Roman", serif';
+            lines = _wrapText(ctx, '"' + texto + '"', innerW);
+            lineH = Math.round(fontSize * 1.25);
+            totalH = lines.length * lineH + gap + refLineH;
+            if (totalH <= innerH) break;
+            fontSize -= 2;
+        }
+
+        // Centraliza verticalmente dentro da caixa
+        let y = innerT + (innerH - totalH) / 2;
+
+        ctx.font = '600 ' + fontSize + 'px Georgia, "Times New Roman", serif';
+        ctx.fillStyle = '#1a2540';
+        for (const ln of lines) {
+            ctx.fillText(ln, cx, y);
+            y += lineH;
+        }
+
+        // Referência (itálico dourado)
+        y += gap;
+        ctx.font = 'italic 600 ' + refSize + 'px Georgia, "Times New Roman", serif';
+        ctx.fillStyle = '#a37a1c';
+        ctx.fillText('— ' + ref, cx, y);
+
+        return new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.92));
+    }
+
+    async function compartilharImagemVersiculo() {
+        const btn = document.getElementById('btnShareImagem');
+        const lbl = document.getElementById('imageLabel');
+        const original = lbl.textContent;
+        lbl.textContent = 'Gerando...';
+        btn.disabled = true;
+        try {
+            const blob = await _gerarImagemVersiculo();
+            const file = new File([blob], 'versiculo-do-dia.jpg', { type: 'image/jpeg' });
+
+            if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                await navigator.share({
+                    files: [file],
+                    title: 'Versículo do Dia',
+                    text: 'Versículo do Dia — Comunidade Batista Floramar\nbatistafloramar.com.br'
+                });
+            } else {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'versiculo-do-dia.jpg';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }
+            lbl.textContent = original;
+        } catch (e) {
+            console.error('Erro ao gerar imagem do versículo:', e);
+            lbl.textContent = 'Erro';
+            alert('Não foi possível gerar a imagem.\n\nDetalhes: ' + (e && e.message ? e.message : e) +
+                  '\n\nVerifique se /images/versiculo-template.jpg existe.');
+            setTimeout(() => { lbl.textContent = original; }, 2500);
+        } finally {
+            btn.disabled = false;
+        }
     }
 </script>
 

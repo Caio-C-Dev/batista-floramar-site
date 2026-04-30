@@ -1585,7 +1585,8 @@ textarea {
 
 @media (max-width: 991.98px) {
   .nav-item:has(.btn-nav-palavra) {
-    margin-top: 0.5rem;
+    margin-top: 0.6rem;
+    margin-bottom: 0.6rem;
   }
 }
 

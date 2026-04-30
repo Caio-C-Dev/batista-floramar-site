@@ -9,8 +9,8 @@
                                 ? ViewBag.Title + " | Comunidade Batista Floramar – Belo Horizonte"
                                 : "Comunidade Batista Floramar – Igreja em Floramar, Belo Horizonte";
         var pageDescription = ViewBag.MetaDescription as string
-                                ?? "Igreja evangélica batista no Floramar, Belo Horizonte – MG. Cultos aos Domingos 10h e 18h e Quartas 20h. Venha crescer na Palavra, servir e fazer parte da nossa família.";
-        var globalKeywords  = "igreja batista, igreja batista belo horizonte, igreja Bíblica, igreja Bíblica belo horizonte, igreja no floramar, igreja perto de mim, igreja evangélica belo horizonte, igreja zona norte BH, Comunidade Batista Floramar";
+                                ?? "Igreja evangélica batista no bairro Floramar, Belo Horizonte – MG. Cultos aos Domingos 10h e 18h e Quartas 20h. Venha crescer na Palavra, servir e fazer parte da nossa família.";
+        var globalKeywords  = "Floramar, Floramar BH, bairro Floramar, Jardim Guanabara, bairro Jardim Guanabara, igreja Floramar, igreja Jardim Guanabara, igreja batista Floramar, igreja batista Jardim Guanabara, culto Floramar, culto no Floramar, culto Jardim Guanabara, culto domingo Floramar, horário culto Floramar, igreja batista, igreja batista belo horizonte, igreja Bíblica, igreja Bíblica belo horizonte, igreja no floramar, igreja perto de mim, igreja evangélica belo horizonte, igreja zona norte BH, Comunidade Batista Floramar";
         var extraKeywords   = ViewBag.MetaKeywords as string;
         var pageKeywords    = extraKeywords != null ? extraKeywords + ", " + globalKeywords : globalKeywords;
         var rawPath         = Context.Request.Path.Value ?? "/";
@@ -26,6 +26,18 @@
         // Dimensões padrão OG para imagem social (1200×630 ideal)
         var ogImageWidth    = ViewBag.OgImageWidth  as string ?? "1200";
         var ogImageHeight   = ViewBag.OgImageHeight as string ?? "630";
+        // Detecta MIME pela extensão (WhatsApp rejeita og:image:type incoerente)
+        var ogImageType = ViewBag.OgImageType as string;
+        if (string.IsNullOrEmpty(ogImageType))
+        {
+            var _u = ogImage.ToLowerInvariant();
+            var _q = _u.IndexOf('?');
+            if (_q >= 0) _u = _u.Substring(0, _q);
+            if      (_u.EndsWith(".png"))  ogImageType = "image/png";
+            else if (_u.EndsWith(".webp")) ogImageType = "image/webp";
+            else if (_u.EndsWith(".gif"))  ogImageType = "image/gif";
+            else                           ogImageType = "image/jpeg";
+        }
     }
 
     <title>@pageTitle</title>
@@ -57,7 +69,7 @@
     <meta property="og:image:secure_url" content="@ogImage" />
     <meta property="og:image:width"      content="@ogImageWidth" />
     <meta property="og:image:height"     content="@ogImageHeight" />
-    <meta property="og:image:type"       content="image/jpeg" />
+    <meta property="og:image:type"       content="@ogImageType" />
     <meta property="og:image:alt"        content="@pageTitle" />
 
     <!-- Twitter Card -->
@@ -74,8 +86,12 @@
       "@@type": ["Church", "LocalBusiness"],
       "@@id": "https://www.batistafloramar.com.br/#church",
       "name": "Comunidade Batista Floramar",
-      "alternateName": "Igreja Batista Floramar",
-      "description": "Igreja evangélica batista no bairro Floramar, Belo Horizonte – MG. Cultos, células, ministérios e palavra expositiva.",
+      "alternateName": [
+        "Igreja Batista Floramar",
+        "Igreja Batista do Jardim Guanabara",
+        "Comunidade Batista Floramar BH"
+      ],
+      "description": "Igreja evangélica batista localizada no bairro Floramar (também conhecido como Jardim Guanabara), zona norte de Belo Horizonte – MG. Cultos, células, ministérios e pregação expositiva da Palavra.",
       "url": "https://www.batistafloramar.com.br",
       "logo": "https://www.batistafloramar.com.br/images/church-logo.png",
       "image": "https://www.batistafloramar.com.br/images/church-logo.png",
@@ -88,13 +104,19 @@
         "addressRegion": "MG",
         "postalCode": "31710-140",
         "addressCountry": "BR",
-        "neighborhood": "Floramar"
+        "neighborhood": "Floramar (Jardim Guanabara)"
       },
       "geo": {
         "@@type": "GeoCoordinates",
         "latitude":  "-19.8423",
         "longitude": "-43.9502"
       },
+      "areaServed": [
+        { "@@type": "Place", "name": "Floramar" },
+        { "@@type": "Place", "name": "Jardim Guanabara" },
+        { "@@type": "Place", "name": "Zona Norte de Belo Horizonte" },
+        { "@@type": "Place", "name": "Belo Horizonte" }
+      ],
       "openingHoursSpecification": [
         { "@@type": "OpeningHoursSpecification", "dayOfWeek": "Sunday",    "opens": "10:00", "closes": "12:00" },
         { "@@type": "OpeningHoursSpecification", "dayOfWeek": "Sunday",    "opens": "18:00", "closes": "20:00" },
@@ -337,16 +359,8 @@
             <a href="/" class="float-nav-link"><i class="fas fa-home"></i><span>Início</span></a>
             <a href="/Sobre" class="float-nav-link"><i class="fas fa-church"></i><span>Sobre</span></a>
             <a href="/Cultos" class="float-nav-link"><i class="fas fa-praying-hands"></i><span>Cultos</span></a>
-            <a href="/Celula" class="float-nav-link"><i class="fas fa-home"></i><span>Células</span></a>
-            <a href="/Ministerios" class="float-nav-link"><i class="fas fa-hands-helping"></i><span>Ministérios</span></a>
-            <a href="/Aovivo" class="float-nav-link"><i class="fas fa-video"></i><span>Ao Vivo</span></a>
-            <a href="/Podcast" class="float-nav-link"><i class="fas fa-podcast"></i><span>Podcast</span></a>
-            <a href="/PalavraDoPastor" class="float-nav-link"><i class="fas fa-bible"></i><span>Palavra</span></a>
-            <a href="/Series" class="float-nav-link"><i class="fas fa-film"></i><span>Séries</span></a>
-            <a href="/Doacao" class="float-nav-link"><i class="fas fa-heart"></i><span>Doações</span></a>
-            <a href="/Galeria" class="float-nav-link"><i class="fas fa-images"></i><span>Galeria</span></a>
-            <a href="/Visita" class="float-nav-link"><i class="fas fa-calendar-check"></i><span>Visita</span></a>
-            <a href="/Contato/Batismo" class="float-nav-link"><i class="fas fa-water"></i><span>Batismo</span></a>
+            <a href="/Celula" class="float-nav-link"><i class="fas fa-users"></i><span>Células</span></a>
+            <a href="/PalavraDoPastor" class="float-nav-link"><i class="fas fa-bible"></i><span>Palavra do Pastor</span></a>
             <a href="/Napalavra" class="float-nav-link"><i class="fas fa-envelope"></i><span>Contato</span></a>
             <button class="float-nav-link float-nav-top" onclick="scrollToTop()" title="Voltar ao topo">
                 <i class="fas fa-arrow-up"></i><span>Topo</span>

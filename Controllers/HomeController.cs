@@ -23,8 +23,8 @@ namespace BatistaFloramar.Controllers
         public async Task<IActionResult> Index()
         {
             ViewBag.Title = "Igreja Batista em Belo Horizonte | Comunidade Batista Floramar – Floramar BH";
-            ViewBag.MetaDescription = "Igreja evangélica batista no Floramar, Belo Horizonte – MG. Cultos domingo 10h, 18h e quarta 20h. Venha crescer na Palavra e fazer parte da nossa família em Cristo.";
-            ViewBag.MetaKeywords = "igreja batista belo horizonte, igreja no floramar, igreja Bíblica BH, igreja evangélica belo horizonte, igreja zona norte BH, culto belo horizonte, Comunidade Batista Floramar";
+            ViewBag.MetaDescription = "Igreja evangélica batista no bairro Floramar, Belo Horizonte – MG. Cultos domingo 10h, 18h e quarta 20h. Venha crescer na Palavra e fazer parte da nossa família em Cristo.";
+            ViewBag.MetaKeywords = "Floramar, Floramar BH, Jardim Guanabara, igreja Floramar, igreja Jardim Guanabara, igreja batista Floramar, igreja batista Jardim Guanabara, culto Floramar, culto Jardim Guanabara, culto domingo Floramar, igreja batista belo horizonte, igreja Bíblica BH, igreja evangélica belo horizonte, igreja zona norte BH, culto belo horizonte, Comunidade Batista Floramar";
             ViewBag.CanonicalUrl = "https://www.batistafloramar.com.br/";
             ViewBag.LatestVideos = await _youtube.GetLatestVideosAsync(5);
             ViewBag.Versiculo = await _bible.GetVersiculoDoDiaAsync();
