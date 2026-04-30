@@ -55,11 +55,24 @@ namespace BatistaFloramar.Application.Services
 
             try
             {
-                using var resp = await _http.GetAsync(url);
+                using var req = new HttpRequestMessage(HttpMethod.Get, url);
+                req.Headers.UserAgent.ParseAdd("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36");
+                req.Headers.AcceptLanguage.ParseAdd("pt-BR,pt;q=0.9,en;q=0.5");
+                req.Headers.Accept.ParseAdd("application/atom+xml,application/xml,text/xml;q=0.9");
+                _http.Timeout = TimeSpan.FromSeconds(15);
+
+                using var resp = await _http.SendAsync(req);
+                Console.WriteLine($"[Shorts RSS] {url} → {(int)resp.StatusCode}");
+
                 if (!resp.IsSuccessStatusCode)
-                    return _shortsCache ?? new List<YouTubeVideo>();
+                {
+                    _shortsCache = new List<YouTubeVideo>();
+                    _shortsCacheExpiry = DateTime.UtcNow.AddMinutes(10); // cache curto pra retry
+                    return _shortsCache;
+                }
 
                 var xml = await resp.Content.ReadAsStringAsync();
+                Console.WriteLine($"[Shorts RSS] XML length: {xml.Length}");
 
                 XNamespace atom = "http://www.w3.org/2005/Atom";
                 XNamespace yt = "http://www.youtube.com/xml/schemas/2015";
@@ -84,12 +97,14 @@ namespace BatistaFloramar.Application.Services
                     })
                     .ToList();
 
+                Console.WriteLine($"[Shorts RSS] Parsed {shorts.Count} shorts");
                 _shortsCache = shorts;
                 _shortsCacheExpiry = DateTime.UtcNow.AddHours(1);
                 return shorts;
             }
-            catch
+            catch (Exception ex)
             {
+                Console.WriteLine($"[Shorts RSS] ERROR: {ex.Message}");
                 return _shortsCache ?? new List<YouTubeVideo>();
             }
         }
