@@ -76,10 +76,12 @@ TestResults/
 *.iws
 
 ## ── Secrets & environment-specific config (NEVER commit) ──────────────────────
+# appsettings.json contém Mercado Pago tokens — NUNCA commitar.
+# Configs públicas (YouTube ChannelId etc) vão em appsettings.Production.json
+# que é force-added explicitamente quando seguro.
+appsettings.json
 appsettings.Development.json
-appsettings.Production.json
 appsettings.*.json
-!appsettings.json
 secrets.json
 .env
 .env.*
@@ -119,4 +121,6 @@ nohup.out
 ## ── Uploads / user content ─────────────────────────────────────────────────────
 # Uncomment if you don't want to track uploaded images:
 # BatistaFloramar/wwwroot/uploads/
-*.json
+
+# NÃO usar `*.json` aqui — bloqueia appsettings.json e quebra deploy.
+# Json sensíveis (Development, Production) já estão filtrados nas linhas 79-81.
