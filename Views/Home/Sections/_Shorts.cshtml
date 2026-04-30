@@ -1,0 +1,556 @@
+@using BatistaFloramar.Application.Services
+@{
+    var shorts = ViewBag.UltimosShorts as List<YouTubeVideo>;
+}
+@if (shorts != null && shorts.Count > 0)
+{
+    <section class="page-section py-5" id="shorts-rail" aria-label="Últimos vídeos do YouTube">
+        <div class="container">
+            <header class="text-center mb-4 scroll-reveal">
+                <span class="section-eyebrow"><i class="fab fa-youtube me-1"></i> Recentes no YouTube</span>
+                <h2 class="shorts-cards-title section-heading">Acompanhe nossos vídeos</h2>
+                <p class="shorts-cards-sub">Arraste para navegar pelos últimos Shorts.</p>
+            </header>
+
+            <div class="shorts-cards-viewport scroll-reveal" id="shortsCardsViewport">
+                <div class="shorts-cards-track" id="shortsCardsTrack">
+                    @for (int i = 0; i < shorts.Count; i++)
+                    {
+                        var v = shorts[i];
+                        <button type="button" class="story-card"
+                                data-index="@i"
+                                data-video-id="@v.VideoId"
+                                data-title="@v.Title"
+                                onclick="abrirShortModalCard(this, event)"
+                                aria-label="@v.Title">
+                            <img src="@v.ThumbnailUrl" alt="@v.Title" loading="lazy" draggable="false" />
+                            <div class="story-card-grad"></div>
+                            @if (v.IsShort)
+                            {
+                                <span class="story-card-badge">Shorts</span>
+                            }
+                            <div class="story-card-meta">
+                                <h3 class="story-card-title h4">@v.Title</h3>
+                            </div>
+                            <div class="story-card-play"><i class="fas fa-play"></i></div>
+                        </button>
+                    }
+                </div>
+            </div>
+
+            <div class="text-center mt-4">
+                <a href="https://www.youtube.com/@@comunidadebatistafloramar"
+                   target="_blank" rel="noopener noreferrer" class="shorts-cards-cta">
+                    Ver mais no canal
+                    <span class="ms-1">&rarr;</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Modal player Shorts (9:16) -->
+        <div id="shortModal" class="short-modal" role="dialog" aria-modal="true" aria-hidden="true">
+            <button type="button" class="short-modal-close" aria-label="Fechar" onclick="fecharShortModal()">
+                <i class="fas fa-times"></i>
+            </button>
+            <button type="button" class="short-modal-nav prev" aria-label="Anterior" onclick="navegarShort(-1)">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <div class="short-modal-frame">
+                <div class="short-modal-iframe-wrap">
+                    <iframe id="shortIframe" src="" frameborder="0"
+                            allow="autoplay; encrypted-media; picture-in-picture; clipboard-write"
+                            allowfullscreen></iframe>
+                </div>
+                <div class="short-modal-meta">
+                    <p class="short-modal-title" id="shortModalTitle"></p>
+                    <a id="shortModalLink" href="#" target="_blank" rel="noopener noreferrer" class="short-modal-link">
+                        Abrir no YouTube <i class="fas fa-arrow-up-right-from-square ms-1"></i>
+                    </a>
+                </div>
+            </div>
+            <button type="button" class="short-modal-nav next" aria-label="Próximo" onclick="navegarShort(1)">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+    </section>
+
+    <style>
+        /* Fade harmônico: bg-primary (About) no topo → bg-secondary (Cultos) no fim */
+        #shorts-rail {
+            background: linear-gradient(
+                to bottom,
+                var(--bg-primary, #0b0b0f) 0%,
+                var(--bg-primary, #0b0b0f) 35%,
+                var(--bg-secondary, #15151d) 100%
+            );
+            position: relative;
+        }
+
+        .shorts-cards-title {
+            color: #fff;
+            font-size: 2rem;
+            font-weight: 700;
+            margin: .25rem 0 .35rem;
+        }
+        .shorts-cards-sub {
+            color: #8a96a8;
+            font-size: 1rem;
+            margin: 0;
+        }
+
+        /* ── Carrossel drag ── */
+        .shorts-cards-viewport {
+            overflow: hidden;
+            cursor: grab;
+            user-select: none;
+            padding: .5rem 0 1rem;
+            -webkit-mask-image: linear-gradient(to right, transparent 0, black 30px, black calc(100% - 30px), transparent 100%);
+                    mask-image: linear-gradient(to right, transparent 0, black 30px, black calc(100% - 30px), transparent 100%);
+        }
+        .shorts-cards-viewport.dragging { cursor: grabbing; }
+
+        .shorts-cards-track {
+            display: flex;
+            gap: 1.5rem;
+            padding: .5rem 1rem 1rem;
+            transform: translate3d(0, 0, 0);
+            will-change: transform;
+            transition: transform .35s cubic-bezier(.22,.61,.36,1);
+        }
+        .shorts-cards-viewport.dragging .shorts-cards-track {
+            transition: none;
+        }
+
+        .story-card {
+            position: relative;
+            flex: 0 0 auto;
+            width: 288px;
+            height: 384px;
+            border-radius: 14px;
+            overflow: hidden;
+            background: #000;
+            border: 0;
+            padding: 0;
+            cursor: pointer;
+            color: inherit;
+            font: inherit;
+            box-shadow: 0 14px 28px rgba(0,0,0,.45);
+            transition: transform .35s ease, box-shadow .35s ease;
+        }
+        .story-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 22px 45px rgba(0,0,0,.7), 0 0 22px rgba(212,175,55,.22);
+        }
+
+        .story-card img {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform .7s ease;
+            pointer-events: none;
+        }
+        .story-card:hover img { transform: scale(1.1); }
+
+        .story-card-grad {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0,0,0,.85), rgba(0,0,0,.18) 55%, transparent);
+            pointer-events: none;
+        }
+
+        .story-card-badge {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            background: #ff0033;
+            color: #fff;
+            font-size: .65rem;
+            font-weight: 700;
+            letter-spacing: .04em;
+            padding: 4px 9px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            z-index: 2;
+        }
+
+        .story-card-meta {
+            position: absolute;
+            inset: auto 0 0 0;
+            padding: 1.5rem;
+            color: #fff;
+            z-index: 2;
+            pointer-events: none;
+        }
+        .story-card-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            letter-spacing: .015em;
+            margin: 0;
+            line-height: 1.25;
+            text-shadow: 2px 2px 8px rgba(0,0,0,.85);
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .story-card-play {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(.8);
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: rgba(212,175,55,.95);
+            color: #0e0e0e;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            opacity: 0;
+            transition: opacity .3s ease, transform .3s ease;
+            pointer-events: none;
+            box-shadow: 0 0 0 8px rgba(212,175,55,.18), 0 0 30px rgba(212,175,55,.35);
+            z-index: 2;
+        }
+        .story-card:hover .story-card-play {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .shorts-cards-cta {
+            color: #c8d8e8;
+            font-weight: 600;
+            text-decoration: none;
+            transition: color .3s ease;
+            font-size: 1rem;
+        }
+        .shorts-cards-cta:hover {
+            color: var(--brand-gold, #d4af37);
+        }
+        .shorts-cards-cta span {
+            display: inline-block;
+            transition: transform .3s ease;
+        }
+        .shorts-cards-cta:hover span { transform: translateX(4px); }
+
+        /* Mobile: cards menores */
+        @@media (max-width: 575.98px) {
+            .story-card { width: 240px; height: 320px; }
+            .story-card-title { font-size: 1.15rem; }
+        }
+
+        /* ── Modal player Shorts ── */
+        .short-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,.92);
+            backdrop-filter: blur(8px);
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+        .short-modal.open {
+            display: flex;
+            animation: shortFadeIn .25s ease-out;
+        }
+        @@keyframes shortFadeIn {
+            from { opacity: 0; }
+            to   { opacity: 1; }
+        }
+
+        .short-modal-frame {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: .8rem;
+            max-width: 100%;
+            max-height: 100%;
+            align-items: center;
+        }
+
+        .short-modal-iframe-wrap {
+            position: relative;
+            aspect-ratio: 9 / 16;
+            height: min(86vh, 720px);
+            max-width: 100%;
+            border-radius: 18px;
+            overflow: hidden;
+            background: #000;
+            box-shadow: 0 20px 60px rgba(0,0,0,.6), 0 0 0 1px rgba(212,175,55,.18);
+        }
+        .short-modal-iframe-wrap iframe {
+            width: 100%;
+            height: 100%;
+            display: block;
+            border: 0;
+        }
+
+        .short-modal-meta {
+            text-align: center;
+            color: #f0e6c8;
+            max-width: 420px;
+        }
+        .short-modal-title {
+            font-size: .95rem;
+            font-weight: 600;
+            margin: 0 0 .35rem;
+            line-height: 1.35;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .short-modal-link {
+            color: var(--brand-gold, #d4af37);
+            font-size: .8rem;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .short-modal-link:hover { text-decoration: underline; }
+
+        .short-modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: rgba(255,255,255,.08);
+            color: #fff;
+            border: 1px solid rgba(255,255,255,.18);
+            cursor: pointer;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background .2s;
+            z-index: 1;
+        }
+        .short-modal-close:hover { background: rgba(255,255,255,.18); }
+
+        .short-modal-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: rgba(13,27,42,.85);
+            color: var(--brand-gold, #d4af37);
+            border: 1px solid rgba(212,175,55,.4);
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            transition: background .2s, color .2s;
+            z-index: 1;
+        }
+        .short-modal-nav:hover {
+            background: var(--brand-gold, #d4af37);
+            color: #0e0e0e;
+        }
+        .short-modal-nav.prev { left: 1.25rem; }
+        .short-modal-nav.next { right: 1.25rem; }
+
+        @@media (min-width: 768px) {
+            .short-modal-nav { display: inline-flex; }
+        }
+    </style>
+
+    <script>
+        /* ─── Drag carousel (vanilla port framer-motion drag) ─── */
+        (function () {
+            const viewport = document.getElementById('shortsCardsViewport');
+            const track    = document.getElementById('shortsCardsTrack');
+            if (!viewport || !track) return;
+
+            let posX = 0;          // posição atual em px (negativa = scroll pra direita)
+            let dragging = false;
+            let startX = 0;
+            let startPos = 0;
+            let velocity = 0;
+            let lastX = 0;
+            let lastT = 0;
+            let dragMoved = false;
+            let rafId = null;
+
+            function bounds() {
+                // min = -(track.scrollWidth - viewport.offsetWidth) — extremo esquerdo
+                const min = Math.min(0, viewport.offsetWidth - track.scrollWidth);
+                return { min: min, max: 0 };
+            }
+
+            function clamp(v, min, max) {
+                if (v > max) return max;
+                if (v < min) return min;
+                return v;
+            }
+
+            function applyTransform(elastic) {
+                const b = bounds();
+                let x = posX;
+                if (elastic) {
+                    // Elasticidade nas bordas durante drag
+                    if (x > b.max) x = b.max + (x - b.max) * 0.3;
+                    else if (x < b.min) x = b.min + (x - b.min) * 0.3;
+                }
+                track.style.transform = `translate3d(${x}px, 0, 0)`;
+            }
+
+            function dragStart(clientX) {
+                dragging = true;
+                dragMoved = false;
+                startX = clientX;
+                startPos = posX;
+                velocity = 0;
+                lastX = clientX;
+                lastT = performance.now();
+                viewport.classList.add('dragging');
+                if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+            }
+
+            function dragMove(clientX) {
+                if (!dragging) return;
+                const dx = clientX - startX;
+                if (Math.abs(dx) > 5) dragMoved = true;
+                posX = startPos + dx;
+                const now = performance.now();
+                const dt = now - lastT;
+                if (dt > 0) velocity = (clientX - lastX) / dt * 16;
+                lastX = clientX;
+                lastT = now;
+                applyTransform(true);
+            }
+
+            function dragEnd() {
+                if (!dragging) return;
+                dragging = false;
+                viewport.classList.remove('dragging');
+                // Snap pra dentro dos limites com inércia leve
+                inertiaSettle();
+            }
+
+            function inertiaSettle() {
+                const b = bounds();
+                function step() {
+                    posX += velocity;
+                    velocity *= 0.92;
+                    // Pull-back nas bordas
+                    if (posX > b.max) {
+                        posX += (b.max - posX) * 0.25;
+                        velocity *= 0.7;
+                    } else if (posX < b.min) {
+                        posX += (b.min - posX) * 0.25;
+                        velocity *= 0.7;
+                    }
+                    track.style.transform = `translate3d(${posX}px, 0, 0)`;
+                    if (Math.abs(velocity) > 0.2 || posX > b.max + .5 || posX < b.min - .5) {
+                        rafId = requestAnimationFrame(step);
+                    } else {
+                        posX = clamp(posX, b.min, b.max);
+                        track.style.transform = `translate3d(${posX}px, 0, 0)`;
+                    }
+                }
+                rafId = requestAnimationFrame(step);
+            }
+
+            // Mouse
+            viewport.addEventListener('mousedown', e => { e.preventDefault(); dragStart(e.clientX); });
+            window.addEventListener('mousemove',  e => dragMove(e.clientX));
+            window.addEventListener('mouseup',    dragEnd);
+            viewport.addEventListener('mouseleave', () => { if (dragging) dragEnd(); });
+
+            // Touch
+            viewport.addEventListener('touchstart', e => dragStart(e.touches[0].clientX), { passive: true });
+            viewport.addEventListener('touchmove',  e => dragMove(e.touches[0].clientX),  { passive: true });
+            viewport.addEventListener('touchend',   dragEnd);
+
+            // Wheel horizontal scroll opcional
+            viewport.addEventListener('wheel', e => {
+                if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
+                e.preventDefault();
+                const b = bounds();
+                posX = clamp(posX - e.deltaY, b.min, b.max);
+                track.style.transform = `translate3d(${posX}px, 0, 0)`;
+            }, { passive: false });
+
+            // Bloqueia click se houve drag
+            track.querySelectorAll('.story-card').forEach(card => {
+                card.addEventListener('click', e => {
+                    if (dragMoved) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }
+                }, true);
+            });
+
+            // Recalc bounds on resize
+            window.addEventListener('resize', () => {
+                const b = bounds();
+                posX = clamp(posX, b.min, b.max);
+                track.style.transform = `translate3d(${posX}px, 0, 0)`;
+            });
+        })();
+
+        /* ─── Modal player Shorts ─── */
+        let _shortIndex = 0;
+        let _shortCards = [];
+
+        function _carregarShortNoModal(idx) {
+            _shortCards = Array.from(document.querySelectorAll('#shortsCardsTrack .story-card'));
+            if (_shortCards.length === 0) return;
+            if (idx < 0) idx = _shortCards.length - 1;
+            if (idx >= _shortCards.length) idx = 0;
+            _shortIndex = idx;
+
+            const card = _shortCards[idx];
+            const id = card.dataset.videoId;
+            const title = card.dataset.title || '';
+
+            const iframe = document.getElementById('shortIframe');
+            iframe.src = `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0&modestbranding=1&playsinline=1`;
+            document.getElementById('shortModalTitle').textContent = title;
+            document.getElementById('shortModalLink').href = `https://www.youtube.com/shorts/${id}`;
+        }
+
+        function abrirShortModalCard(card, ev) {
+            const idx = parseInt(card.dataset.index || '0', 10);
+            const modal = document.getElementById('shortModal');
+            modal.classList.add('open');
+            modal.setAttribute('aria-hidden', 'false');
+            document.body.style.overflow = 'hidden';
+            _carregarShortNoModal(idx);
+        }
+
+        function fecharShortModal() {
+            const modal = document.getElementById('shortModal');
+            modal.classList.remove('open');
+            modal.setAttribute('aria-hidden', 'true');
+            document.body.style.overflow = '';
+            document.getElementById('shortIframe').src = '';
+        }
+
+        function navegarShort(delta) {
+            _carregarShortNoModal(_shortIndex + delta);
+        }
+
+        document.addEventListener('keydown', e => {
+            const modal = document.getElementById('shortModal');
+            if (!modal || !modal.classList.contains('open')) return;
+            if (e.key === 'Escape') fecharShortModal();
+            else if (e.key === 'ArrowRight') navegarShort(1);
+            else if (e.key === 'ArrowLeft')  navegarShort(-1);
+        });
+        document.getElementById('shortModal')?.addEventListener('click', e => {
+            if (e.target.id === 'shortModal') fecharShortModal();
+        });
+    </script>
+
+}

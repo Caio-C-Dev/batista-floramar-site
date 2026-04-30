@@ -27,6 +27,7 @@ namespace BatistaFloramar.Controllers
             ViewBag.MetaKeywords = "Floramar, Floramar BH, Jardim Guanabara, igreja Floramar, igreja Jardim Guanabara, igreja batista Floramar, igreja batista Jardim Guanabara, culto Floramar, culto Jardim Guanabara, culto domingo Floramar, igreja batista belo horizonte, igreja Bíblica BH, igreja evangélica belo horizonte, igreja zona norte BH, culto belo horizonte, Comunidade Batista Floramar";
             ViewBag.CanonicalUrl = "https://www.batistafloramar.com.br/";
             ViewBag.LatestVideos = await _youtube.GetLatestVideosAsync(5);
+            ViewBag.UltimosShorts = await _youtube.GetLatestShortsAsync(10);
             ViewBag.Versiculo = await _bible.GetVersiculoDoDiaAsync();
             ViewBag.Ministerios = await _db.Ministerios
                 .Where(m => m.Ativo)

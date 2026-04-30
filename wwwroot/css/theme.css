@@ -1,4 +1,73 @@
-﻿:root {
+﻿/* ════════ ShinyText — letras sempre visíveis + overlay de brilho ════════
+   Estratégia:
+   - Texto base com cor sólida (color: gold) sempre legível.
+   - Pseudo ::after duplica o texto via attr(data-text) com gradient de shine
+     branco transparente que desliza por cima, com background-clip: text.
+   - Apenas o brilho move; letras nunca somem. */
+.shiny {
+  --shiny-base: #ffe38f;
+  --shiny-shine: #ffffff;
+  --shiny-duration: 3s;
+  --shiny-delay: 0s;
+
+  position: relative;
+  display: inline-block;
+  color: var(--shiny-base) !important; /* vence .text-gold !important */
+  text-shadow: 0 0 4px rgba(255, 224, 130, 0.425); /* glow sutil sempre presente */
+}
+
+.shiny::after {
+  content: attr(data-text);
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  background-image: linear-gradient(
+    115deg,
+    transparent 0%,
+    transparent 35%,
+    var(--shiny-shine) 50%,
+    transparent 65%,
+    transparent 100%
+  );
+  background-size: 220% auto;
+  background-position: 150% center;
+  background-repeat: no-repeat;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  animation: shinyTextMove var(--shiny-duration) linear infinite;
+  animation-delay: var(--shiny-delay);
+  will-change: background-position;
+  /* Glow no shine durante passagem */
+  filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.55));
+}
+
+.shiny-gold {
+  --shiny-base: #ffe38f; /* gold brilhante (mais sat. que brand) */
+  --shiny-shine: #ffffff;
+}
+
+@keyframes shinyTextMove {
+  0% {
+    background-position: 150% center;
+  }
+  100% {
+    background-position: -50% center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shiny::after {
+    animation: none;
+    opacity: 0;
+  }
+}
+
+:root {
   --bg-primary: #0b0b0f;
   --bg-secondary: #15151d;
   --bg-tertiary: #1d2331;
@@ -40,16 +109,30 @@ img {
 /* ============================================================
    MOBILE TAP: elimina delay de 300ms e garante área mínima de toque
    ============================================================ */
-a, button, [role="button"], input, select, textarea, label,
-.btn, .nav-link, .dropdown-item, .float-nav-btn, .float-nav-link,
-.whatsapp-float, .btn-nav-visit, .btn-nav-pastor, .btn-nav-palavra, .btn-nav-contact {
+a,
+button,
+[role="button"],
+input,
+select,
+textarea,
+label,
+.btn,
+.nav-link,
+.dropdown-item,
+.float-nav-btn,
+.float-nav-link,
+.whatsapp-float,
+.btn-nav-visit,
+.btn-nav-pastor,
+.btn-nav-palavra,
+.btn-nav-contact {
   touch-action: manipulation;
 }
 
 /* Área mínima de toque (44×44px recomendado pela Apple/Google) */
 @media (max-width: 991.98px) {
   /* .btn: inline-flex é OBRIGATÓRIO no iOS Safari.
-     Com inline-block + min-height, o iOS não expande a área de toque;  
+     Com inline-block + min-height, o iOS não expande a área de toque;
      com inline-flex a área clícavel corresponde ao tamanho visual real. */
   .btn {
     display: inline-flex;
@@ -78,17 +161,24 @@ a, button, [role="button"], input, select, textarea, label,
 
 /* Ícones Font Awesome e SVG dentro de elementos clicáveis nunca devem interceptar toques.
    O evento passa sempre para o <a> ou <button> pai. */
-a > i, a > svg,
-button > i, button > svg,
-.btn > i, .btn > svg,
-.nav-link > i, .nav-link > svg,
-.dropdown-item > i, .dropdown-item > svg,
-.float-nav-link > i, .float-nav-link > svg,
-.float-nav-btn > i, .float-nav-btn > svg,
-.whatsapp-float > i, .whatsapp-float > svg {
+a > i,
+a > svg,
+button > i,
+button > svg,
+.btn > i,
+.btn > svg,
+.nav-link > i,
+.nav-link > svg,
+.dropdown-item > i,
+.dropdown-item > svg,
+.float-nav-link > i,
+.float-nav-link > svg,
+.float-nav-btn > i,
+.float-nav-btn > svg,
+.whatsapp-float > i,
+.whatsapp-float > svg {
   pointer-events: none;
 }
-
 
 .heart-overlay {
   position: fixed;
@@ -724,10 +814,26 @@ button {
 
 /* PIX section highlight pulse on selection */
 @keyframes pixHighlight {
-  0%   { box-shadow: 0 0 0 rgba(230, 193, 90, 0); border-color: rgba(255,255,255,.08); }
-  30%  { box-shadow: 0 0 0 6px rgba(230, 193, 90, 0.22), 0 0 40px rgba(230, 193, 90, 0.18); border-color: var(--brand-gold-border); }
-  70%  { box-shadow: 0 0 0 3px rgba(230, 193, 90, 0.12), 0 0 24px rgba(230, 193, 90, 0.1); border-color: var(--brand-gold-border); }
-  100% { box-shadow: 0 0 0 rgba(230, 193, 90, 0); border-color: rgba(255,255,255,.08); }
+  0% {
+    box-shadow: 0 0 0 rgba(230, 193, 90, 0);
+    border-color: rgba(255, 255, 255, 0.08);
+  }
+  30% {
+    box-shadow:
+      0 0 0 6px rgba(230, 193, 90, 0.22),
+      0 0 40px rgba(230, 193, 90, 0.18);
+    border-color: var(--brand-gold-border);
+  }
+  70% {
+    box-shadow:
+      0 0 0 3px rgba(230, 193, 90, 0.12),
+      0 0 24px rgba(230, 193, 90, 0.1);
+    border-color: var(--brand-gold-border);
+  }
+  100% {
+    box-shadow: 0 0 0 rgba(230, 193, 90, 0);
+    border-color: rgba(255, 255, 255, 0.08);
+  }
 }
 
 .pix-section-highlight {
@@ -1239,7 +1345,11 @@ textarea {
   left: 0;
   right: 0;
   height: 280px;
-  background: linear-gradient(to bottom, transparent 0%, var(--bg-secondary) 100%);
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    var(--bg-secondary) 100%
+  );
   pointer-events: none;
   z-index: 1;
 }
@@ -1467,31 +1577,52 @@ textarea {
 }
 
 /* ── Planejar Visita CTA button ─────────────────── */
+.main-navbar .nav-item .btn-nav-visit,
+.main-navbar .btn-nav-visit,
+a.btn-nav-visit,
 .btn-nav-visit {
   background: linear-gradient(135deg, #e6c15a 0%, #c9a63c 100%) !important;
-  color: #0e0e0e !important;
+  color: #1a1a1a !important;
   padding: 0.42rem 1.3rem !important;
   border-radius: 999px !important;
-  font-weight: 700 !important;
+  font-weight: 800 !important;
   font-size: 0.85rem !important;
   letter-spacing: 0.02em !important;
+  text-shadow: none !important;
   box-shadow: 0 0 0 0 rgba(230, 193, 90, 0);
   transition:
     box-shadow 0.25s ease,
-    opacity 0.2s ease !important;
+    opacity 0.2s ease,
+    background 0.2s ease !important;
+}
+
+/* Força ícone também escuro (Font Awesome herda mas hover dropdown override pode pegar) */
+.main-navbar .btn-nav-visit i,
+a.btn-nav-visit i,
+.btn-nav-visit i {
+  color: #1a1a1a !important;
 }
 
 .btn-nav-visit::after {
   display: none !important;
 }
 
-.btn-nav-visit:hover,
 .main-navbar .nav-item .btn-nav-visit:hover,
-.main-navbar .nav-item .btn-nav-visit:focus {
-  background: linear-gradient(135deg, #e6c15a 0%, #c9a63c 100%) !important;
-  color: #0e0e0e !important;
-  box-shadow: 0 0 20px rgba(230, 193, 90, 0.5) !important;
-  opacity: 0.92 !important;
+.main-navbar .nav-item .btn-nav-visit:focus,
+a.btn-nav-visit:hover,
+a.btn-nav-visit:focus,
+.btn-nav-visit:hover,
+.btn-nav-visit:focus {
+  background: linear-gradient(135deg, #f0cd6f 0%, #d4af3e 100%) !important;
+  color: #000 !important;
+  box-shadow: 0 0 22px rgba(230, 193, 90, 0.55) !important;
+  opacity: 1 !important;
+  transform: translateY(-1px);
+}
+
+.btn-nav-visit:hover i,
+.btn-nav-visit:focus i {
+  color: #000 !important;
 }
 
 .btn-nav-contact {
@@ -1556,26 +1687,42 @@ textarea {
 
 /* ── Palavra do Pastor CTA button ───────────────── */
 .btn-nav-palavra {
-  background: linear-gradient(135deg, rgba(138,170,255,.15) 0%, rgba(100,140,255,.08) 100%) !important;
+  background: linear-gradient(
+    135deg,
+    rgba(138, 170, 255, 0.15) 0%,
+    rgba(100, 140, 255, 0.08) 100%
+  ) !important;
   color: #8aaeff !important;
   padding: 0.42rem 1.2rem !important;
   border-radius: 999px !important;
-  border: 1px solid rgba(138,170,255,.4) !important;
+  border: 1px solid rgba(138, 170, 255, 0.4) !important;
   font-weight: 600 !important;
-  font-size: .875rem !important;
-  transition: background .22s, box-shadow .22s, border-color .22s, color .22s !important;
+  font-size: 0.875rem !important;
+  transition:
+    background 0.22s,
+    box-shadow 0.22s,
+    border-color 0.22s,
+    color 0.22s !important;
 }
 
-.btn-nav-palavra::after { display: none !important; }
+.btn-nav-palavra::after {
+  display: none !important;
+}
 
-.btn-nav-palavra i { color: #8aaeff !important; }
+.btn-nav-palavra i {
+  color: #8aaeff !important;
+}
 
 .navbar .nav-item .btn-nav-palavra:hover,
 .navbar .nav-item .btn-nav-palavra:focus {
-  background: linear-gradient(135deg, rgba(138,170,255,.28) 0%, rgba(100,140,255,.18) 100%) !important;
+  background: linear-gradient(
+    135deg,
+    rgba(138, 170, 255, 0.28) 0%,
+    rgba(100, 140, 255, 0.18) 100%
+  ) !important;
   color: #aac4ff !important;
-  border-color: rgba(138,170,255,.7) !important;
-  box-shadow: 0 0 16px rgba(138,170,255,.25) !important;
+  border-color: rgba(138, 170, 255, 0.7) !important;
+  box-shadow: 0 0 16px rgba(138, 170, 255, 0.25) !important;
 }
 
 .navbar .nav-item .btn-nav-palavra:hover i,
@@ -1621,7 +1768,7 @@ textarea {
 }
 
 .about-pillar::before {
-  content: '';
+  content: "";
   position: absolute;
   inset: 0;
   background: linear-gradient(
@@ -1631,16 +1778,22 @@ textarea {
     hsla(0, 0%, 0%, 0) 80%,
     hsla(0, 0%, 0%, 0) 100%
   );
-  background-size: 300% 300%, 100% 100%;
+  background-size:
+    300% 300%,
+    100% 100%;
   background-repeat: no-repeat;
-  background-position: -100% -100%, 0 0;
+  background-position:
+    -100% -100%,
+    0 0;
   transition: 800ms ease;
   pointer-events: none;
   z-index: 1;
 }
 
 .about-pillar:hover::before {
-  background-position: 100% 100%, 0 0;
+  background-position:
+    100% 100%,
+    0 0;
 }
 
 .about-pillar > * {

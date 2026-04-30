@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using System.Xml.Linq;
 
 namespace BatistaFloramar.Application.Services
@@ -10,27 +11,96 @@ namespace BatistaFloramar.Application.Services
         public string VideoUrl { get; set; } = "";
         public DateTime PublishedAt { get; set; }
         public string PublishedFormatted => PublishedAt.ToString("dd MMM yyyy");
+        public bool IsShort { get; set; }
+        public string ShortUrl => $"https://www.youtube.com/shorts/{VideoId}";
     }
 
     public class YouTubeRssService
     {
         private readonly HttpClient _http;
         private readonly string _channelId;
+        private readonly string _channelHandle;
         private static List<YouTubeVideo>? _cache;
         private static DateTime _cacheExpiry = DateTime.MinValue;
+        private static List<YouTubeVideo>? _shortsCache;
+        private static DateTime _shortsCacheExpiry = DateTime.MinValue;
 
         public YouTubeRssService(HttpClient http, IConfiguration config)
         {
             _http = http;
             _channelId = config["YouTube:ChannelId"] ?? "";
+            _channelHandle = config["YouTube:ChannelHandle"] ?? "comunidadebatistafloramar";
         }
 
         public async Task<List<YouTubeVideo>> GetLatestVideosAsync(int count = 5)
         {
+            var all = await GetAllAsync();
+            return all.Take(count).ToList();
+        }
+
+        /// <summary>
+        /// Scrape direto da aba /shorts do canal — retorna SÓ Shorts (sem fallback).
+        /// </summary>
+        public async Task<List<YouTubeVideo>> GetLatestShortsAsync(int count = 8)
+        {
+            if (_shortsCache != null && DateTime.UtcNow < _shortsCacheExpiry)
+                return _shortsCache.Take(count).ToList();
+
+            if (string.IsNullOrWhiteSpace(_channelId) || !_channelId.StartsWith("UC"))
+                return new List<YouTubeVideo>();
+
+            // YouTube tem RSS oficial pra cada playlist do sistema. Shorts = "UUSH" + channelId sem "UC"
+            var shortsPlaylistId = "UUSH" + _channelId.Substring(2);
+            var url = $"https://www.youtube.com/feeds/videos.xml?playlist_id={shortsPlaylistId}";
+
+            try
+            {
+                using var resp = await _http.GetAsync(url);
+                if (!resp.IsSuccessStatusCode)
+                    return _shortsCache ?? new List<YouTubeVideo>();
+
+                var xml = await resp.Content.ReadAsStringAsync();
+
+                XNamespace atom = "http://www.w3.org/2005/Atom";
+                XNamespace yt = "http://www.youtube.com/xml/schemas/2015";
+                XNamespace media = "http://search.yahoo.com/mrss/";
+
+                var doc = XDocument.Parse(xml);
+                var shorts = doc.Descendants(atom + "entry")
+                    .Take(count)
+                    .Select(e =>
+                    {
+                        var videoId = e.Element(yt + "videoId")?.Value ?? "";
+                        return new YouTubeVideo
+                        {
+                            VideoId = videoId,
+                            Title = e.Element(atom + "title")?.Value ?? "",
+                            VideoUrl = $"https://www.youtube.com/shorts/{videoId}",
+                            ThumbnailUrl = e.Descendants(media + "thumbnail").FirstOrDefault()?.Attribute("url")?.Value
+                                           ?? $"https://i.ytimg.com/vi/{videoId}/hqdefault.jpg",
+                            PublishedAt = DateTime.TryParse(e.Element(atom + "published")?.Value, out var dt) ? dt : DateTime.UtcNow,
+                            IsShort = true
+                        };
+                    })
+                    .ToList();
+
+                _shortsCache = shorts;
+                _shortsCacheExpiry = DateTime.UtcNow.AddHours(1);
+                return shorts;
+            }
+            catch
+            {
+                return _shortsCache ?? new List<YouTubeVideo>();
+            }
+        }
+
+
+        private async Task<List<YouTubeVideo>> GetAllAsync()
+        {
             if (_cache != null && DateTime.UtcNow < _cacheExpiry)
                 return _cache;
 
-            if (string.IsNullOrWhiteSpace(_channelId) || _channelId == "UCd5R5bNSpiIk2Swx2KWSxlQ")
+            if (string.IsNullOrWhiteSpace(_channelId))
                 return new List<YouTubeVideo>();
 
             try
@@ -47,18 +117,24 @@ namespace BatistaFloramar.Application.Services
 
                 var doc = XDocument.Parse(xml);
                 var videos = doc.Descendants(atom + "entry")
-                    .Take(count)
                     .Select(e =>
                     {
                         var videoId = e.Element(yt + "videoId")?.Value ?? "";
+                        var title = e.Element(atom + "title")?.Value ?? "";
+                        var titleLower = title.ToLowerInvariant();
+                        var isShort = titleLower.Contains("#shorts")
+                                      || titleLower.Contains("#short")
+                                      || titleLower.Contains(" shorts")
+                                      || titleLower.StartsWith("shorts");
                         return new YouTubeVideo
                         {
                             VideoId = videoId,
-                            Title = e.Element(atom + "title")?.Value ?? "",
+                            Title = title,
                             VideoUrl = $"https://www.youtube.com/watch?v={videoId}",
                             ThumbnailUrl = e.Descendants(media + "thumbnail").FirstOrDefault()?.Attribute("url")?.Value
                                            ?? $"https://i.ytimg.com/vi/{videoId}/hqdefault.jpg",
-                            PublishedAt = DateTime.TryParse(e.Element(atom + "published")?.Value, out var dt) ? dt : DateTime.UtcNow
+                            PublishedAt = DateTime.TryParse(e.Element(atom + "published")?.Value, out var dt) ? dt : DateTime.UtcNow,
+                            IsShort = isShort
                         };
                     })
                     .ToList();
@@ -69,7 +145,7 @@ namespace BatistaFloramar.Application.Services
             }
             catch
             {
-                return new List<YouTubeVideo>();
+                return _cache ?? new List<YouTubeVideo>();
             }
         }
     }
