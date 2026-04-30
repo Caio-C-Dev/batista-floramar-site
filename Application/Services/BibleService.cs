@@ -1,3 +1,7 @@
+using System.Net.Http.Headers;
+using System.Text.Json;
+using Microsoft.Extensions.Caching.Memory;
+
 namespace BatistaFloramar.Application.Services
 {
     public class BibleVerseDto
@@ -9,8 +13,121 @@ namespace BatistaFloramar.Application.Services
 
     public class BibleService
     {
-        // Lista curada de versículos — rotaciona 1 por dia pelo número do dia do ano
-        private static readonly BibleVerseDto[] Versiculo = new[]
+        private readonly HttpClient _http;
+        private readonly IMemoryCache _cache;
+        private readonly IConfiguration _config;
+        private readonly ILogger<BibleService> _log;
+
+        // Versão preferida pra puxar (NVI > ARA > ACF > AA)
+        private const string VersaoApi = "nvi";
+
+        public BibleService(HttpClient http, IMemoryCache cache, IConfiguration config, ILogger<BibleService> log)
+        {
+            _http = http;
+            _cache = cache;
+            _config = config;
+            _log = log;
+        }
+
+        public async Task<BibleVerseDto> GetVersiculoDoDiaAsync()
+        {
+            var hojeBR = HojeBrasilia();
+            var cacheKey = $"versiculo_{hojeBR:yyyy-MM-dd}";
+
+            if (_cache.TryGetValue<BibleVerseDto>(cacheKey, out var cached) && cached != null)
+                return cached;
+
+            // Tenta API primeiro. Se falhar, usa fallback hardcoded.
+            BibleVerseDto resultado;
+            try
+            {
+                resultado = await BuscarDaApiAsync() ?? VersiculoFallback(hojeBR);
+            }
+            catch (Exception ex)
+            {
+                _log.LogWarning(ex, "Falha ao buscar versículo do dia da abibliadigital — usando fallback");
+                resultado = VersiculoFallback(hojeBR);
+            }
+
+            // Cacheia até meia-noite BR (próxima troca)
+            var amanhaMeiaNoiteBR = hojeBR.AddDays(1);
+            var ttl = amanhaMeiaNoiteBR - DateTime.UtcNow.AddHours(-3);
+            if (ttl < TimeSpan.FromMinutes(5)) ttl = TimeSpan.FromHours(24);
+            _cache.Set(cacheKey, resultado, ttl);
+
+            return resultado;
+        }
+
+        private async Task<BibleVerseDto?> BuscarDaApiAsync()
+        {
+            var token = _config["AbibliaDigital:Token"]
+                        ?? Environment.GetEnvironmentVariable("ABIBLIADIGITAL_TOKEN");
+
+            var url = $"https://www.abibliadigital.com.br/api/verses/{VersaoApi}/random";
+            using var req = new HttpRequestMessage(HttpMethod.Get, url);
+            if (!string.IsNullOrWhiteSpace(token))
+                req.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            req.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            _http.Timeout = TimeSpan.FromSeconds(8);
+
+            using var resp = await _http.SendAsync(req);
+            if (!resp.IsSuccessStatusCode)
+            {
+                _log.LogInformation("abibliadigital retornou {Status}", (int)resp.StatusCode);
+                return null;
+            }
+
+            await using var stream = await resp.Content.ReadAsStreamAsync();
+            using var doc = await JsonDocument.ParseAsync(stream);
+            var root = doc.RootElement;
+
+            string texto = root.TryGetProperty("text", out var t) ? (t.GetString() ?? "") : "";
+            int chapter   = root.TryGetProperty("chapter", out var c) ? c.GetInt32() : 0;
+            int verseNum  = root.TryGetProperty("number",  out var n) ? n.GetInt32() : 0;
+            string livro = "";
+            if (root.TryGetProperty("book", out var bk))
+            {
+                if (bk.TryGetProperty("name", out var bn))
+                    livro = bn.GetString() ?? "";
+            }
+
+            if (string.IsNullOrWhiteSpace(texto) || string.IsNullOrWhiteSpace(livro))
+                return null;
+
+            return new BibleVerseDto
+            {
+                Texto      = texto.Trim(),
+                Livro      = livro,
+                Referencia = $"{livro} {chapter}:{verseNum} (NVI)"
+            };
+        }
+
+        private static DateTime HojeBrasilia()
+        {
+            try
+            {
+                var tz = TimeZoneInfo.FindSystemTimeZoneById("America/Sao_Paulo");
+                return TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, tz).Date;
+            }
+            catch
+            {
+                try
+                {
+                    var tz = TimeZoneInfo.FindSystemTimeZoneById("E. South America Standard Time");
+                    return TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, tz).Date;
+                }
+                catch { return DateTime.UtcNow.AddHours(-3).Date; }
+            }
+        }
+
+        // ─── Fallback: array curado caso API falhe ──────────────────────────────
+        private static BibleVerseDto VersiculoFallback(DateTime hoje)
+        {
+            var idx = hoje.DayOfYear % FallbackVersos.Length;
+            return FallbackVersos[idx];
+        }
+
+        private static readonly BibleVerseDto[] FallbackVersos = new[]
         {
             new BibleVerseDto { Texto = "Confie no Senhor de todo o seu coração e não se apoie em seu próprio entendimento; reconheça o Senhor em todos os seus caminhos, e ele endireitará as suas sendas.", Referencia = "Provérbios 3:5-6 (NVI)" },
             new BibleVerseDto { Texto = "O Senhor é o meu pastor e nada me faltará.", Referencia = "Salmos 23:1 (ARA)" },
@@ -44,12 +161,5 @@ namespace BatistaFloramar.Application.Services
             new BibleVerseDto { Texto = "O coração do homem pondera o seu caminho, mas do Senhor é que provém a direção dos seus passos.", Referencia = "Provérbios 16:9 (ARA)" },
             new BibleVerseDto { Texto = "O Senhor abençoe você e te guarde; o Senhor faça resplandecer o seu rosto sobre ti e te conceda graça.", Referencia = "Números 6:24-25 (NVI)" },
         };
-
-        public Task<BibleVerseDto> GetVersiculoDoDiaAsync()
-        {
-            // Seleciona o versículo pelo dia do ano — muda a cada dia, sem API externa
-            var index = DateTime.Today.DayOfYear % Versiculo.Length;
-            return Task.FromResult(Versiculo[index]);
-        }
     }
 }

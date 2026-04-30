@@ -27,7 +27,7 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddHttpClient<BatistaFloramar.Application.Services.YouTubeRssService>();
-builder.Services.AddSingleton<BatistaFloramar.Application.Services.BibleService>();
+builder.Services.AddHttpClient<BatistaFloramar.Application.Services.BibleService>();
 builder.Services.AddMemoryCache();
 builder.Services.AddScoped<BatistaFloramar.Application.Services.FinanceiroService>();
 builder.Services.AddScoped<BatistaFloramar.Application.Services.DoacaoService>();
