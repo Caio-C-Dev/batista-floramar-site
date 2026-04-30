@@ -158,6 +158,10 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
+// Healthcheck endpoint leve — Railway/Cloudflare/uptime monitors.
+// Não toca em DB/services externos: garante 200 instantâneo mesmo se home page demorar.
+app.MapGet("/health", () => Results.Text("OK"));
+
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
