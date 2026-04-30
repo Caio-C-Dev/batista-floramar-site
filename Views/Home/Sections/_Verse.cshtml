@@ -6,35 +6,203 @@
 }
 <section class="verse-section">
     <div class="container">
-        <div class="verse-banner scroll-reveal">
-            <div class="verse-icon"><i class="fas fa-book-open"></i></div>
-            <p class="section-eyebrow mb-3">Versículo do Dia</p>
-            <blockquote class="verse-quote" id="verseText">
-                "@texto"
-            </blockquote>
-            <cite class="verse-cite" id="verseRef">— @referencia</cite>
+        <div id="verseGlowCard" class="border-glow-card scroll-reveal">
+            <span class="edge-light"></span>
+            <div class="border-glow-inner verse-banner">
+                <div class="verse-icon"><i class="fas fa-book-open"></i></div>
+                <p class="section-eyebrow mb-3">Versículo do Dia</p>
+                <blockquote class="verse-quote" id="verseText">
+                    "@texto"
+                </blockquote>
+                <cite class="verse-cite" id="verseRef">— @referencia</cite>
 
-            <div class="verse-actions mt-4">
-                <button id="btnShareImagem" class="verse-action-btn verse-action-primary"
-                        onclick="compartilharImagemVersiculo()"
-                        title="Gerar imagem e compartilhar">
-                    <i class="fas fa-share-nodes me-2"></i><span id="imageLabel">Compartilhar</span>
-                </button>
-            </div>
+                <div class="verse-actions mt-4">
+                    <button id="btnShareImagem" class="verse-action-btn verse-action-primary"
+                            onclick="compartilharImagemVersiculo()"
+                            title="Gerar imagem e compartilhar">
+                        <i class="fas fa-share-nodes me-2"></i><span id="imageLabel">Compartilhar</span>
+                    </button>
+                </div>
 
-            <!-- Canvas oculto usado para gerar a imagem do versículo (dimensões setadas via JS) -->
-            <canvas id="verseCanvas" style="display:none;"></canvas>
+                <!-- Canvas oculto usado para gerar a imagem do versículo (dimensões setadas via JS) -->
+                <canvas id="verseCanvas" style="display:none;"></canvas>
 
-            <!-- Toast de feedback (sucesso/erro) -->
-            <div id="verseToast" class="verse-toast" role="status" aria-live="polite">
-                <i class="verse-toast-icon fas fa-circle-info"></i>
-                <span class="verse-toast-msg"></span>
+                <!-- Toast de feedback (sucesso/erro) -->
+                <div id="verseToast" class="verse-toast" role="status" aria-live="polite">
+                    <i class="verse-toast-icon fas fa-circle-info"></i>
+                    <span class="verse-toast-msg"></span>
+                </div>
             </div>
         </div>
     </div>
 </section>
 
 <style>
+    /* ════════ BorderGlow (port React → vanilla) ════════ */
+    .border-glow-card {
+        --edge-proximity: 0;
+        --cursor-angle: 45deg;
+        --edge-sensitivity: 30;
+        --color-sensitivity: calc(var(--edge-sensitivity) + 20);
+        --border-radius: 28px;
+        --glow-padding: 40px;
+        --cone-spread: 25;
+        --card-bg: #120F17;
+        --fill-opacity: 0.5;
+
+        --glow-color:    hsl(40deg 80% 80% / 100%);
+        --glow-color-60: hsl(40deg 80% 80% / 60%);
+        --glow-color-50: hsl(40deg 80% 80% / 50%);
+        --glow-color-40: hsl(40deg 80% 80% / 40%);
+        --glow-color-30: hsl(40deg 80% 80% / 30%);
+        --glow-color-20: hsl(40deg 80% 80% / 20%);
+        --glow-color-10: hsl(40deg 80% 80% / 10%);
+
+        --gradient-one:   radial-gradient(at 80% 55%, #c084fc 0px, transparent 50%);
+        --gradient-two:   radial-gradient(at 69% 34%, #f472b6 0px, transparent 50%);
+        --gradient-three: radial-gradient(at  8%  6%, #38bdf8 0px, transparent 50%);
+        --gradient-four:  radial-gradient(at 41% 38%, #c084fc 0px, transparent 50%);
+        --gradient-five:  radial-gradient(at 86% 85%, #f472b6 0px, transparent 50%);
+        --gradient-six:   radial-gradient(at 82% 18%, #38bdf8 0px, transparent 50%);
+        --gradient-seven: radial-gradient(at 51%  4%, #f472b6 0px, transparent 50%);
+        --gradient-base:  linear-gradient(#c084fc 0 100%);
+
+        position: relative;
+        border-radius: var(--border-radius);
+        isolation: isolate;
+        transform: translate3d(0, 0, 0.01px);
+        display: grid;
+        border: 1px solid rgb(255 255 255 / 15%);
+        background: var(--card-bg);
+        overflow: visible;
+        box-shadow:
+            rgba(0,0,0,0.1) 0 1px 2px,
+            rgba(0,0,0,0.1) 0 2px 4px,
+            rgba(0,0,0,0.1) 0 4px 8px,
+            rgba(0,0,0,0.1) 0 8px 16px,
+            rgba(0,0,0,0.1) 0 16px 32px,
+            rgba(0,0,0,0.1) 0 32px 64px;
+    }
+
+    .border-glow-card::before,
+    .border-glow-card::after,
+    .border-glow-card > .edge-light {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        transition: opacity 0.25s ease-out;
+        z-index: -1;
+    }
+
+    .border-glow-card:not(:hover):not(.sweep-active)::before,
+    .border-glow-card:not(:hover):not(.sweep-active)::after,
+    .border-glow-card:not(:hover):not(.sweep-active) > .edge-light {
+        opacity: 0;
+        transition: opacity 0.75s ease-in-out;
+    }
+
+    .border-glow-card::before {
+        border: 1px solid transparent;
+        background:
+            linear-gradient(var(--card-bg) 0 100%) padding-box,
+            linear-gradient(rgb(255 255 255 / 0%) 0% 100%) border-box,
+            var(--gradient-one)   border-box,
+            var(--gradient-two)   border-box,
+            var(--gradient-three) border-box,
+            var(--gradient-four)  border-box,
+            var(--gradient-five)  border-box,
+            var(--gradient-six)   border-box,
+            var(--gradient-seven) border-box,
+            var(--gradient-base)  border-box;
+        opacity: calc((var(--edge-proximity) - var(--color-sensitivity)) / (100 - var(--color-sensitivity)));
+        -webkit-mask-image: conic-gradient(
+            from var(--cursor-angle) at center,
+            black calc(var(--cone-spread) * 1%),
+            transparent calc((var(--cone-spread) + 15) * 1%),
+            transparent calc((100 - var(--cone-spread) - 15) * 1%),
+            black calc((100 - var(--cone-spread)) * 1%));
+                mask-image: conic-gradient(
+            from var(--cursor-angle) at center,
+            black calc(var(--cone-spread) * 1%),
+            transparent calc((var(--cone-spread) + 15) * 1%),
+            transparent calc((100 - var(--cone-spread) - 15) * 1%),
+            black calc((100 - var(--cone-spread)) * 1%));
+    }
+
+    .border-glow-card::after {
+        border: 1px solid transparent;
+        background:
+            var(--gradient-one)   padding-box,
+            var(--gradient-two)   padding-box,
+            var(--gradient-three) padding-box,
+            var(--gradient-four)  padding-box,
+            var(--gradient-five)  padding-box,
+            var(--gradient-six)   padding-box,
+            var(--gradient-seven) padding-box,
+            var(--gradient-base)  padding-box;
+        opacity: calc(var(--fill-opacity) * (var(--edge-proximity) - var(--color-sensitivity)) / (100 - var(--color-sensitivity)));
+        mix-blend-mode: soft-light;
+        -webkit-mask-image:
+            linear-gradient(to bottom, black, black),
+            radial-gradient(ellipse at 50% 50%, black 40%, transparent 65%),
+            radial-gradient(ellipse at 66% 66%, black  5%, transparent 40%),
+            radial-gradient(ellipse at 33% 33%, black  5%, transparent 40%),
+            radial-gradient(ellipse at 66% 33%, black  5%, transparent 40%),
+            radial-gradient(ellipse at 33% 66%, black  5%, transparent 40%),
+            conic-gradient(from var(--cursor-angle) at center, transparent 5%, black 15%, black 85%, transparent 95%);
+        -webkit-mask-composite: source-out, source-over, source-over, source-over, source-over, source-over;
+                mask-composite: subtract, add, add, add, add, add;
+    }
+
+    .border-glow-card > .edge-light {
+        inset: calc(var(--glow-padding) * -1);
+        pointer-events: none;
+        z-index: 1;
+        opacity: calc((var(--edge-proximity) - var(--edge-sensitivity)) / (100 - var(--edge-sensitivity)));
+        mix-blend-mode: plus-lighter;
+        -webkit-mask-image: conic-gradient(
+            from var(--cursor-angle) at center, black 2.5%, transparent 10%, transparent 90%, black 97.5%);
+                mask-image: conic-gradient(
+            from var(--cursor-angle) at center, black 2.5%, transparent 10%, transparent 90%, black 97.5%);
+    }
+
+    .border-glow-card > .edge-light::before {
+        content: "";
+        position: absolute;
+        inset: var(--glow-padding);
+        border-radius: inherit;
+        box-shadow:
+            inset 0 0  0 1px var(--glow-color),
+            inset 0 0  1px 0 var(--glow-color-60),
+            inset 0 0  3px 0 var(--glow-color-50),
+            inset 0 0  6px 0 var(--glow-color-40),
+            inset 0 0 15px 0 var(--glow-color-30),
+            inset 0 0 25px 2px var(--glow-color-20),
+            inset 0 0 50px 2px var(--glow-color-10),
+                  0 0  1px 0 var(--glow-color-60),
+                  0 0  3px 0 var(--glow-color-50),
+                  0 0  6px 0 var(--glow-color-40),
+                  0 0 15px 0 var(--glow-color-30),
+                  0 0 25px 2px var(--glow-color-20),
+                  0 0 50px 2px var(--glow-color-10);
+    }
+
+    .border-glow-inner {
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        z-index: 1;
+        border-radius: inherit;
+    }
+
+    /* Mantém estilo verse-banner por dentro mas remove borda dupla */
+    .border-glow-inner.verse-banner {
+        background: transparent;
+        border: 0;
+        box-shadow: none;
+    }
+
     .verse-actions {
         display: flex;
         flex-wrap: wrap;
@@ -129,6 +297,33 @@
 </style>
 
 <script>
+    /* ─── BorderGlow handler ─── */
+    (function _initBorderGlow() {
+        const card = document.getElementById('verseGlowCard');
+        if (!card) return;
+        function onMove(e) {
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const cx = rect.width / 2;
+            const cy = rect.height / 2;
+            const dx = x - cx;
+            const dy = y - cy;
+            let kx = Infinity, ky = Infinity;
+            if (dx !== 0) kx = cx / Math.abs(dx);
+            if (dy !== 0) ky = cy / Math.abs(dy);
+            const edge = Math.min(Math.max(1 / Math.min(kx, ky), 0), 1);
+            let deg = 0;
+            if (dx !== 0 || dy !== 0) {
+                deg = Math.atan2(dy, dx) * (180 / Math.PI) + 90;
+                if (deg < 0) deg += 360;
+            }
+            card.style.setProperty('--edge-proximity', (edge * 100).toFixed(3));
+            card.style.setProperty('--cursor-angle', deg.toFixed(3) + 'deg');
+        }
+        card.addEventListener('pointermove', onMove);
+    })();
+
     /* Pré-carrega template assim que script roda — sem isso o user gesture do
        navigator.share expira durante o fetch da imagem. */
     let _verseTemplate = null;
