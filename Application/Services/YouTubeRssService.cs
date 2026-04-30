@@ -43,11 +43,16 @@ namespace BatistaFloramar.Application.Services
         /// </summary>
         public async Task<List<YouTubeVideo>> GetLatestShortsAsync(int count = 8)
         {
+            Console.WriteLine($"[Shorts] GetLatestShortsAsync called. ChannelId='{_channelId}' CacheCount={_shortsCache?.Count ?? -1} CacheValid={(_shortsCache != null && DateTime.UtcNow < _shortsCacheExpiry)}");
+
             if (_shortsCache != null && DateTime.UtcNow < _shortsCacheExpiry)
                 return _shortsCache.Take(count).ToList();
 
             if (string.IsNullOrWhiteSpace(_channelId) || !_channelId.StartsWith("UC"))
+            {
+                Console.WriteLine($"[Shorts] Aborted: invalid channel id '{_channelId}'");
                 return new List<YouTubeVideo>();
+            }
 
             // YouTube tem RSS oficial pra cada playlist do sistema. Shorts = "UUSH" + channelId sem "UC"
             var shortsPlaylistId = "UUSH" + _channelId.Substring(2);
@@ -98,6 +103,15 @@ namespace BatistaFloramar.Application.Services
                     .ToList();
 
                 Console.WriteLine($"[Shorts RSS] Parsed {shorts.Count} shorts");
+
+                // Fallback: se RSS Shorts retornou 0 (canal sem shorts ou bloqueio), pega últimos vídeos
+                if (shorts.Count == 0)
+                {
+                    Console.WriteLine("[Shorts RSS] 0 shorts → fallback latest videos");
+                    var all = await GetAllAsync();
+                    shorts = all.Take(count).ToList();
+                }
+
                 _shortsCache = shorts;
                 _shortsCacheExpiry = DateTime.UtcNow.AddHours(1);
                 return shorts;
@@ -105,7 +119,21 @@ namespace BatistaFloramar.Application.Services
             catch (Exception ex)
             {
                 Console.WriteLine($"[Shorts RSS] ERROR: {ex.Message}");
-                return _shortsCache ?? new List<YouTubeVideo>();
+                // Fallback em erro: tenta latest videos
+                try
+                {
+                    var all = await GetAllAsync();
+                    var fb = all.Take(count).ToList();
+                    Console.WriteLine($"[Shorts RSS] Catch fallback → {fb.Count} videos");
+                    _shortsCache = fb;
+                    _shortsCacheExpiry = DateTime.UtcNow.AddMinutes(15);
+                    return fb;
+                }
+                catch (Exception ex2)
+                {
+                    Console.WriteLine($"[Shorts RSS] Fallback also failed: {ex2.Message}");
+                    return _shortsCache ?? new List<YouTubeVideo>();
+                }
             }
         }
 
