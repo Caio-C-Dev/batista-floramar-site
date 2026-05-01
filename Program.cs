@@ -85,6 +85,18 @@ if (app.Environment.IsProduction())
     app.Use(async (context, next) =>
     {
         var host = context.Request.Host.Host;
+        var path = context.Request.Path.Value ?? string.Empty;
+
+        // BYPASS healthcheck: Railway/Cloudflare/uptime monitors batem em hosts/paths
+        // diferentes (ex: healthcheck.railway.app/health). Não redirecionar.
+        if (path.Equals("/health", StringComparison.OrdinalIgnoreCase) ||
+            path.Equals("/healthz", StringComparison.OrdinalIgnoreCase) ||
+            host.Contains("healthcheck", StringComparison.OrdinalIgnoreCase) ||
+            host.Equals("localhost", StringComparison.OrdinalIgnoreCase))
+        {
+            await next();
+            return;
+        }
 
         // Railway termina TLS na borda e repassa como HTTP internamente.
         // Usar X-Forwarded-Proto para saber o scheme real do cliente.
