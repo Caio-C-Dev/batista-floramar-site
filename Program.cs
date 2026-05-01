@@ -158,16 +158,25 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
+// Healthcheck leve — não toca DB. Garante 200 instantâneo pro Railway/uptime.
+app.MapGet("/health", () => Results.Text("OK"));
+app.MapGet("/healthz", () => Results.Text("OK"));
+
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
-using (var scope = app.Services.CreateScope())
+// Migrations + seed em BACKGROUND — app sobe instantâneo, migrations rodam paralelo.
+// Sem isso: Railway healthcheck timeout enquanto SQL slug/seed roda.
+_ = Task.Run(async () =>
 {
-    var db = scope.ServiceProvider.GetRequiredService<BatistaFloramarDbContext>();
-    if (databaseUrl != null)
+    try
     {
-        await db.Database.EnsureCreatedAsync();
+        using var scope = app.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<BatistaFloramarDbContext>();
+        if (databaseUrl != null)
+        {
+            await db.Database.EnsureCreatedAsync();
         // Cria tabelas novas que EnsureCreated não adiciona em bancos já existentes
         await db.Database.ExecuteSqlRawAsync(@"
             CREATE TABLE IF NOT EXISTS ""EventosSemanais"" (
@@ -269,11 +278,18 @@ using (var scope = app.Services.CreateScope())
                 ""Justificativa"" VARCHAR(500)
             )
         ");
-    }
-    else
-        await db.Database.MigrateAsync();
-}
+        }
+        else
+            await db.Database.MigrateAsync();
 
-await SeedData.InicializarAsync(app.Services);
+        await SeedData.InicializarAsync(app.Services);
+        Console.WriteLine("[Startup] Migrations + Seed concluídos OK");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"[Startup] ERRO em migrations/seed (background): {ex.Message}");
+        Console.WriteLine(ex.StackTrace);
+    }
+});
 
 app.Run();
