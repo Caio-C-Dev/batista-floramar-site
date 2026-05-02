@@ -4,7 +4,9 @@
 }
 @if (shorts != null && shorts.Count > 0)
 {
-    <section class="page-section py-5" id="shorts-rail" aria-label="Últimos vídeos do YouTube">
+    <section class="page-section py-5" id="shorts-rail"
+             aria-label="Últimos vídeos do YouTube"
+             data-channel-id="UCd5R5bNSpiIk2Swx2KWSxlQ">
         <div class="container">
             <header class="text-center mb-4 scroll-reveal">
                 <span class="section-eyebrow"><i class="fab fa-youtube me-1"></i> Recentes no YouTube</span>
@@ -551,6 +553,62 @@
         document.getElementById('shortModal')?.addEventListener('click', e => {
             if (e.target.id === 'shortModal') fecharShortModal();
         });
+
+        /* ─── Upgrade client-side: substitui cards do servidor por SHORTS reais.
+              Server pode entregar fallback de vídeos genéricos (IP Railway bloqueado pelo YouTube).
+              Browser do user busca via rss2json (free, CORS-friendly) e renderiza Shorts reais.
+              Falha silenciosa: mantém o que veio do server. ─── */
+        (async function upgradeShorts() {
+            const section = document.getElementById('shorts-rail');
+            if (!section) return;
+            const channelId = section.dataset.channelId;
+            if (!channelId || !channelId.startsWith('UC')) return;
+
+            const playlistId = 'UUSH' + channelId.substring(2);
+            const rssUrl = `https://www.youtube.com/feeds/videos.xml?playlist_id=${playlistId}`;
+            const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}&count=10`;
+
+            try {
+                const resp = await fetch(apiUrl);
+                if (!resp.ok) return;
+                const data = await resp.json();
+                if (data.status !== 'ok' || !Array.isArray(data.items) || data.items.length === 0) return;
+
+                const track = document.getElementById('shortsCardsTrack');
+                if (!track) return;
+
+                track.innerHTML = '';
+                data.items.forEach((item, idx) => {
+                    const m = (item.guid || item.link || '').match(/[a-zA-Z0-9_-]{11}/);
+                    if (!m) return;
+                    const id = m[0];
+                    const title = item.title || 'Vídeo';
+
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.className = 'story-card';
+                    btn.dataset.index = idx;
+                    btn.dataset.videoId = id;
+                    btn.dataset.title = title;
+                    btn.setAttribute('aria-label', title);
+                    btn.onclick = function (ev) { abrirShortModalCard(this, ev); };
+                    btn.innerHTML = `
+                        <img src="https://i.ytimg.com/vi/${id}/hqdefault.jpg" alt="${title.replace(/"/g, '&quot;')}" loading="lazy" draggable="false" />
+                        <div class="story-card-grad"></div>
+                        <span class="story-card-badge">Shorts</span>
+                        <div class="story-card-meta">
+                            <h3 class="story-card-title h4">${title.replace(/</g, '&lt;')}</h3>
+                        </div>
+                        <div class="story-card-play"><i class="fas fa-play"></i></div>
+                    `;
+                    track.appendChild(btn);
+                });
+
+                track.style.transform = 'translate3d(0, 0, 0)';
+            } catch (e) {
+                /* Mantém fallback do server */
+            }
+        })();
     </script>
 
 }

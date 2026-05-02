@@ -25,11 +25,17 @@ namespace BatistaFloramar.Application.Services
         private static List<YouTubeVideo>? _shortsCache;
         private static DateTime _shortsCacheExpiry = DateTime.MinValue;
 
+        // Default hardcoded — garante funcionamento mesmo sem env var/appsettings em prod.
+        private const string DEFAULT_CHANNEL_ID = "UCd5R5bNSpiIk2Swx2KWSxlQ";
+        private const string DEFAULT_CHANNEL_HANDLE = "comunidadebatistafloramar";
+
         public YouTubeRssService(HttpClient http, IConfiguration config)
         {
             _http = http;
-            _channelId = config["YouTube:ChannelId"] ?? "";
-            _channelHandle = config["YouTube:ChannelHandle"] ?? "comunidadebatistafloramar";
+            var cid = config["YouTube:ChannelId"];
+            _channelId = string.IsNullOrWhiteSpace(cid) ? DEFAULT_CHANNEL_ID : cid;
+            var ch = config["YouTube:ChannelHandle"];
+            _channelHandle = string.IsNullOrWhiteSpace(ch) ? DEFAULT_CHANNEL_HANDLE : ch;
         }
 
         public async Task<List<YouTubeVideo>> GetLatestVideosAsync(int count = 5)
