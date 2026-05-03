@@ -65,10 +65,10 @@
                     @for (int i = 0; i < shorts.Count; i++)
                     {
                         var v = shorts[i];
-                        /* Portrait thumbnail (oardefault) → maxresdefault fallback → hqdefault */
-                        var portraitThumb = $"https://i.ytimg.com/vi/{v.VideoId}/oardefault.jpg";
+                        /* hqdefault sempre existe; maxresdefault como fallback de qualidade */
+                        var portraitThumb = $"https://i.ytimg.com/vi/{v.VideoId}/hqdefault.jpg";
                         var maxresThumb   = $"https://i.ytimg.com/vi/{v.VideoId}/maxresdefault.jpg";
-                        var hqThumb       = $"https://i.ytimg.com/vi/{v.VideoId}/hqdefault.jpg";
+                        var hqThumb       = $"https://i.ytimg.com/vi/{v.VideoId}/mqdefault.jpg";
                         <div class="story-card-wrapper" itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
                             <meta itemprop="position" content="@(i+1)" />
                             <button type="button" class="story-card"
@@ -737,10 +737,10 @@
                     const id = m[0];
                     const title = (item.title || 'Vídeo').replace(/</g, '&lt;').replace(/"/g, '&quot;');
 
-                    /* Portrait thumbnail → maxres fallback → hq fallback */
-                    const portraitSrc = `https://i.ytimg.com/vi/${id}/oardefault.jpg`;
+                    /* hqdefault sempre existe; maxresdefault como fallback de qualidade */
+                    const portraitSrc = `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
                     const maxresSrc   = `https://i.ytimg.com/vi/${id}/maxresdefault.jpg`;
-                    const hqSrc       = `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
+                    const hqSrc       = `https://i.ytimg.com/vi/${id}/mqdefault.jpg`;
 
                     const wrapper = document.createElement('div');
                     wrapper.className = 'story-card-wrapper';

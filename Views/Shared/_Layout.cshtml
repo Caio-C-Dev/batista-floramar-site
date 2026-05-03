@@ -144,7 +144,8 @@
         <link rel="preload" as="image" href="/images/image_principal_2.jpeg" fetchpriority="high" />
     }
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'" />
+    <noscript><link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" /></noscript>
     @* Font Awesome carregado de forma não-bloqueante *@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" media="print" onload="this.media='all'" />
     <noscript><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" /></noscript>
@@ -291,7 +292,7 @@
                         <div class="footer-brand-block">
                             <img src="~/images/church-logo.png" alt="Logo da Comunidade Batista Floramar" class="footer-logo-image" />
                             <div>
-                                <h5 class="mb-2">Comunidade Batista Floramar</h5>
+                                <p class="h5 fw-semibold mb-2">Comunidade Batista Floramar</p>
                                 <p class="mb-0 text-secondary">Uma igreja Bíblica que se preocupa com a exposição da palavra na íntegra.</p>
                             </div>
                         </div>
@@ -309,7 +310,7 @@
                     </div>
                     <div class="col-lg-4">
                         <div class="footer-links">
-                            <h6>Links rápidos</h6>
+                            <h2 class="h6">Links rápidos</h2>
                             <ul>
                                 <li><a href="/">Início</a></li>
                                 <li><a href="/Sobre">Sobre</a></li>
@@ -329,7 +330,7 @@
                     </div>
                     <div class="col-lg-4">
                         <div class="footer-social-block">
-                            <h5>Redes sociais</h5>
+                            <h2 class="h5">Redes sociais</h2>
                             <div class="social-links">
                                 <a href="https://www.facebook.com/batistafloramar/" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
                                 <a href="https://www.instagram.com/batistafloramar/" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
@@ -370,8 +371,8 @@
             <a href="/Celula" class="float-nav-link"><i class="fas fa-users"></i><span>Células</span></a>
             <a href="/PalavraDoPastor" class="float-nav-link"><i class="fas fa-bible"></i><span>Palavra do Pastor</span></a>
             <a href="/Napalavra" class="float-nav-link"><i class="fas fa-envelope"></i><span>Contato</span></a>
-            <button class="float-nav-link float-nav-top" onclick="scrollToTop()" title="Voltar ao topo">
-                <i class="fas fa-arrow-up"></i><span>Topo</span>
+            <button class="float-nav-link float-nav-top" onclick="scrollToTop()" aria-label="Voltar ao topo da página">
+                <i class="fas fa-arrow-up" aria-hidden="true"></i><span>Topo</span>
             </button>
         </div>
     </div>
