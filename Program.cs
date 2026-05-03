@@ -153,7 +153,8 @@ app.UseStaticFiles(new StaticFileOptions
             headers.CacheControl = "public, max-age=31536000, immutable";
         }
         else if (path.EndsWith(".png") || path.EndsWith(".jpg") || path.EndsWith(".jpeg") ||
-                 path.EndsWith(".webp") || path.EndsWith(".svg") || path.EndsWith(".ico"))
+                 path.EndsWith(".webp") || path.EndsWith(".svg") || path.EndsWith(".ico") ||
+                 path.EndsWith(".jfif") || path.EndsWith(".gif") || path.EndsWith(".avif"))
         {
             // Imagens — cache de 7 dias
             headers.CacheControl = "public, max-age=604800";

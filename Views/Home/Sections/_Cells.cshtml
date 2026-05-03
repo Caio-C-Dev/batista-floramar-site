@@ -35,8 +35,6 @@
                 <div id="miniMapaCelulas" class="cells-mini-map"></div>
             </div>
 
-            <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-            <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
             <script>
             (function () {
                 var celulasData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(celulasComMapa.Select(c => new {
@@ -48,6 +46,20 @@
                     lat = c.Latitude!.Value,
                     lng = c.Longitude!.Value
                 })));
+
+                var leafletLoaded = false;
+                function carregarLeaflet(cb) {
+                    if (leafletLoaded) { cb(); return; }
+                    leafletLoaded = true;
+                    var css = document.createElement('link');
+                    css.rel = 'stylesheet';
+                    css.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+                    document.head.appendChild(css);
+                    var js = document.createElement('script');
+                    js.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+                    js.onload = cb;
+                    document.head.appendChild(js);
+                }
 
                 function initMiniMapa() {
                     if (!document.getElementById('miniMapaCelulas') || typeof L === 'undefined') {
@@ -91,10 +103,17 @@
                     }
                 }
 
-                if (document.readyState === 'loading') {
-                    document.addEventListener('DOMContentLoaded', initMiniMapa);
-                } else {
-                    initMiniMapa();
+                var mapEl = document.getElementById('miniMapaCelulas');
+                if (mapEl && 'IntersectionObserver' in window) {
+                    var obs = new IntersectionObserver(function(entries, o) {
+                        if (entries[0].isIntersecting) {
+                            o.disconnect();
+                            carregarLeaflet(initMiniMapa);
+                        }
+                    }, { rootMargin: '200px' });
+                    obs.observe(mapEl);
+                } else if (mapEl) {
+                    carregarLeaflet(initMiniMapa);
                 }
             })();
             </script>
