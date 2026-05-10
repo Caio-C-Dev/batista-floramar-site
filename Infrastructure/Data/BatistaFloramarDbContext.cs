@@ -28,6 +28,9 @@ namespace BatistaFloramar.Infrastructure.Data
         public DbSet<Integrante> Integrantes => Set<Integrante>();
         public DbSet<Presenca> Presencas => Set<Presenca>();
         public DbSet<PresencaDetalhe> PresencasDetalhes => Set<PresencaDetalhe>();
+        public DbSet<AulaBatismo> AulasBatismo => Set<AulaBatismo>();
+        public DbSet<PresencaAulaBatismo> PresencasAulaBatismo => Set<PresencaAulaBatismo>();
+        public DbSet<BatizadoHistorico> BatizadosHistorico => Set<BatizadoHistorico>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -237,6 +240,36 @@ namespace BatistaFloramar.Infrastructure.Data
                  .WithMany(x => x.Detalhes)
                  .HasForeignKey(x => x.IntegranteId)
                  .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            modelBuilder.Entity<AulaBatismo>(e =>
+            {
+                e.ToTable("AulasBatismo");
+                e.HasKey(x => x.Id);
+                e.Property(x => x.Titulo).HasMaxLength(200).IsRequired();
+                e.Property(x => x.ProfessorNome).HasMaxLength(150).IsRequired();
+                e.Property(x => x.Observacoes).HasMaxLength(1000);
+            });
+
+            modelBuilder.Entity<PresencaAulaBatismo>(e =>
+            {
+                e.ToTable("PresencasAulaBatismo");
+                e.HasKey(x => x.Id);
+                e.Property(x => x.NomePessoa).HasMaxLength(150).IsRequired();
+                e.Property(x => x.Observacao).HasMaxLength(500);
+                e.HasOne(x => x.Aula)
+                 .WithMany(x => x.Presencas)
+                 .HasForeignKey(x => x.AulaBatismoId)
+                 .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            modelBuilder.Entity<BatizadoHistorico>(e =>
+            {
+                e.ToTable("BatizadosHistorico");
+                e.HasKey(x => x.Id);
+                e.Property(x => x.Nome).HasMaxLength(150).IsRequired();
+                e.Property(x => x.WhatsApp).HasMaxLength(30);
+                e.Property(x => x.Observacoes).HasMaxLength(500);
             });
         }
     }

@@ -22,13 +22,25 @@ namespace BatistaFloramar.Infrastructure.Data
 
         private static async Task SeedCredenciaisAsync(BatistaFloramarDbContext db)
         {
-            if (await db.AdminCredenciais.AnyAsync()) return;
-
-            db.AdminCredenciais.Add(new AdminCredencial
+            if (!await db.AdminCredenciais.AnyAsync(c => c.Usuario == "pastor"))
             {
-                Usuario = "pastor",
-                SenhaHash = BCrypt.Net.BCrypt.HashPassword("Floramar@2026")
-            });
+                db.AdminCredenciais.Add(new AdminCredencial
+                {
+                    Usuario = "pastor",
+                    SenhaHash = BCrypt.Net.BCrypt.HashPassword("Floramar@2026")
+                });
+            }
+
+            if (!await db.AdminCredenciais.AnyAsync(c => c.Usuario == "BatismoFloramar"))
+            {
+                db.AdminCredenciais.Add(new AdminCredencial
+                {
+                    Usuario = "BatismoFloramar",
+                    SenhaHash = BCrypt.Net.BCrypt.HashPassword("Ibf@2026"),
+                    Role = "Batismo"
+                });
+            }
+
             await db.SaveChangesAsync();
         }
 

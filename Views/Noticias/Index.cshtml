@@ -1,46 +1,136 @@
 @{
-    ViewBag.Title = "Notícias";
+    ViewBag.Title = "Notícias | Comunidade Batista Floramar BH";
     Layout = "_Layout";
+    ViewBag.FullWidth = true;
 }
+<style>
+    .noticias-hero {
+        background: radial-gradient(ellipse at top, var(--bg-tertiary) 0%, var(--bg-primary) 60%);
+        padding: 5.5rem 0 4rem;
+        text-align: center;
+        border-bottom: 1px solid var(--brand-gold-border);
+        position: relative;
+        overflow: hidden;
+    }
+    .noticias-hero::before {
+        content: '';
+        position: absolute; inset: 0;
+        background: radial-gradient(ellipse 60% 50% at 50% 100%, var(--brand-gold-light) 0%, transparent 70%);
+    }
+    .noticias-hero h1 { font-size: clamp(2rem,5vw,3.2rem); font-weight: 800; color: var(--text-primary); margin-bottom: 1rem; position: relative; }
+    .noticias-hero .section-eyebrow { position: relative; }
+    .noticias-hero p { color: var(--text-secondary); max-width: 620px; margin: 0 auto; font-size: 1.1rem; position: relative; }
 
-<div class="page-card">
-    <div class="page-header">
+    .noticias-section { padding: 4.5rem 0; }
+
+    .noticia-card {
+        background: var(--bg-tertiary);
+        border: 1px solid rgba(255,255,255,.07);
+        border-radius: calc(var(--radius) * 1.5);
+        padding: 2rem;
+        height: 100%;
+        position: relative;
+        overflow: hidden;
+        transition: transform var(--transition-smooth), box-shadow var(--transition-smooth), border-color var(--transition-smooth);
+    }
+    .noticia-card::before {
+        content: '';
+        position: absolute; inset: 0;
+        background: linear-gradient(-30deg, hsla(0,0%,0%,0) 60%, rgba(255,255,255,0.25) 70%, hsla(0,0%,0%,0) 80%);
+        background-size: 300% 300%;
+        background-repeat: no-repeat;
+        background-position: -100% -100%;
+        transition: 800ms ease;
+        pointer-events: none; z-index: 1;
+    }
+    .noticia-card:hover::before { background-position: 100% 100%; }
+    .noticia-card > * { position: relative; z-index: 2; }
+    .noticia-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-hover); border-color: var(--brand-gold-border); }
+
+    .noticia-icon {
+        width: 52px; height: 52px; margin-bottom: 1.25rem;
+        background: var(--brand-gold-light); border: 1px solid var(--brand-gold-border);
+        border-radius: 50%; display: flex; align-items: center; justify-content: center;
+        font-size: 1.3rem; color: var(--brand-gold);
+    }
+    .noticia-card h3 { color: var(--text-primary); font-weight: 700; font-size: 1.1rem; margin-bottom: .5rem; }
+    .noticia-card p { color: var(--text-secondary); font-size: .95rem; }
+    .noticia-date { color: var(--text-secondary); font-size: .82rem; }
+    .noticia-date i { color: var(--brand-gold); }
+
+    .cta-block {
+        background: var(--bg-secondary);
+        border-top: 1px solid var(--brand-gold-border);
+        padding: 5rem 0;
+        text-align: center;
+    }
+    .cta-block h2 { color: var(--text-primary); font-weight: 700; font-size: clamp(1.5rem,3vw,2rem); margin-bottom: .75rem; }
+    .cta-block p { color: var(--text-secondary); max-width: 540px; margin: 0 auto 2rem; }
+</style>
+
+<!-- Hero -->
+<div class="noticias-hero">
+    <div class="container">
         <span class="section-eyebrow">Acontecimentos da Igreja</span>
-        <h1 class="page-title">Notícias & Eventos</h1>
-        <p class="page-subtitle">
-            Confira os últimos encontros, celebrações e ações comunitárias da Comunidade Batista Floramar.
-        </p>
+        <h1>Notícias &amp; Eventos</h1>
+        <p>Confira os últimos encontros, celebrações e ações comunitárias da Comunidade Batista Floramar.</p>
     </div>
+</div>
 
-    <div class="row row-cols-1 row-cols-md-2 g-4 mt-2">
-        <div class="col">
-            <div class="section-card h-100">
-                <h3><i class="fas fa-church me-2 text-gold"></i>Culto de Celebração</h3>
-                <p class="text-secondary">Uma noite de louvor, oração e mensagem transformadora.</p>
-                <p class="text-secondary small"><i class="fas fa-calendar me-1"></i> 25 de março de 2026</p>
+<!-- Notícias -->
+<div class="noticias-section">
+    <div class="container">
+        <div class="row row-cols-1 row-cols-md-2 g-4">
+            <div class="col">
+                <div class="noticia-card scroll-reveal delay-1">
+                    <div class="noticia-icon"><i class="fas fa-church"></i></div>
+                    <h3>Culto de Celebração</h3>
+                    <p>Uma noite de louvor, oração e mensagem transformadora.</p>
+                    <p class="noticia-date mb-0"><i class="fas fa-calendar me-1"></i> 25 de março de 2026</p>
+                </div>
             </div>
-        </div>
-        <div class="col">
-            <div class="section-card h-100">
-                <h3><i class="fas fa-box-open me-2 text-gold"></i>Campanha Solidária</h3>
-                <p class="text-secondary">Distribuição de cestas e apoio a famílias da região do Floramar.</p>
-                <p class="text-secondary small"><i class="fas fa-calendar me-1"></i> 10 de março de 2026</p>
+            <div class="col">
+                <div class="noticia-card scroll-reveal delay-2">
+                    <div class="noticia-icon"><i class="fas fa-box-open"></i></div>
+                    <h3>Campanha Solidária</h3>
+                    <p>Distribuição de cestas e apoio a famílias da região do Floramar.</p>
+                    <p class="noticia-date mb-0"><i class="fas fa-calendar me-1"></i> 10 de março de 2026</p>
+                </div>
             </div>
-        </div>
-        <div class="col">
-            <div class="section-card h-100">
-                <h3><i class="fas fa-mountain me-2 text-gold"></i>Retiro Espiritual</h3>
-                <p class="text-secondary">Momentos de oração e renovação em meio à natureza.</p>
-                <p class="text-secondary small"><i class="fas fa-calendar me-1"></i> 5 de fevereiro de 2026</p>
+            <div class="col">
+                <div class="noticia-card scroll-reveal delay-3">
+                    <div class="noticia-icon"><i class="fas fa-mountain"></i></div>
+                    <h3>Retiro Espiritual</h3>
+                    <p>Momentos de oração e renovação em meio à natureza.</p>
+                    <p class="noticia-date mb-0"><i class="fas fa-calendar me-1"></i> 5 de fevereiro de 2026</p>
+                </div>
             </div>
-        </div>
-        <div class="col">
-            <div class="section-card h-100">
-                <h3><i class="fas fa-praying-hands me-2 text-gold"></i>Semana da Oração</h3>
-                <p class="text-secondary">Dias dedicados à comunhão e fortalecimento espiritual da congregação.</p>
-                <p class="text-secondary small"><i class="fas fa-calendar me-1"></i> 20 de janeiro de 2026</p>
+            <div class="col">
+                <div class="noticia-card scroll-reveal delay-4">
+                    <div class="noticia-icon"><i class="fas fa-praying-hands"></i></div>
+                    <h3>Semana da Oração</h3>
+                    <p>Dias dedicados à comunhão e fortalecimento espiritual da congregação.</p>
+                    <p class="noticia-date mb-0"><i class="fas fa-calendar me-1"></i> 20 de janeiro de 2026</p>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
+<!-- CTA -->
+<div class="cta-block">
+    <div class="container">
+        <h2>Fique por dentro de tudo</h2>
+        <p>Acompanhe a Comunidade Batista Floramar nas redes sociais e não perca nenhum evento.</p>
+        <div class="d-flex flex-wrap justify-content-center gap-3">
+            <a href="https://www.instagram.com/comunidadebatistafloramar"
+               target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-lg">
+                <i class="fab fa-instagram me-2"></i> Instagram
+            </a>
+            <a href="https://www.youtube.com/@@comunidadebatistafloramar"
+               target="_blank" rel="noopener noreferrer" class="btn btn-outline-hero btn-lg">
+                <i class="fab fa-youtube me-2"></i> YouTube
+            </a>
+        </div>
+    </div>
+</div>

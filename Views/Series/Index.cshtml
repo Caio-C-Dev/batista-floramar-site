@@ -1,71 +1,154 @@
 @model List<BatistaFloramar.Domain.Entities.SerieMensagem>
 @{
-    ViewBag.Title = "Séries de Mensagens";
+    ViewBag.Title = "Séries de Mensagens | Comunidade Batista Floramar BH";
     Layout = "_Layout";
+    ViewBag.FullWidth = true;
 }
-
-<div class="page-card">
-    <div class="page-header">
-        <span class="section-eyebrow">Ensino Expositivo</span>
-        <h1 class="page-title">Séries de Mensagens</h1>
-        <p class="page-subtitle">
-            Explore as séries de mensagens pregadas na Comunidade Batista Floramar. Clique em uma série para assistir no YouTube.
-        </p>
-    </div>
-
-    @if (Model == null || !Model.Any())
-    {
-        <div class="section-card mt-4 text-center py-5">
-            <i class="fab fa-youtube text-gold" style="font-size:2.5rem;margin-bottom:1rem;display:block;"></i>
-            <p class="text-secondary">Nenhuma série disponível ainda. Volte em breve!</p>
-        </div>
+<style>
+    .series-hero {
+        background: radial-gradient(ellipse at top, var(--bg-tertiary) 0%, var(--bg-primary) 60%);
+        padding: 5.5rem 0 4rem;
+        text-align: center;
+        border-bottom: 1px solid var(--brand-gold-border);
+        position: relative;
+        overflow: hidden;
     }
-    else
-    {
-        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mt-2">
-            @foreach (var s in Model)
-            {
-                <div class="col">
-                    <a href="@Url.Action("Detalhe", "Series", new { id = s.Slug })"
-                       class="text-decoration-none">
-                        <div class="section-card h-100 p-0 overflow-hidden"
-                             style="transition:transform .25s,box-shadow .25s;cursor:pointer;"
-                             onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 12px 30px rgba(0,0,0,.5)'"
-                             onmouseout="this.style.transform='';this.style.boxShadow=''">
-                            <div style="position:relative;height:190px;overflow:hidden;background:#0d1b3e;">
+    .series-hero::before {
+        content: '';
+        position: absolute; inset: 0;
+        background: radial-gradient(ellipse 60% 50% at 50% 100%, var(--brand-gold-light) 0%, transparent 70%);
+    }
+    .series-hero h1 { font-size: clamp(2rem,5vw,3.2rem); font-weight: 800; color: var(--text-primary); margin-bottom: 1rem; position: relative; }
+    .series-hero .section-eyebrow { position: relative; }
+    .series-hero p { color: var(--text-secondary); max-width: 620px; margin: 0 auto; font-size: 1.1rem; position: relative; }
+
+    .series-section { padding: 4.5rem 0; }
+
+    .serie-card {
+        background: var(--bg-tertiary);
+        border: 1px solid rgba(255,255,255,.07);
+        border-radius: calc(var(--radius) * 1.5);
+        overflow: hidden;
+        height: 100%;
+        transition: transform var(--transition-smooth), box-shadow var(--transition-smooth), border-color var(--transition-smooth);
+        text-decoration: none;
+        display: block;
+    }
+    .serie-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-hover); border-color: var(--brand-gold-border); }
+
+    .serie-cover {
+        position: relative;
+        height: 190px;
+        overflow: hidden;
+        background: var(--bg-primary);
+    }
+    .serie-cover img {
+        width: 100%; height: 100%;
+        object-fit: cover; display: block;
+        transition: transform var(--transition-smooth);
+    }
+    .serie-card:hover .serie-cover img { transform: scale(1.04); }
+    .serie-cover-placeholder {
+        height: 100%;
+        display: flex; align-items: center; justify-content: center;
+    }
+    .serie-cover-placeholder i { font-size: 4rem; color: #ff4444; opacity: .65; }
+    .serie-yt-badge {
+        position: absolute; bottom: 0; left: 0; right: 0;
+        padding: .5rem .75rem;
+        background: linear-gradient(transparent, rgba(0,0,0,.75));
+    }
+    .serie-yt-badge span {
+        background: #ff0000; color: #fff;
+        font-size: .7rem; font-weight: 700;
+        padding: .15rem .45rem; border-radius: 3px;
+    }
+    .serie-body { padding: 1rem 1.1rem 1.25rem; }
+    .serie-body h3 { color: var(--text-primary); font-size: 1rem; font-weight: 700; margin: 0 0 .5rem; line-height: 1.3; }
+    .serie-body p { color: var(--text-secondary); font-size: .85rem; margin: 0 0 .6rem; line-height: 1.5;
+        display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .serie-link { color: var(--brand-gold); font-size: .8rem; }
+
+    .cta-block {
+        background: var(--bg-secondary);
+        border-top: 1px solid var(--brand-gold-border);
+        padding: 5rem 0;
+        text-align: center;
+    }
+    .cta-block h2 { color: var(--text-primary); font-weight: 700; font-size: clamp(1.5rem,3vw,2rem); margin-bottom: .75rem; }
+    .cta-block p { color: var(--text-secondary); max-width: 540px; margin: 0 auto 2rem; }
+</style>
+
+<!-- Hero -->
+<div class="series-hero">
+    <div class="container">
+        <span class="section-eyebrow">Ensino Expositivo</span>
+        <h1>Séries de Mensagens</h1>
+        <p>Explore as séries de mensagens pregadas na Comunidade Batista Floramar. Clique em uma série para assistir no YouTube.</p>
+    </div>
+</div>
+
+<!-- Grid de séries -->
+<div class="series-section">
+    <div class="container">
+        @if (Model == null || !Model.Any())
+        {
+            <div class="text-center py-5 scroll-reveal">
+                <div class="about-pillar-icon-lg mx-auto mb-3"><i class="fab fa-youtube"></i></div>
+                <p class="text-secondary">Nenhuma série disponível ainda. Volte em breve!</p>
+            </div>
+        }
+        else
+        {
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                @foreach (var s in Model)
+                {
+                    <div class="col scroll-reveal">
+                        <a href="@Url.Action("Detalhe", "Series", new { id = s.Slug })" class="serie-card">
+                            <div class="serie-cover">
                                 @if (!string.IsNullOrEmpty(s.ImagemCapa))
                                 {
-                                    <img src="@s.ImagemCapa" alt="@s.Nome"
-                                         style="width:100%;height:100%;object-fit:cover;display:block;transition:transform .35s;"
-                                         onmouseover="this.style.transform='scale(1.04)'"
-                                         onmouseout="this.style.transform=''" />
+                                    <img src="@s.ImagemCapa" alt="@s.Nome" loading="lazy" />
                                 }
                                 else
                                 {
-                                    <div style="height:100%;display:flex;align-items:center;justify-content:center;">
-                                        <i class="fab fa-youtube" style="font-size:4rem;color:#ff4444;opacity:.7;"></i>
+                                    <div class="serie-cover-placeholder">
+                                        <i class="fab fa-youtube"></i>
                                     </div>
                                 }
-                                <div style="position:absolute;bottom:0;left:0;right:0;padding:.5rem .75rem;background:linear-gradient(transparent,rgba(0,0,0,.75));">
-                                    <span style="background:#ff0000;color:#fff;font-size:.7rem;font-weight:700;padding:.15rem .45rem;border-radius:3px;">
-                                        <i class="fab fa-youtube me-1"></i>YouTube
-                                    </span>
+                                <div class="serie-yt-badge">
+                                    <span><i class="fab fa-youtube me-1"></i>YouTube</span>
                                 </div>
                             </div>
-                            <div style="padding:1rem 1.1rem 1.2rem;">
-                                <h3 style="color:#fff;font-size:1rem;font-weight:700;margin:0 0 .5rem;line-height:1.3;">@s.Nome</h3>
+                            <div class="serie-body">
+                                <h3>@s.Nome</h3>
                                 @if (!string.IsNullOrEmpty(s.Descricao))
                                 {
-                                    <p style="color:#a0b0c8;font-size:.85rem;margin:0;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">@s.Descricao</p>
+                                    <p>@s.Descricao</p>
                                 }
-                                <p style="color:#d4af37;font-size:.8rem;margin:.6rem 0 0;">
-                                    <i class="fas fa-external-link-alt me-1"></i> Ver série completa no YouTube
-                                </p>
+                                <p class="serie-link mb-0"><i class="fas fa-external-link-alt me-1"></i> Ver série completa no YouTube</p>
                             </div>
-                        </div>
-                    </a>
-                </div>
-            }
+                        </a>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+<!-- CTA -->
+<div class="cta-block">
+    <div class="container">
+        <h2>Quer receber as mensagens em primeira mão?</h2>
+        <p>Inscreva-se no canal oficial do YouTube e acompanhe ao vivo ou assista quando quiser.</p>
+        <div class="d-flex flex-wrap justify-content-center gap-3">
+            <a href="https://www.youtube.com/@@comunidadebatistafloramar"
+               target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-lg">
+                <i class="fab fa-youtube me-2"></i> Acessar o Canal
+            </a>
+            <a href="/Cultos" class="btn btn-outline-hero btn-lg">
+                <i class="fas fa-church me-2"></i> Ver Cultos
+            </a>
         </div>
-    }
+    </div>
 </div>

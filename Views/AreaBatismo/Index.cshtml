@@ -1,0 +1,107 @@
+@model IEnumerable<BatistaFloramar.Domain.Entities.AulaBatismo>
+@{
+    Layout = "~/Views/Shared/_BatismoAreaLayout.cshtml";
+    var aulasFaltando = ViewBag.AulasFaltando as List<int> ?? new List<int>();
+    var proximaAula = ViewBag.ProximaAula as int?;
+}
+
+<div class="row g-3 mb-4">
+    <div class="col-sm-6 col-lg-3">
+        <div class="admin-card" style="padding: 1.25rem 1.5rem;">
+            <div style="font-size:.8rem;color:var(--admin-text-muted);margin-bottom:.4rem;">Aulas realizadas</div>
+            <div style="font-size:2rem;font-weight:700;color:var(--admin-accent);">@ViewBag.TotalAulas</div>
+            <div style="font-size:.78rem;color:var(--admin-text-muted);">de @ViewBag.TotalAulasEsperadas previstas</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+        <div class="admin-card" style="padding: 1.25rem 1.5rem;">
+            <div style="font-size:.8rem;color:var(--admin-text-muted);margin-bottom:.4rem;">Aulas faltando</div>
+            <div style="font-size:2rem;font-weight:700;color:@(aulasFaltando.Any() ? "#d4af37" : "#5d8");">@aulasFaltando.Count</div>
+            @if (proximaAula.HasValue)
+            {
+                <div style="font-size:.78rem;color:#d4af37;">Próxima: Aula @proximaAula</div>
+            }
+            else
+            {
+                <div style="font-size:.78rem;color:#5d8;">Completo!</div>
+            }
+        </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+        <div class="admin-card" style="padding: 1.25rem 1.5rem;">
+            <div style="font-size:.8rem;color:var(--admin-text-muted);margin-bottom:.4rem;">Batizados registrados</div>
+            <div style="font-size:2rem;font-weight:700;color:var(--admin-accent);">@ViewBag.TotalBatizados</div>
+            <div style="font-size:.78rem;color:var(--admin-text-muted);">no histórico</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+        <div class="admin-card" style="padding: 1.25rem 1.5rem; display:flex; flex-direction:column; justify-content:center; gap:.5rem;">
+            <a href="@Url.Action("NovaAula", "AreaBatismo")" class="btn-admin" style="font-size:.85rem;">
+                <i class="fas fa-plus"></i> Nova Aula
+            </a>
+            <a href="@Url.Action("NovoBatizado", "AreaBatismo")" class="btn-admin-outline" style="font-size:.85rem;">
+                <i class="fas fa-user-plus"></i> Novo Batizado
+            </a>
+        </div>
+    </div>
+</div>
+
+@if (aulasFaltando.Any())
+{
+    <div class="admin-card mb-4">
+        <h3 style="font-size:1rem;margin-bottom:1rem;color:var(--admin-text-muted);"><i class="fas fa-exclamation-circle me-2" style="color:#d4af37;"></i>Aulas ainda não realizadas</h3>
+        <div class="d-flex flex-wrap gap-2">
+            @foreach (var n in aulasFaltando)
+            {
+                <span class="badge-admin" style="background:#4a3010;color:#d4af37;font-size:.9rem;padding:.4rem .8rem;">
+                    Aula @n
+                </span>
+            }
+        </div>
+    </div>
+}
+
+<div class="admin-card">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3 style="font-size:1rem;margin:0;">Aulas realizadas</h3>
+        <a href="@Url.Action("Aulas", "AreaBatismo")" class="btn-admin-outline" style="font-size:.82rem;">Ver todas</a>
+    </div>
+    @if (!Model.Any())
+    {
+        <div class="empty-state">
+            <i class="fas fa-book-open"></i>
+            <p>Nenhuma aula registrada ainda.</p>
+            <a href="@Url.Action("NovaAula", "AreaBatismo")" class="btn-admin"><i class="fas fa-plus me-1"></i>Registrar primeira aula</a>
+        </div>
+    }
+    else
+    {
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th style="width:60px;">Nº</th>
+                    <th>Título</th>
+                    <th>Professor</th>
+                    <th>Data</th>
+                    <th style="width:80px;text-align:center;">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var a in Model.Take(5))
+                {
+                    <tr>
+                        <td><span class="badge-admin" style="background:#1a2a4a;color:#7ab;">@a.NumeroAula</span></td>
+                        <td><strong>@a.Titulo</strong></td>
+                        <td style="font-size:.87rem;">@a.ProfessorNome</td>
+                        <td style="font-size:.85rem;white-space:nowrap;">@a.DataAula.ToString("dd/MM/yyyy")</td>
+                        <td>
+                            <a href="@Url.Action("DetalhesAula", "AreaBatismo", new { id = a.Id })" class="btn-admin-sm" title="Ver detalhes">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>

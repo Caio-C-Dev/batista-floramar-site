@@ -1,5 +1,7 @@
 @{
     Layout = "_Layout";
+    ViewBag.Title = "Cultos | Comunidade Batista Floramar BH";
+    ViewBag.FullWidth = true;
 }
 
 <script type="application/ld+json">
@@ -86,93 +88,246 @@
   ]
 }
 </script>
+<style>
+    .cultos-hero {
+        background: radial-gradient(ellipse at top, var(--bg-tertiary) 0%, var(--bg-primary) 60%);
+        padding: 5.5rem 0 4rem;
+        text-align: center;
+        border-bottom: 1px solid var(--brand-gold-border);
+        position: relative;
+        overflow: hidden;
+    }
+    .cultos-hero::before {
+        content: '';
+        position: absolute; inset: 0;
+        background: radial-gradient(ellipse 60% 50% at 50% 100%, var(--brand-gold-light) 0%, transparent 70%);
+    }
+    .cultos-hero h1 { font-size: clamp(2rem,5vw,3.2rem); font-weight: 800; color: var(--text-primary); margin-bottom: 1rem; position: relative; }
+    .cultos-hero .section-eyebrow { position: relative; }
+    .cultos-hero p { color: var(--text-secondary); max-width: 620px; margin: 0 auto; font-size: 1.1rem; position: relative; }
 
-<div class="page-card">
-    <div class="page-header">
-        <span class="section-eyebrow">Horários & Encontros</span>
-        <h1 class="page-title">Venha adorar conosco</h1>
-        <p class="page-subtitle">
-            Confira os cultos semanais e venha participar ao vivo ou acompanhe pelo YouTube.
-        </p>
+    .cultos-section { padding: 4.5rem 0; }
+    .cultos-section.alt { background: var(--bg-secondary); }
+
+    .culto-card {
+        background: var(--bg-tertiary);
+        border: 1px solid rgba(255,255,255,.07);
+        border-radius: calc(var(--radius) * 1.5);
+        padding: 2rem;
+        text-align: center;
+        height: 100%;
+        position: relative;
+        overflow: hidden;
+        transition: transform var(--transition-smooth), box-shadow var(--transition-smooth), border-color var(--transition-smooth);
+    }
+    .culto-card::before {
+        content: '';
+        position: absolute; inset: 0;
+        background: linear-gradient(-30deg, hsla(0,0%,0%,0) 60%, rgba(255,255,255,0.25) 70%, hsla(0,0%,0%,0) 80%);
+        background-size: 300% 300%;
+        background-repeat: no-repeat;
+        background-position: -100% -100%;
+        transition: 800ms ease;
+        pointer-events: none; z-index: 1;
+    }
+    .culto-card:hover::before { background-position: 100% 100%; }
+    .culto-card > * { position: relative; z-index: 2; }
+    .culto-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-hover); border-color: var(--brand-gold-border); }
+
+    .culto-icon {
+        width: 66px; height: 66px; margin: 0 auto 1rem;
+        background: var(--brand-gold-light); border: 1px solid var(--brand-gold-border);
+        border-radius: 50%; display: flex; align-items: center; justify-content: center;
+        font-size: 1.6rem; color: var(--brand-gold);
+    }
+    .culto-card h3 { color: var(--text-primary); font-weight: 700; font-size: 1.15rem; margin-bottom: .25rem; }
+    .culto-time { color: var(--brand-gold); font-size: 1.75rem; font-weight: 800; margin: .25rem 0 .75rem; line-height: 1; }
+    .culto-badge {
+        position: absolute; top: 12px; right: 12px;
+        background: #16a34a; color: #fff;
+        font-size: .7rem; font-weight: 700;
+        padding: .25rem .55rem; border-radius: 6px; letter-spacing: .04em;
+        z-index: 3;
+    }
+    .libras-note { color: var(--text-secondary); font-size: .82rem; margin-bottom: .25rem; }
+    .libras-note i { color: #16a34a; }
+
+    .quote-wrap {
+        background: var(--bg-tertiary);
+        border-radius: calc(var(--radius) * 1.5);
+        overflow: hidden;
+        border: 1px solid rgba(255,255,255,.07);
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    .quote-wrap img { width: 100%; max-height: 420px; object-fit: contain; background: #111; display: block; }
+    .quote-body {
+        padding: 2rem;
+        text-align: center;
+        background: rgba(0,0,0,0.6);
+    }
+    .quote-body blockquote { margin: 0; }
+    .quote-body .quote-text { font-size: 1.25rem; font-weight: 700; color: var(--text-primary); }
+    .quote-body cite { display: block; margin-top: .5rem; }
+
+    .info-card {
+        background: var(--bg-tertiary);
+        border: 1px solid rgba(255,255,255,.07);
+        border-radius: calc(var(--radius) * 1.5);
+        padding: 2rem;
+        height: 100%;
+        transition: border-color var(--transition-smooth);
+    }
+    .info-card:hover { border-color: var(--brand-gold-border); }
+    .info-card h3 { color: var(--text-primary); font-weight: 700; margin-bottom: .75rem; }
+
+    .infantil-box {
+        background: var(--brand-gold-light);
+        border: 1px solid var(--brand-gold-border);
+        border-radius: calc(var(--radius) * 1.5);
+        padding: 3rem 2rem;
+        text-align: center;
+        max-width: 700px;
+        margin: 0 auto;
+    }
+    .infantil-box i { font-size: 2.5rem; color: var(--brand-gold); margin-bottom: 1rem; display: block; }
+    .infantil-box h3 { color: var(--text-primary); font-weight: 700; margin-bottom: .75rem; }
+    .infantil-box p { color: var(--text-secondary); margin: 0; }
+
+    .cta-block {
+        background: var(--bg-secondary);
+        border-top: 1px solid var(--brand-gold-border);
+        padding: 5rem 0;
+        text-align: center;
+    }
+    .cta-block h2 { color: var(--text-primary); font-weight: 700; font-size: clamp(1.5rem,3vw,2rem); margin-bottom: .75rem; }
+    .cta-block p { color: var(--text-secondary); max-width: 540px; margin: 0 auto 2rem; }
+</style>
+
+<!-- Hero -->
+<div class="cultos-hero">
+    <div class="container">
+        <span class="section-eyebrow">Horários &amp; Encontros</span>
+        <h1>Venha adorar conosco</h1>
+        <p>Confira os cultos semanais e venha participar ao vivo ou acompanhe pelo YouTube.</p>
     </div>
+</div>
 
-    <div class="row row-cols-1 row-cols-md-3 g-4 mt-2">
-        <div class="col">
-            <div class="section-card h-100 text-center">
-                <div class="about-pillar-icon-lg"><i class="fas fa-sun"></i></div>
-                <h3>Domingo — Manhã</h3>
-                <p class="service-hour">10h00</p>
-                <p class="text-secondary">Culto de adoração e aprofundamento na pregação expositiva.</p>
-                <p class="text-secondary small mb-2"><i class="fas fa-user me-1 text-gold"></i>Pr. Rodrigo N. Ferreira</p>
-                <span class="service-pill mt-2 d-inline-block">Domingo</span>
-            </div>
+<!-- Cultos -->
+<div class="cultos-section">
+    <div class="container">
+        <div class="text-center mb-5 scroll-reveal">
+            <span class="section-eyebrow">Quando nos reunimos</span>
+            <h2 class="section-heading">Nossos Cultos Semanais</h2>
         </div>
-        <div class="col">
-            <div class="section-card h-100 text-center" style="position:relative;">
-                <span style="position:absolute;top:12px;right:12px;background:#16a34a;color:#fff;font-size:.7rem;font-weight:700;padding:.25rem .55rem;border-radius:6px;letter-spacing:.04em;">LIBRAS</span>
-                <div class="about-pillar-icon-lg"><i class="fas fa-moon"></i></div>
-                <h3>Domingo — Noite</h3>
-                <p class="service-hour">18h00</p>
-                <p class="text-secondary">Culto de adoração e aprofundamento na pregação expositiva.</p>
-                <p class="text-secondary small"><em>com intérprete de libras presencial</em></p>
-                <p class="text-secondary small mb-2"><i class="fas fa-user me-1 text-gold"></i>Pr. Rodrigo N. Ferreira</p>
-                <span class="service-pill mt-2 d-inline-block">Domingo</span>
-                <p class="text-secondary small mt-2 mb-0"><i class="fas fa-hands me-1" style="color:#16a34a;"></i>Intérprete de Libras presente</p>
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            <div class="col">
+                <div class="culto-card scroll-reveal delay-1">
+                    <div class="culto-icon"><i class="fas fa-sun"></i></div>
+                    <h3>Domingo — Manhã</h3>
+                    <p class="culto-time">10h00</p>
+                    <p class="text-secondary">Culto de adoração e aprofundamento na pregação expositiva.</p>
+                    <p class="text-secondary small mb-2"><i class="fas fa-user me-1 text-gold"></i>Pr. Rodrigo N. Ferreira</p>
+                    <span class="service-pill d-inline-block">Domingo</span>
+                </div>
             </div>
-        </div>
-        <div class="col">
-            <div class="section-card h-100 text-center">
-                <div class="about-pillar-icon-lg"><i class="fas fa-users"></i></div>
-                <h3>Quarta — Família</h3>
-                <p class="service-hour">20h00</p>
-                <p class="text-secondary">Culto de oração em família e pregação temática das Escrituras.</p>
-                <p class="text-secondary small mb-2"><i class="fas fa-user me-1 text-gold"></i>Pr. Delmo Gonçalves e Pra. Dinéia</p>
-                <span class="service-pill mt-2 d-inline-block">Quarta-feira</span>
+            <div class="col">
+                <div class="culto-card scroll-reveal delay-2">
+                    <span class="culto-badge">LIBRAS</span>
+                    <div class="culto-icon"><i class="fas fa-moon"></i></div>
+                    <h3>Domingo — Noite</h3>
+                    <p class="culto-time">18h00</p>
+                    <p class="text-secondary">Culto de adoração e aprofundamento na pregação expositiva.</p>
+                    <p class="libras-note"><em>com intérprete de libras presencial</em></p>
+                    <p class="text-secondary small mb-2"><i class="fas fa-user me-1 text-gold"></i>Pr. Rodrigo N. Ferreira</p>
+                    <span class="service-pill d-inline-block">Domingo</span>
+                    <p class="libras-note mt-2 mb-0"><i class="fas fa-hands me-1"></i>Intérprete de Libras presente</p>
+                </div>
+            </div>
+            <div class="col">
+                <div class="culto-card scroll-reveal delay-3">
+                    <div class="culto-icon"><i class="fas fa-users"></i></div>
+                    <h3>Quarta — Família</h3>
+                    <p class="culto-time">20h00</p>
+                    <p class="text-secondary">Culto de oração em família e pregação temática das Escrituras.</p>
+                    <p class="text-secondary small mb-2"><i class="fas fa-user me-1 text-gold"></i>Pr. Delmo Gonçalves e Pra. Dinéia</p>
+                    <span class="service-pill d-inline-block">Quarta-feira</span>
+                </div>
             </div>
         </div>
     </div>
+</div>
 
-    <div class="section-card mt-4 p-0 overflow-hidden">
-        <div class="position-relative text-center" style="background:#111;">
-            <img src="~/images/MelhorSemana.jpeg" alt="Venha viver a melhor semana da sua vida na Comunidade Batista Floramar, Belo Horizonte" class="img-fluid" loading="lazy" style="max-height:400px;max-width:100%;object-fit:contain;display:block;margin:0 auto;" />
-            <div class="p-3" style="background:rgba(0,0,0,0.75);">
-                <blockquote class="mb-0 text-center">
+<!-- Citação -->
+<div class="cultos-section alt">
+    <div class="container">
+        <div class="quote-wrap scroll-reveal">
+            <img src="~/images/MelhorSemana.jpeg"
+                 alt="Venha viver a melhor semana da sua vida na Comunidade Batista Floramar, Belo Horizonte"
+                 loading="lazy" />
+            <div class="quote-body">
+                <blockquote>
                     <i class="fas fa-quote-left text-gold me-2"></i>
-                    <span style="font-size:1.25rem;font-weight:700;color:#fff;">Vá viver a melhor semana da sua vida!</span>
+                    <span class="quote-text">Vá viver a melhor semana da sua vida!</span>
                     <i class="fas fa-quote-right text-gold ms-2"></i>
-                    <cite class="d-block mt-1 text-gold small">— Pr. Rodrigo N. Ferreira</cite>
+                    <cite class="text-gold small">— Pr. Rodrigo N. Ferreira</cite>
                 </blockquote>
             </div>
         </div>
     </div>
+</div>
 
-    <div class="row g-4 mt-2">
-        <div class="col-md-6">
-            <div class="section-card h-100">
-                <h3><i class="fas fa-map-marker-alt me-2 text-gold"></i>Como chegar</h3>
-                <p class="text-secondary mb-1">R. José Lima de Almeida, 59 — Jardim Guanabara</p>
-                <p class="text-secondary mb-1">Belo Horizonte — MG, CEP 31742-033</p>
-                <p class="text-secondary mt-2">Venha de transporte próprio, Uber ou ônibus. O estacionamento é nas ruas próximas.</p>
+<!-- Como chegar + YouTube -->
+<div class="cultos-section">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-md-6 scroll-reveal">
+                <div class="info-card">
+                    <h3><i class="fas fa-map-marker-alt me-2 text-gold"></i>Como chegar</h3>
+                    <p class="text-secondary mb-1">R. José Lima de Almeida, 59 — Jardim Guanabara</p>
+                    <p class="text-secondary mb-1">Belo Horizonte — MG, CEP 31742-033</p>
+                    <p class="text-secondary mt-2 mb-0">Venha de transporte próprio, Uber ou ônibus. O estacionamento é nas ruas próximas.</p>
+                </div>
             </div>
-        </div>
-        <div class="col-md-6">
-            <div class="section-card h-100">
-                <h3><i class="fab fa-youtube me-2 text-gold"></i>Ao Vivo pelo YouTube</h3>
-                <p class="text-secondary mb-3">
-                    Não pode comparecer presencialmente? Acompanhe nossos cultos ao vivo pelo canal oficial da Comunidade Batista Floramar.
-                </p>
-                <a href="https://www.youtube.com/@@comunidadebatistafloramar" target="_blank" rel="noopener noreferrer" class="btn btn-primary">
-                    <i class="fab fa-youtube me-2"></i> Acessar o Canal
-                </a>
+            <div class="col-md-6 scroll-reveal delay-1">
+                <div class="info-card">
+                    <h3><i class="fab fa-youtube me-2 text-gold"></i>Ao Vivo pelo YouTube</h3>
+                    <p class="text-secondary mb-3">
+                        Não pode comparecer presencialmente? Acompanhe nossos cultos ao vivo pelo canal oficial da Comunidade Batista Floramar.
+                    </p>
+                    <a href="https://www.youtube.com/@@comunidadebatistafloramar" target="_blank" rel="noopener noreferrer" class="btn btn-primary">
+                        <i class="fab fa-youtube me-2"></i> Acessar o Canal
+                    </a>
+                </div>
             </div>
         </div>
     </div>
+</div>
 
-    <div class="section-card mt-4">
-        <h3><i class="fas fa-child me-2 text-gold"></i>Ministério Infantil</h3>
-        <p class="text-secondary">
-            Durante todos os cultos, a igreja oferece programação especial para as crianças com professores treinados,
-            atividades Bíblicas e muito carinho. Seus filhos são bem-vindos!
-        </p>
+<!-- Ministério Infantil -->
+<div class="cultos-section alt">
+    <div class="container">
+        <div class="infantil-box scroll-reveal">
+            <i class="fas fa-child"></i>
+            <h3>Ministério Infantil</h3>
+            <p>Durante todos os cultos, a igreja oferece programação especial para as crianças com professores treinados, atividades Bíblicas e muito carinho. Seus filhos são bem-vindos!</p>
+        </div>
+    </div>
+</div>
+
+<!-- CTA -->
+<div class="cta-block">
+    <div class="container">
+        <h2>Pronto para participar?</h2>
+        <p>Escolha um culto e venha adorar conosco. Será uma honra ter você aqui.</p>
+        <div class="d-flex flex-wrap justify-content-center gap-3">
+            <a href="/Visita" class="btn btn-primary btn-lg">
+                <i class="fas fa-map-marker-alt me-2"></i> Planejar Visita
+            </a>
+            <a href="https://www.youtube.com/@@comunidadebatistafloramar"
+               target="_blank" rel="noopener noreferrer" class="btn btn-outline-hero btn-lg">
+                <i class="fab fa-youtube me-2"></i> Assistir ao Vivo
+            </a>
+        </div>
     </div>
 </div>

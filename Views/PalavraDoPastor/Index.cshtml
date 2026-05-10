@@ -1,107 +1,48 @@
 @model List<BatistaFloramar.Domain.Entities.PalavraDoPastor>
 @{
-    ViewBag.Title = "Palavra do Pastor";
+    ViewBag.Title = "Palavra do Pastor | Comunidade Batista Floramar BH";
     Layout = "_Layout";
+    ViewBag.FullWidth = true;
 }
-
-<div class="page-card">
-    <div class="page-header">
-        <span class="section-eyebrow">Reflexão & Edificação</span>
-        <h1 class="page-title">Palavra do Pastor</h1>
-        <p class="page-subtitle">
-            Sermões, devocionais e reflexões escritas pelo pastor para edificar e fortalecer sua fé.
-        </p>
-    </div>
-
-    @if (Model == null || !Model.Any())
-    {
-        <div class="section-card mt-4 text-center py-5">
-            <i class="fas fa-pen-nib text-gold" style="font-size:2.5rem;margin-bottom:1rem;display:block;"></i>
-            <p class="text-secondary">Nenhuma palavra publicada ainda. Volte em breve!</p>
-        </div>
-    }
-    else
-    {
-        <div class="row row-cols-1 row-cols-md-2 g-4 mt-2">
-            @foreach (var p in Model)
-            {
-                var shareUrl = "https://www.batistafloramar.com.br/PalavraDoPastor/Detalhe/" + p.Slug;
-                var shareWa  = "https://wa.me/?text=" + Uri.EscapeDataString(p.Titulo + " — " + shareUrl);
-                <div class="col">
-                    <div class="section-card h-100 palavra-index-card"
-                         onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 8px 24px rgba(0,0,0,.4)'"
-                         onmouseout="this.style.transform='';this.style.boxShadow=''">
-
-                        <a href="/PalavraDoPastor/Detalhe/@p.Slug" class="text-decoration-none d-block">
-                            @if (!string.IsNullOrEmpty(p.ImagemDestaque))
-                            {
-                                <img src="@p.ImagemDestaque" alt="@p.Titulo"
-                                     style="width:100%;height:180px;object-fit:cover;border-radius:10px;margin-bottom:1rem;" />
-                            }
-                            <div class="d-flex align-items-center gap-2 mb-2">
-                                @if (p.Tipo == BatistaFloramar.Domain.Entities.TipoPalavra.Sermao)
-                                {
-                                    <span style="background:#1a3a6a;color:#8af;font-size:.72rem;font-weight:700;padding:.2rem .6rem;border-radius:4px;letter-spacing:.04em;">SERMÃO</span>
-                                }
-                                else
-                                {
-                                    <span style="background:#3a2505;color:#f4a;font-size:.72rem;font-weight:700;padding:.2rem .6rem;border-radius:4px;letter-spacing:.04em;">DEVOCIONAL</span>
-                                }
-                                <span class="text-secondary small">@p.DataPublicacao.ToString("dd/MM/yyyy")</span>
-                            </div>
-                            <h3 style="color:#fff;font-size:1.1rem;margin:0 0 .5rem;line-height:1.35;">@p.Titulo</h3>
-                            <p class="text-secondary small mb-0"><i class="fas fa-user me-1 text-gold"></i>@p.AutorNome</p>
-                        </a>
-
-                        <div class="palavra-share-row">
-                            <span class="text-secondary" style="font-size:.75rem;">Compartilhar:</span>
-
-                            @if (true) /* native share — shown/hidden via JS */
-                            {
-                                <button class="pcard-share-btn btn-share-native-card"
-                                        data-url="@shareUrl"
-                                        data-title="@p.Titulo"
-                                        title="Compartilhar"
-                                        onclick="compartilharNativoCard(this)">
-                                    <i class="fas fa-share-alt"></i>
-                                </button>
-                            }
-
-                            <a class="pcard-share-btn pcard-share-wa"
-                               href="@shareWa"
-                               target="_blank" rel="noopener noreferrer"
-                               title="Compartilhar no WhatsApp">
-                                <i class="fab fa-whatsapp"></i>
-                            </a>
-
-                            <button class="pcard-share-btn"
-                                    data-url="@shareUrl"
-                                    title="Copiar link"
-                                    onclick="copiarLinkCard(this)">
-                                <i class="fas fa-link"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            }
-        </div>
-    }
-</div>
-
-<div id="share-toast-list" class="share-toast-list" aria-live="polite"></div>
-
 <style>
+    .palavra-hero {
+        background: radial-gradient(ellipse at top, var(--bg-tertiary) 0%, var(--bg-primary) 60%);
+        padding: 5.5rem 0 4rem;
+        text-align: center;
+        border-bottom: 1px solid var(--brand-gold-border);
+        position: relative;
+        overflow: hidden;
+    }
+    .palavra-hero::before {
+        content: '';
+        position: absolute; inset: 0;
+        background: radial-gradient(ellipse 60% 50% at 50% 100%, var(--brand-gold-light) 0%, transparent 70%);
+    }
+    .palavra-hero h1 { font-size: clamp(2rem,5vw,3.2rem); font-weight: 800; color: var(--text-primary); margin-bottom: 1rem; position: relative; }
+    .palavra-hero .section-eyebrow { position: relative; }
+    .palavra-hero p { color: var(--text-secondary); max-width: 620px; margin: 0 auto; font-size: 1.1rem; position: relative; }
+
+    .palavra-section { padding: 4.5rem 0; }
+
     .palavra-index-card {
+        background: var(--bg-tertiary);
+        border: 1px solid rgba(255,255,255,.07);
+        border-radius: calc(var(--radius) * 1.5);
+        padding: 1.5rem;
+        height: 100%;
         display: flex;
         flex-direction: column;
-        transition: transform .2s, box-shadow .2s;
-        cursor: default;
+        transition: transform var(--transition-smooth), box-shadow var(--transition-smooth), border-color var(--transition-smooth);
     }
+    .palavra-index-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-hover); border-color: var(--brand-gold-border); }
+    .palavra-index-card > a { flex: 1; cursor: pointer; }
 
-    .palavra-index-card > a {
-        flex: 1;
-        cursor: pointer;
-    }
+    .palavra-img { width: 100%; height: 180px; object-fit: cover; border-radius: var(--radius); margin-bottom: 1rem; display: block; }
+
+    .tipo-badge-sermao { background: #1a3a6a; color: #8af; font-size: .72rem; font-weight: 700; padding: .2rem .6rem; border-radius: 4px; letter-spacing: .04em; }
+    .tipo-badge-devocional { background: #3a2505; color: #f4a; font-size: .72rem; font-weight: 700; padding: .2rem .6rem; border-radius: 4px; letter-spacing: .04em; }
+
+    .palavra-card-title { color: var(--text-primary); font-size: 1.1rem; font-weight: 700; margin: .5rem 0; line-height: 1.35; }
 
     .palavra-share-row {
         display: flex;
@@ -112,13 +53,10 @@
         border-top: 1px solid rgba(255,255,255,.07);
         flex-wrap: wrap;
     }
-
     .pcard-share-btn {
         display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 32px;
-        height: 32px;
+        align-items: center; justify-content: center;
+        width: 32px; height: 32px;
         border-radius: 50%;
         background: rgba(255,255,255,.06);
         border: 1px solid rgba(255,255,255,.12);
@@ -126,55 +64,129 @@
         font-size: .82rem;
         cursor: pointer;
         text-decoration: none;
-        transition: background .18s, border-color .18s, color .18s;
+        transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
         flex-shrink: 0;
     }
-
-    .pcard-share-btn:hover {
-        background: rgba(230,193,90,.14);
-        border-color: rgba(230,193,90,.4);
-        color: #e6c15a;
-    }
-
-    .pcard-share-wa {
-        color: #4cda7a;
-        border-color: rgba(76,218,122,.25);
-        background: rgba(76,218,122,.08);
-    }
-
-    .pcard-share-wa:hover {
-        background: rgba(76,218,122,.18);
-        border-color: rgba(76,218,122,.5);
-        color: #4cda7a;
-    }
+    .pcard-share-btn:hover { background: rgba(230,193,90,.14); border-color: rgba(230,193,90,.4); color: #e6c15a; }
+    .pcard-share-wa { color: #4cda7a; border-color: rgba(76,218,122,.25); background: rgba(76,218,122,.08); }
+    .pcard-share-wa:hover { background: rgba(76,218,122,.18); border-color: rgba(76,218,122,.5); color: #4cda7a; }
 
     .share-toast-list {
         position: fixed;
-        bottom: 1.5rem;
-        left: 50%;
+        bottom: 1.5rem; left: 50%;
         transform: translateX(-50%) translateY(1rem);
-        background: #1e2e4e;
-        color: #c8d8e8;
+        background: #1e2e4e; color: #c8d8e8;
         border: 1px solid rgba(230,193,90,.3);
         border-radius: 10px;
         padding: .6rem 1.25rem;
-        font-size: .85rem;
-        font-weight: 600;
-        opacity: 0;
-        pointer-events: none;
+        font-size: .85rem; font-weight: 600;
+        opacity: 0; pointer-events: none;
         transition: opacity .25s, transform .25s;
-        z-index: 9999;
-        white-space: nowrap;
+        z-index: 9999; white-space: nowrap;
     }
+    .share-toast-list.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-    .share-toast-list.show {
-        opacity: 1;
-        transform: translateX(-50%) translateY(0);
+    .cta-block {
+        background: var(--bg-secondary);
+        border-top: 1px solid var(--brand-gold-border);
+        padding: 5rem 0;
+        text-align: center;
     }
+    .cta-block h2 { color: var(--text-primary); font-weight: 700; font-size: clamp(1.5rem,3vw,2rem); margin-bottom: .75rem; }
+    .cta-block p { color: var(--text-secondary); max-width: 540px; margin: 0 auto 2rem; }
 </style>
 
+<!-- Hero -->
+<div class="palavra-hero">
+    <div class="container">
+        <span class="section-eyebrow">Reflexão &amp; Edificação</span>
+        <h1>Palavra do Pastor</h1>
+        <p>Sermões, devocionais e reflexões escritas pelo pastor para edificar e fortalecer sua fé.</p>
+    </div>
+</div>
+
+<!-- Cards -->
+<div class="palavra-section">
+    <div class="container">
+        @if (Model == null || !Model.Any())
+        {
+            <div class="text-center py-5 scroll-reveal">
+                <div class="about-pillar-icon-lg mx-auto mb-3"><i class="fas fa-pen-nib"></i></div>
+                <p class="text-secondary">Nenhuma palavra publicada ainda. Volte em breve!</p>
+            </div>
+        }
+        else
+        {
+            <div class="row row-cols-1 row-cols-md-2 g-4">
+                @foreach (var p in Model)
+                {
+                    var shareUrl = "https://www.batistafloramar.com.br/PalavraDoPastor/Detalhe/" + p.Slug;
+                    var shareWa  = "https://wa.me/?text=" + Uri.EscapeDataString(p.Titulo + " — " + shareUrl);
+                    <div class="col scroll-reveal">
+                        <div class="palavra-index-card">
+                            <a href="/PalavraDoPastor/Detalhe/@p.Slug" class="text-decoration-none d-block">
+                                @if (!string.IsNullOrEmpty(p.ImagemDestaque))
+                                {
+                                    <img src="@p.ImagemDestaque" alt="@p.Titulo" class="palavra-img" loading="lazy" />
+                                }
+                                <div class="d-flex align-items-center gap-2 mb-2">
+                                    @if (p.Tipo == BatistaFloramar.Domain.Entities.TipoPalavra.Sermao)
+                                    {
+                                        <span class="tipo-badge-sermao">SERMÃO</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="tipo-badge-devocional">DEVOCIONAL</span>
+                                    }
+                                    <span class="text-secondary small">@p.DataPublicacao.ToString("dd/MM/yyyy")</span>
+                                </div>
+                                <p class="palavra-card-title">@p.Titulo</p>
+                                <p class="text-secondary small mb-0"><i class="fas fa-user me-1 text-gold"></i>@p.AutorNome</p>
+                            </a>
+                            <div class="palavra-share-row">
+                                <span class="text-secondary" style="font-size:.75rem;">Compartilhar:</span>
+                                <button class="pcard-share-btn btn-share-native-card"
+                                        data-url="@shareUrl"
+                                        data-title="@p.Titulo"
+                                        title="Compartilhar"
+                                        onclick="compartilharNativoCard(this)">
+                                    <i class="fas fa-share-alt"></i>
+                                </button>
+                                <a class="pcard-share-btn pcard-share-wa"
+                                   href="@shareWa"
+                                   target="_blank" rel="noopener noreferrer"
+                                   title="Compartilhar no WhatsApp">
+                                    <i class="fab fa-whatsapp"></i>
+                                </a>
+                                <button class="pcard-share-btn"
+                                        data-url="@shareUrl"
+                                        title="Copiar link"
+                                        onclick="copiarLinkCard(this)">
+                                    <i class="fas fa-link"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+<div id="share-toast-list" class="share-toast-list" aria-live="polite"></div>
+
+<!-- CTA -->
+<div class="cta-block">
+    <div class="container">
+        <h2>Tem uma dúvida ou pedido de oração?</h2>
+        <p>Envie uma mensagem ao pastor. Nossa equipe cuidará do encaminhamento com atenção.</p>
+        <a href="/Napalavra" class="btn btn-primary btn-lg">
+            <i class="fas fa-comment-dots me-2"></i> Enviar Mensagem ao Pastor
+        </a>
+    </div>
+</div>
+
 <script>
-    /* Oculta botão nativo em cards onde Web Share API não está disponível */
     if (!navigator.share) {
         document.querySelectorAll('.btn-share-native-card').forEach(function (b) {
             b.style.display = 'none';

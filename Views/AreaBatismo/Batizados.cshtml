@@ -1,0 +1,90 @@
+@model IEnumerable<BatistaFloramar.Domain.Entities.BatizadoHistorico>
+@{
+    Layout = "~/Views/Shared/_BatismoAreaLayout.cshtml";
+    var porAno = Model.GroupBy(b => b.DataBatismo.Year).OrderByDescending(g => g.Key).ToList();
+}
+
+@section TopbarActions {
+    <a href="@Url.Action("NovoBatizado", "AreaBatismo")" class="btn-admin" style="font-size:.82rem;">
+        <i class="fas fa-user-plus me-1"></i>Novo Batizado
+    </a>
+}
+
+@if (!Model.Any())
+{
+    <div class="admin-card">
+        <div class="empty-state">
+            <i class="fas fa-star-of-david"></i>
+            <p>Nenhum batizado registrado ainda.</p>
+            <a href="@Url.Action("NovoBatizado", "AreaBatismo")" class="btn-admin">
+                <i class="fas fa-user-plus me-1"></i> Registrar primeiro batizado
+            </a>
+        </div>
+    </div>
+}
+else
+{
+    <div class="admin-card mb-3" style="padding:1rem 1.5rem;">
+        <span style="font-size:.85rem;color:var(--admin-text-muted);">
+            <i class="fas fa-users me-2" style="color:var(--admin-accent);"></i>
+            Total: <strong style="color:var(--admin-text);">@Model.Count()</strong> batizado@(Model.Count() != 1 ? "s" : "") registrado@(Model.Count() != 1 ? "s" : "")
+        </span>
+    </div>
+
+    @foreach (var grupo in porAno)
+    {
+        <div class="admin-card mb-4">
+            <h3 style="font-size:.95rem;margin-bottom:1rem;color:var(--admin-accent);">
+                <i class="fas fa-calendar-alt me-2"></i>@grupo.Key
+                <span style="font-size:.8rem;color:var(--admin-text-muted);margin-left:.5rem;">(@grupo.Count() batizado@(grupo.Count() != 1 ? "s" : ""))</span>
+            </h3>
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Data do Batismo</th>
+                        <th>WhatsApp</th>
+                        <th>Observações</th>
+                        <th style="width:70px;">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var b in grupo.OrderBy(x => x.DataBatismo))
+                    {
+                        <tr>
+                            <td><strong>@b.Nome</strong></td>
+                            <td style="font-size:.87rem;white-space:nowrap;">@b.DataBatismo.ToString("dd/MM/yyyy")</td>
+                            <td>
+                                @if (!string.IsNullOrWhiteSpace(b.WhatsApp))
+                                {
+                                    <a href="https://wa.me/55@(b.WhatsApp.Replace("(","").Replace(")","").Replace(" ","").Replace("-",""))"
+                                       target="_blank" rel="noopener noreferrer" style="color:#25d366;font-size:.87rem;">
+                                        <i class="fab fa-whatsapp me-1"></i>@b.WhatsApp
+                                    </a>
+                                }
+                                else { <span style="color:#555;">—</span> }
+                            </td>
+                            <td style="font-size:.83rem;color:#9aacb8;max-width:200px;">
+                                @if (!string.IsNullOrWhiteSpace(b.Observacoes))
+                                {
+                                    <span title="@b.Observacoes">@(b.Observacoes.Length > 50 ? b.Observacoes[..50] + "…" : b.Observacoes)</span>
+                                }
+                                else { <span style="color:#555;">—</span> }
+                            </td>
+                            <td>
+                                <form method="post" action="@Url.Action("ExcluirBatizado", "AreaBatismo")"
+                                      onsubmit="return confirm('Remover @b.Nome do histórico?')">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@b.Id" />
+                                    <button type="submit" class="btn-admin-sm btn-admin-danger" title="Excluir">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+}

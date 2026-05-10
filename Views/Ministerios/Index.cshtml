@@ -1,55 +1,123 @@
-﻿@using BatistaFloramar.Domain.Entities
+@using BatistaFloramar.Domain.Entities
 @model IEnumerable<Ministerio>
 @{
-    ViewBag.Title = "Ministérios";
+    ViewBag.Title = "Ministérios | Comunidade Batista Floramar BH";
     Layout = "_Layout";
+    ViewBag.FullWidth = true;
 }
+<style>
+    .ministerios-hero {
+        background: radial-gradient(ellipse at top, var(--bg-tertiary) 0%, var(--bg-primary) 60%);
+        padding: 5.5rem 0 4rem;
+        text-align: center;
+        border-bottom: 1px solid var(--brand-gold-border);
+        position: relative;
+        overflow: hidden;
+    }
+    .ministerios-hero::before {
+        content: '';
+        position: absolute; inset: 0;
+        background: radial-gradient(ellipse 60% 50% at 50% 100%, var(--brand-gold-light) 0%, transparent 70%);
+    }
+    .ministerios-hero h1 { font-size: clamp(2rem,5vw,3.2rem); font-weight: 800; color: var(--text-primary); margin-bottom: 1rem; position: relative; }
+    .ministerios-hero .section-eyebrow { position: relative; }
+    .ministerios-hero p { color: var(--text-secondary); max-width: 620px; margin: 0 auto; font-size: 1.1rem; position: relative; }
 
-<div class="page-card">
-    <div class="page-header">
+    .ministerios-section { padding: 4.5rem 0; }
+    .ministerios-section.alt { background: var(--bg-secondary); }
+
+    .ministerio-card {
+        background: var(--bg-tertiary);
+        border: 1px solid rgba(255,255,255,.07);
+        border-radius: calc(var(--radius) * 1.5);
+        padding: 1.75rem;
+        height: 100%;
+        position: relative;
+        overflow: hidden;
+        transition: transform var(--transition-smooth), box-shadow var(--transition-smooth), border-color var(--transition-smooth);
+    }
+    .ministerio-card::before {
+        content: '';
+        position: absolute; inset: 0;
+        background: linear-gradient(-30deg, hsla(0,0%,0%,0) 60%, rgba(255,255,255,0.22) 70%, hsla(0,0%,0%,0) 80%);
+        background-size: 300% 300%;
+        background-repeat: no-repeat;
+        background-position: -100% -100%;
+        transition: 800ms ease;
+        pointer-events: none; z-index: 1;
+    }
+    .ministerio-card:hover::before { background-position: 100% 100%; }
+    .ministerio-card > * { position: relative; z-index: 2; }
+    .ministerio-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-hover); border-color: var(--brand-gold-border); }
+
+    .cta-box {
+        background: var(--brand-gold-light);
+        border: 1px solid var(--brand-gold-border);
+        border-radius: calc(var(--radius) * 1.5);
+        padding: 3rem 2rem;
+        text-align: center;
+        max-width: 700px;
+        margin: 0 auto;
+    }
+    .cta-box i { font-size: 2.5rem; color: var(--brand-gold); margin-bottom: 1rem; display: block; }
+    .cta-box h3 { color: var(--text-primary); font-weight: 700; margin-bottom: .75rem; }
+    .cta-box p { color: var(--text-secondary); margin: 0 0 1.5rem; }
+</style>
+
+<!-- Hero -->
+<div class="ministerios-hero">
+    <div class="container">
         <span class="section-eyebrow">Sirva com seus dons</span>
-        <h1 class="page-title">Ministérios</h1>
-        <p class="page-subtitle">
-            Cada membro tem um dom. Conheça os ministérios da Comunidade Batista Floramar e descubra onde você pode servir.
-        </p>
-    </div>
-
-    <div class="row row-cols-1 row-cols-md-2 g-4 mt-2">
-        @foreach (var m in Model)
-        {
-            <div class="col">
-                <a href="/Ministerios/Detalhes/@m.Slug" class="text-decoration-none">
-                    <div class="section-card h-100" style="transition: transform .2s ease, border-color .2s ease;">
-                        <div class="d-flex align-items-center gap-3 mb-3">
-                            <div class="ministry-icon-page"><i class="@m.Icone"></i></div>
-                            <div>
-                                <h3 class="mb-0" style="color:var(--text-primary)">@m.Nome</h3>
-                                <p class="mb-0 small text-secondary"><i class="fas fa-user me-1 text-gold"></i>@m.Lideranca</p>
-                            </div>
-                        </div>
-                        <p class="text-secondary mb-3">@(string.IsNullOrEmpty(m.ResumoBreve) ? (m.Descricao != null ? m.Descricao.Substring(0, Math.Min(120, m.Descricao.Length)) + "…" : "") : m.ResumoBreve)</p>
-                        <span class="text-gold small fw-semibold">Conhecer ministério <i class="fas fa-arrow-right ms-1"></i></span>
-                    </div>
-                </a>
-            </div>
-        }
-        @if (!Model.Any())
-        {
-            <div class="col-12 text-center py-5">
-                <p class="text-secondary">Nenhum ministério disponível no momento.</p>
-            </div>
-        }
-    </div>
-
-    <div class="section-card mt-4 text-center">
-        <h3>Quero participar de um ministério</h3>
-        <p class="text-secondary">Entre em contato conosco e nossa equipe irá orientá-lo a encontrar o lugar certo para servir.</p>
-        <a href="/Napalavra" class="btn btn-primary btn-lg mt-2">
-            <i class="fas fa-envelope me-2"></i> Fale conosco
-        </a>
+        <h1>Ministérios</h1>
+        <p>Cada membro tem um dom. Conheça os ministérios da Comunidade Batista Floramar e descubra onde você pode servir.</p>
     </div>
 </div>
 
-<style>
-.section-card:hover { transform: translateY(-3px); border-color: rgba(212,175,55,.4) !important; }
-</style>
+<!-- Grid de ministérios -->
+<div class="ministerios-section">
+    <div class="container">
+        @if (!Model.Any())
+        {
+            <div class="text-center py-5 scroll-reveal">
+                <p class="text-secondary">Nenhum ministério disponível no momento.</p>
+            </div>
+        }
+        else
+        {
+            <div class="row row-cols-1 row-cols-md-2 g-4">
+                @foreach (var m in Model)
+                {
+                    <div class="col scroll-reveal">
+                        <a href="/Ministerios/Detalhes/@m.Slug" class="text-decoration-none">
+                            <div class="ministerio-card">
+                                <div class="d-flex align-items-center gap-3 mb-3">
+                                    <div class="ministry-icon-page"><i class="@m.Icone"></i></div>
+                                    <div>
+                                        <h3 class="mb-0" style="color:var(--text-primary)">@m.Nome</h3>
+                                        <p class="mb-0 small text-secondary"><i class="fas fa-user me-1 text-gold"></i>@m.Lideranca</p>
+                                    </div>
+                                </div>
+                                <p class="text-secondary mb-3">@(string.IsNullOrEmpty(m.ResumoBreve) ? (m.Descricao != null ? m.Descricao.Substring(0, Math.Min(120, m.Descricao.Length)) + "…" : "") : m.ResumoBreve)</p>
+                                <span class="text-gold small fw-semibold">Conhecer ministério <i class="fas fa-arrow-right ms-1"></i></span>
+                            </div>
+                        </a>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+<!-- CTA -->
+<div class="ministerios-section alt">
+    <div class="container">
+        <div class="cta-box scroll-reveal">
+            <i class="fas fa-hands-helping"></i>
+            <h3>Quero participar de um ministério</h3>
+            <p>Entre em contato conosco e nossa equipe irá orientá-lo a encontrar o lugar certo para servir.</p>
+            <a href="/Napalavra" class="btn btn-primary btn-lg">
+                <i class="fas fa-envelope me-2"></i> Fale conosco
+            </a>
+        </div>
+    </div>
+</div>

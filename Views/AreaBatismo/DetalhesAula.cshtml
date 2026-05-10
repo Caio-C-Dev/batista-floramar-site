@@ -1,0 +1,118 @@
+@model BatistaFloramar.Domain.Entities.AulaBatismo
+@{
+    Layout = "~/Views/Shared/_BatismoAreaLayout.cshtml";
+    var presentes = Model.Presencas.Where(p => p.Presente).OrderBy(p => p.NomePessoa).ToList();
+    var ausentes = Model.Presencas.Where(p => !p.Presente).OrderBy(p => p.NomePessoa).ToList();
+}
+
+@section TopbarActions {
+    <a href="@Url.Action("EditarAula", "AreaBatismo", new { id = Model.Id })" class="btn-admin-outline" style="font-size:.82rem;">
+        <i class="fas fa-pencil-alt me-1"></i> Editar
+    </a>
+    <form method="post" action="@Url.Action("ExcluirAula", "AreaBatismo")"
+          onsubmit="return confirm('Excluir esta aula permanentemente?')" style="display:inline;">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="id" value="@Model.Id" />
+        <button type="submit" class="btn-admin-sm btn-admin-danger" title="Excluir">
+            <i class="fas fa-trash"></i>
+        </button>
+    </form>
+}
+
+<div class="row g-4">
+    <div class="col-lg-4">
+        <div class="admin-card">
+            <h3 style="font-size:.85rem;color:var(--admin-text-muted);margin-bottom:1rem;text-transform:uppercase;letter-spacing:.05em;">Informações da Aula</h3>
+            <div style="margin-bottom:.8rem;">
+                <div style="font-size:.78rem;color:var(--admin-text-muted);">Número</div>
+                <span class="badge-admin" style="background:#1a2a4a;color:#7ab;font-size:1rem;padding:.35rem .8rem;">Aula @Model.NumeroAula</span>
+            </div>
+            <div style="margin-bottom:.8rem;">
+                <div style="font-size:.78rem;color:var(--admin-text-muted);">Título</div>
+                <div style="font-weight:600;">@Model.Titulo</div>
+            </div>
+            <div style="margin-bottom:.8rem;">
+                <div style="font-size:.78rem;color:var(--admin-text-muted);">Data</div>
+                <div>@Model.DataAula.ToString("dd 'de' MMMM 'de' yyyy", new System.Globalization.CultureInfo("pt-BR"))</div>
+            </div>
+            <div style="margin-bottom:.8rem;">
+                <div style="font-size:.78rem;color:var(--admin-text-muted);">Professor</div>
+                <div><i class="fas fa-chalkboard-teacher me-1" style="color:var(--admin-accent);"></i>@Model.ProfessorNome</div>
+            </div>
+            <div style="margin-bottom:.8rem;">
+                <div style="font-size:.78rem;color:var(--admin-text-muted);">Presença</div>
+                <div class="d-flex gap-2">
+                    <span class="badge-admin" style="background:#1a4a2a;color:#5d8;"><i class="fas fa-check me-1"></i>@presentes.Count presentes</span>
+                    @if (ausentes.Any())
+                    {
+                        <span class="badge-admin" style="background:#4a1a1a;color:#f88;"><i class="fas fa-times me-1"></i>@ausentes.Count ausentes</span>
+                    }
+                </div>
+            </div>
+            @if (!string.IsNullOrWhiteSpace(Model.Observacoes))
+            {
+                <div style="margin-top:1rem;padding:1rem;background:var(--admin-bg);border-radius:8px;border-left:3px solid var(--admin-accent);">
+                    <div style="font-size:.78rem;color:var(--admin-text-muted);margin-bottom:.4rem;">Observações</div>
+                    <div style="font-size:.9rem;">@Model.Observacoes</div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="col-lg-8">
+        @if (presentes.Any())
+        {
+            <div class="admin-card mb-4">
+                <h3 style="font-size:.92rem;margin-bottom:1rem;color:#5d8;">
+                    <i class="fas fa-check-circle me-2"></i>Presentes (@presentes.Count)
+                </h3>
+                <div class="d-flex flex-wrap gap-2">
+                    @foreach (var p in presentes)
+                    {
+                        <span style="background:rgba(80,200,120,.1);border:1px solid rgba(80,200,120,.25);color:#8ec;padding:.3rem .75rem;border-radius:20px;font-size:.88rem;">
+                            @p.NomePessoa
+                        </span>
+                    }
+                </div>
+            </div>
+        }
+
+        @if (ausentes.Any())
+        {
+            <div class="admin-card mb-4">
+                <h3 style="font-size:.92rem;margin-bottom:1rem;color:#f88;">
+                    <i class="fas fa-times-circle me-2"></i>Ausentes (@ausentes.Count)
+                </h3>
+                <div class="d-flex flex-wrap gap-2">
+                    @foreach (var a in ausentes)
+                    {
+                        <span style="background:rgba(200,80,80,.1);border:1px solid rgba(200,80,80,.25);color:#f99;padding:.3rem .75rem;border-radius:20px;font-size:.88rem;">
+                            @a.NomePessoa
+                            @if (!string.IsNullOrWhiteSpace(a.Observacao))
+                            { <span style="font-size:.78rem;opacity:.7;"> — @a.Observacao</span> }
+                        </span>
+                    }
+                </div>
+            </div>
+        }
+
+        @if (!presentes.Any() && !ausentes.Any())
+        {
+            <div class="admin-card">
+                <div class="empty-state" style="padding:2rem;">
+                    <i class="fas fa-users" style="font-size:1.8rem;"></i>
+                    <p style="margin:.5rem 0 1rem;">Nenhuma presença registrada nesta aula.</p>
+                    <a href="@Url.Action("EditarAula", "AreaBatismo", new { id = Model.Id })" class="btn-admin">
+                        <i class="fas fa-pencil-alt me-1"></i> Adicionar presenças
+                    </a>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<div class="mt-3">
+    <a href="@Url.Action("Aulas", "AreaBatismo")" style="color:var(--admin-text-muted);font-size:.85rem;text-decoration:none;">
+        <i class="fas fa-arrow-left me-1"></i> Voltar para Aulas
+    </a>
+</div>

@@ -1,84 +1,144 @@
-﻿@{
-    ViewBag.Title = "Doação";
+@{
+    ViewBag.Title = "Doações | Comunidade Batista Floramar BH";
     ViewBag.MetaDescription = "Contribua com a Comunidade Batista Floramar e ajude a sustentar a obra de Deus em Belo Horizonte. Doação via Pix ou cartão.";
     Layout = "_Layout";
+    ViewBag.FullWidth = true;
 }
+<style>
+    .doacao-hero {
+        background: radial-gradient(ellipse at top, var(--bg-tertiary) 0%, var(--bg-primary) 60%);
+        padding: 5.5rem 0 4rem;
+        text-align: center;
+        border-bottom: 1px solid var(--brand-gold-border);
+        position: relative;
+        overflow: hidden;
+    }
+    .doacao-hero::before {
+        content: '';
+        position: absolute; inset: 0;
+        background: radial-gradient(ellipse 60% 50% at 50% 100%, var(--brand-gold-light) 0%, transparent 70%);
+    }
+    .doacao-hero h1 { font-size: clamp(2rem,5vw,3.2rem); font-weight: 800; color: var(--text-primary); margin-bottom: 1rem; position: relative; }
+    .doacao-hero .section-eyebrow { position: relative; }
+    .doacao-hero p { color: var(--text-secondary); max-width: 620px; margin: 0 auto; font-size: 1.1rem; position: relative; }
 
-<div class="page-card">
-    <div class="page-header">
+    .doacao-section { padding: 4.5rem 0; }
+    .doacao-section.alt { background: var(--bg-secondary); }
+
+    .cta-block {
+        background: var(--bg-secondary);
+        border-top: 1px solid var(--brand-gold-border);
+        padding: 5rem 0;
+        text-align: center;
+    }
+    .cta-block h2 { color: var(--text-primary); font-weight: 700; font-size: clamp(1.5rem,3vw,2rem); margin-bottom: .75rem; }
+    .cta-block p { color: var(--text-secondary); max-width: 540px; margin: 0 auto 2rem; }
+</style>
+
+<!-- Hero -->
+<div class="doacao-hero">
+    <div class="container">
         <span class="section-eyebrow">Contribua com Alegria</span>
-        <h1 class="page-title">Doações</h1>
-        <p class="page-subtitle">
-            Sua oferta é um ato de adoração. Contribua com a Comunidade Batista Floramar de forma rápida e segura.
-            — <em>2 Coríntios 9:7</em>
-        </p>
+        <h1>Doações</h1>
+        <p>Sua oferta é um ato de adoração. Contribua com a Comunidade Batista Floramar de forma rápida e segura. — <em>2 Coríntios 9:7</em></p>
     </div>
+</div>
 
-    <div class="row row-cols-1 row-cols-md-3 g-4 mt-2">
-        <div class="col">
-            <div class="section-card donation-select-card h-100 text-center" onclick="selectDonacao('doacao', this)">
-                <span class="selected-badge">SELECIONADO</span>
-                <div class="about-pillar-icon-lg"><i class="fas fa-heart"></i></div>
-                <h3>Doação</h3>
-                <p class="text-secondary">Oferta geral para ajudar a comunidade a manter seus projetos e ministérios.</p>
-                <button type="button" class="donation-select-btn">
-                    <i class="fas fa-qrcode"></i> Contribuir via PIX
-                </button>
-            </div>
+<!-- Tipos de doação -->
+<div class="doacao-section">
+    <div class="container">
+        <div class="text-center mb-5 scroll-reveal">
+            <span class="section-eyebrow">Como contribuir</span>
+            <h2 class="section-heading">Escolha sua forma de contribuição</h2>
         </div>
-        <div class="col">
-            <div class="section-card donation-select-card h-100 text-center" onclick="selectDonacao('dizimo', this)">
-                <span class="selected-badge">SELECIONADO</span>
-                <div class="about-pillar-icon-lg"><i class="fas fa-percentage"></i></div>
-                <h3>Dízimo</h3>
-                <p class="text-secondary">Contribuição mensal para sustentar o ministério e o trabalho da igreja.</p>
-                <button type="button" class="donation-select-btn">
-                    <i class="fas fa-qrcode"></i> Contribuir via PIX
-                </button>
-            </div>
-        </div>
-        <div class="col">
-            <div class="section-card donation-select-card h-100 text-center" onclick="selectDonacao('oferta', this)">
-                <span class="selected-badge">SELECIONADO</span>
-                <div class="about-pillar-icon-lg"><i class="fas fa-gift"></i></div>
-                <h3>Oferta</h3>
-                <p class="text-secondary">Oferta especial de gratidão para momentos de bênção e celebração.</p>
-                <button type="button" class="donation-select-btn">
-                    <i class="fas fa-qrcode"></i> Contribuir via PIX
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <div class="row g-4 mt-2" id="pix">
-        <div class="col-md-6">
-            <div class="section-card h-100 text-center" id="pix-card">
-                <h3><i class="fas fa-qrcode me-2 text-gold"></i>PIX</h3>
-                <p class="text-secondary mb-3">Escaneie o QR Code ou copie a chave CNPJ abaixo para contribuir instantaneamente.</p>
-                <img src="~/images/qr_code.png"
-                     alt="QR Code PIX Comunidade Batista Floramar"
-                     class="img-fluid pix-qr-img mb-3"
-                     onerror="this.style.display='none'" />
-                <div class="pix-key-box rounded-3 p-3 mb-3">
-                    <p class="mb-1 text-secondary small">Chave PIX (CNPJ)</p>
-                    <strong class="text-gold fs-5">44.457.832/0001-07</strong>
+        <div class="row row-cols-1 row-cols-md-3 g-4 scroll-reveal delay-1">
+            <div class="col">
+                <div class="section-card donation-select-card h-100 text-center" onclick="selectDonacao('doacao', this)">
+                    <span class="selected-badge">SELECIONADO</span>
+                    <div class="about-pillar-icon-lg"><i class="fas fa-heart"></i></div>
+                    <h3>Doação</h3>
+                    <p class="text-secondary">Oferta geral para ajudar a comunidade a manter seus projetos e ministérios.</p>
+                    <button type="button" class="donation-select-btn">
+                        <i class="fas fa-qrcode"></i> Contribuir via PIX
+                    </button>
                 </div>
-                <button type="button" class="btn btn-primary" onclick="navigator.clipboard.writeText('44.457.832/0001-07');this.innerHTML='<i class=\'fas fa-check me-2\'></i> Copiado!'">
-                    <i class="fas fa-copy me-2"></i> Copiar chave
-                </button>
+            </div>
+            <div class="col">
+                <div class="section-card donation-select-card h-100 text-center" onclick="selectDonacao('dizimo', this)">
+                    <span class="selected-badge">SELECIONADO</span>
+                    <div class="about-pillar-icon-lg"><i class="fas fa-percentage"></i></div>
+                    <h3>Dízimo</h3>
+                    <p class="text-secondary">Contribuição mensal para sustentar o ministério e o trabalho da igreja.</p>
+                    <button type="button" class="donation-select-btn">
+                        <i class="fas fa-qrcode"></i> Contribuir via PIX
+                    </button>
+                </div>
+            </div>
+            <div class="col">
+                <div class="section-card donation-select-card h-100 text-center" onclick="selectDonacao('oferta', this)">
+                    <span class="selected-badge">SELECIONADO</span>
+                    <div class="about-pillar-icon-lg"><i class="fas fa-gift"></i></div>
+                    <h3>Oferta</h3>
+                    <p class="text-secondary">Oferta especial de gratidão para momentos de bênção e celebração.</p>
+                    <button type="button" class="donation-select-btn">
+                        <i class="fas fa-qrcode"></i> Contribuir via PIX
+                    </button>
+                </div>
             </div>
         </div>
-        <div class="col-md-6">
-            <div class="section-card h-100">
-                <h3><i class="fas fa-info-circle me-2 text-gold"></i>Por que contribuir?</h3>
-                <ul class="info-list mt-2">
-                    <li><i class="fas fa-check-circle"></i><span>Sustento do ministério e da equipe pastoral</span></li>
-                    <li><i class="fas fa-check-circle"></i><span>Projetos de ação social e missões</span></li>
-                    <li><i class="fas fa-check-circle"></i><span>Manutenção e crescimento da comunidade</span></li>
-                    <li><i class="fas fa-check-circle"></i><span>Apoio a famílias em necessidade</span></li>
-                    <li><i class="fas fa-check-circle"></i><span>Ministério com crianças e jovens</span></li>
-                </ul>
+    </div>
+</div>
+
+<!-- PIX + Por que contribuir -->
+<div class="doacao-section alt" id="pix">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-md-6 scroll-reveal">
+                <div class="section-card h-100 text-center" id="pix-card">
+                    <h3><i class="fas fa-qrcode me-2 text-gold"></i>PIX</h3>
+                    <p class="text-secondary mb-3">Escaneie o QR Code ou copie a chave CNPJ abaixo para contribuir instantaneamente.</p>
+                    <img src="~/images/qr_code.png"
+                         alt="QR Code PIX Comunidade Batista Floramar"
+                         class="img-fluid pix-qr-img mb-3"
+                         onerror="this.style.display='none'" />
+                    <div class="pix-key-box rounded-3 p-3 mb-3">
+                        <p class="mb-1 text-secondary small">Chave PIX (CNPJ)</p>
+                        <strong class="text-gold fs-5">44.457.832/0001-07</strong>
+                    </div>
+                    <button type="button" class="btn btn-primary" onclick="navigator.clipboard.writeText('44.457.832/0001-07');this.innerHTML='<i class=\'fas fa-check me-2\'></i> Copiado!'">
+                        <i class="fas fa-copy me-2"></i> Copiar chave
+                    </button>
+                </div>
             </div>
+            <div class="col-md-6 scroll-reveal delay-1">
+                <div class="section-card h-100">
+                    <h3><i class="fas fa-info-circle me-2 text-gold"></i>Por que contribuir?</h3>
+                    <ul class="info-list mt-2">
+                        <li><i class="fas fa-check-circle"></i><span>Sustento do ministério e da equipe pastoral</span></li>
+                        <li><i class="fas fa-check-circle"></i><span>Projetos de ação social e missões</span></li>
+                        <li><i class="fas fa-check-circle"></i><span>Manutenção e crescimento da comunidade</span></li>
+                        <li><i class="fas fa-check-circle"></i><span>Apoio a famílias em necessidade</span></li>
+                        <li><i class="fas fa-check-circle"></i><span>Ministério com crianças e jovens</span></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- CTA -->
+<div class="cta-block">
+    <div class="container">
+        <h2>Dúvidas sobre como contribuir?</h2>
+        <p>Nossa equipe está disponível para ajudá-lo. Entre em contato pelo WhatsApp ou venha nos visitar pessoalmente.</p>
+        <div class="d-flex flex-wrap justify-content-center gap-3">
+            <a href="https://wa.me/5531992898901?text=Olá!%20Tenho%20dúvidas%20sobre%20as%20doações."
+               target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-lg">
+                <i class="fab fa-whatsapp me-2"></i> Falar no WhatsApp
+            </a>
+            <a href="/Napalavra" class="btn btn-outline-hero btn-lg">
+                <i class="fas fa-envelope me-2"></i> Enviar Mensagem
+            </a>
         </div>
     </div>
 </div>
@@ -86,24 +146,19 @@
 @section Scripts {
 <script>
     function selectDonacao(type, card) {
-        // Remove selected state from all cards
         document.querySelectorAll('.donation-select-card').forEach(function (c) {
             c.classList.remove('selected');
         });
-        // Mark this card as selected
         card.classList.add('selected');
 
-        // Smooth scroll to PIX section
         var pixSection = document.getElementById('pix');
         if (pixSection) {
             pixSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
-        // Highlight the PIX card briefly
         var pixCard = document.getElementById('pix-card');
         if (pixCard) {
             pixCard.classList.remove('pix-section-highlight');
-            // Force reflow to restart animation
             void pixCard.offsetWidth;
             pixCard.classList.add('pix-section-highlight');
             setTimeout(function () { pixCard.classList.remove('pix-section-highlight'); }, 1700);

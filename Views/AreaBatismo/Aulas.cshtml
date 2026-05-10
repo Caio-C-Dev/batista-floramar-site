@@ -1,0 +1,99 @@
+@model IEnumerable<BatistaFloramar.Domain.Entities.AulaBatismo>
+@{
+    Layout = "~/Views/Shared/_BatismoAreaLayout.cshtml";
+    var aulasFaltando = ViewBag.AulasFaltando as List<int> ?? new List<int>();
+}
+
+@section TopbarActions {
+    <a href="@Url.Action("NovaAula", "AreaBatismo")" class="btn-admin" style="font-size:.82rem;">
+        <i class="fas fa-plus me-1"></i>Nova Aula
+    </a>
+}
+
+@if (aulasFaltando.Any())
+{
+    <div class="admin-card mb-4">
+        <h3 style="font-size:.92rem;margin-bottom:.8rem;color:var(--admin-text-muted);">
+            <i class="fas fa-exclamation-circle me-2" style="color:#d4af37;"></i>
+            Aulas não realizadas (@aulasFaltando.Count de @ViewBag.TotalAulasEsperadas)
+        </h3>
+        <div class="d-flex flex-wrap gap-2">
+            @foreach (var n in aulasFaltando)
+            {
+                <span class="badge-admin" style="background:#4a3010;color:#d4af37;padding:.35rem .75rem;">Aula @n</span>
+            }
+        </div>
+    </div>
+}
+
+<div class="admin-card">
+    @if (!Model.Any())
+    {
+        <div class="empty-state">
+            <i class="fas fa-book-open"></i>
+            <p>Nenhuma aula registrada ainda.</p>
+            <a href="@Url.Action("NovaAula", "AreaBatismo")" class="btn-admin"><i class="fas fa-plus me-1"></i>Registrar primeira aula</a>
+        </div>
+    }
+    else
+    {
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th style="width:60px;">Nº</th>
+                    <th>Título</th>
+                    <th>Professor</th>
+                    <th>Data</th>
+                    <th style="text-align:center;">Presentes</th>
+                    <th style="text-align:center;">Ausentes</th>
+                    <th style="width:130px;">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var a in Model)
+                {
+                    var presentes = a.Presencas.Count(p => p.Presente);
+                    var ausentes = a.Presencas.Count(p => !p.Presente);
+                    <tr>
+                        <td><span class="badge-admin" style="background:#1a2a4a;color:#7ab;font-size:.9rem;padding:.3rem .7rem;">@a.NumeroAula</span></td>
+                        <td><strong>@a.Titulo</strong></td>
+                        <td style="font-size:.87rem;">@a.ProfessorNome</td>
+                        <td style="font-size:.85rem;white-space:nowrap;">@a.DataAula.ToString("dd/MM/yyyy")</td>
+                        <td style="text-align:center;">
+                            @if (presentes > 0)
+                            {
+                                <span class="badge-admin" style="background:#1a4a2a;color:#5d8;">@presentes</span>
+                            }
+                            else { <span style="color:#555;">—</span> }
+                        </td>
+                        <td style="text-align:center;">
+                            @if (ausentes > 0)
+                            {
+                                <span class="badge-admin" style="background:#4a1a1a;color:#f88;">@ausentes</span>
+                            }
+                            else { <span style="color:#555;">—</span> }
+                        </td>
+                        <td>
+                            <div class="d-flex gap-2">
+                                <a href="@Url.Action("DetalhesAula", "AreaBatismo", new { id = a.Id })" class="btn-admin-sm" title="Ver detalhes">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a href="@Url.Action("EditarAula", "AreaBatismo", new { id = a.Id })" class="btn-admin-sm" title="Editar">
+                                    <i class="fas fa-pencil-alt"></i>
+                                </a>
+                                <form method="post" action="@Url.Action("ExcluirAula", "AreaBatismo")"
+                                      onsubmit="return confirm('Excluir aula @a.NumeroAula — @a.Titulo?')">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@a.Id" />
+                                    <button type="submit" class="btn-admin-sm btn-admin-danger" title="Excluir">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>

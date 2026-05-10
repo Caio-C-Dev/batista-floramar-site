@@ -1,0 +1,70 @@
+@model BatistaFloramar.Models.NovaAulaViewModel
+@{
+    Layout = "~/Views/Shared/_BatismoAreaLayout.cshtml";
+    var aulaId = ViewBag.AulaId;
+}
+
+<div class="admin-card" style="max-width: 720px;">
+    <form method="post" asp-action="EditarAula" asp-controller="AreaBatismo" asp-route-id="@aulaId" novalidate>
+        @Html.AntiForgeryToken()
+
+        <div class="row g-3 mb-3">
+            <div class="col-sm-8">
+                <label asp-for="Titulo" class="form-label"></label>
+                <input asp-for="Titulo" class="form-control" placeholder="Ex: Introdução ao Batismo" />
+                <span asp-validation-for="Titulo" class="field-validation-error"></span>
+            </div>
+            <div class="col-sm-4">
+                <label asp-for="NumeroAula" class="form-label"></label>
+                <input asp-for="NumeroAula" type="number" min="1" max="99" class="form-control" />
+                <span asp-validation-for="NumeroAula" class="field-validation-error"></span>
+            </div>
+        </div>
+
+        <div class="row g-3 mb-3">
+            <div class="col-sm-6">
+                <label asp-for="DataAula" class="form-label"></label>
+                <input asp-for="DataAula" type="date" class="form-control" />
+                <span asp-validation-for="DataAula" class="field-validation-error"></span>
+            </div>
+            <div class="col-sm-6">
+                <label asp-for="ProfessorNome" class="form-label"></label>
+                <input asp-for="ProfessorNome" class="form-control" />
+                <span asp-validation-for="ProfessorNome" class="field-validation-error"></span>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Observacoes" class="form-label"></label>
+            <textarea asp-for="Observacoes" class="form-control" rows="3"></textarea>
+        </div>
+
+        <hr style="border-color:var(--admin-border);margin:1.5rem 0;" />
+
+        <div class="row g-3 mb-4">
+            <div class="col-sm-6">
+                <label asp-for="PresentesTexto" class="form-label">
+                    <i class="fas fa-check-circle me-1" style="color:#5d8;"></i>@Html.DisplayNameFor(m => m.PresentesTexto)
+                </label>
+                <textarea asp-for="PresentesTexto" class="form-control" rows="6"
+                          placeholder="Um nome por linha"></textarea>
+                <small class="text-muted" style="font-size:.78rem;">Um nome por linha</small>
+            </div>
+            <div class="col-sm-6">
+                <label asp-for="AusentesTexto" class="form-label">
+                    <i class="fas fa-times-circle me-1" style="color:#f88;"></i>@Html.DisplayNameFor(m => m.AusentesTexto)
+                </label>
+                <textarea asp-for="AusentesTexto" class="form-control" rows="6"
+                          placeholder="Um nome por linha"></textarea>
+                <small class="text-muted" style="font-size:.78rem;">Um nome por linha</small>
+            </div>
+        </div>
+
+        <div class="d-flex gap-3">
+            <button type="submit" class="btn-admin">
+                <i class="fas fa-save me-1"></i> Salvar Alterações
+            </button>
+            <a href="@Url.Action("DetalhesAula", "AreaBatismo", new { id = aulaId })" class="btn-admin-outline">Cancelar</a>
+        </div>
+    </form>
+</div>

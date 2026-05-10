@@ -1,94 +1,190 @@
-﻿@using BatistaFloramar.Domain.Entities
+@using BatistaFloramar.Domain.Entities
 @model IEnumerable<Celula>
 @{
-    ViewBag.Title = "Células";
+    ViewBag.Title = "Células | Comunidade Batista Floramar BH";
     Layout = "_Layout";
+    ViewBag.FullWidth = true;
 
     var grupos = Model.GroupBy(c => c.DiaSemana).ToList();
     var celulasComMapa = Model.Where(c => c.Latitude.HasValue && c.Longitude.HasValue).ToList();
 }
+<style>
+    .celulas-hero {
+        background: radial-gradient(ellipse at top, var(--bg-tertiary) 0%, var(--bg-primary) 60%);
+        padding: 5.5rem 0 4rem;
+        text-align: center;
+        border-bottom: 1px solid var(--brand-gold-border);
+        position: relative;
+        overflow: hidden;
+    }
+    .celulas-hero::before {
+        content: '';
+        position: absolute; inset: 0;
+        background: radial-gradient(ellipse 60% 50% at 50% 100%, var(--brand-gold-light) 0%, transparent 70%);
+    }
+    .celulas-hero h1 { font-size: clamp(2rem,5vw,3.2rem); font-weight: 800; color: var(--text-primary); margin-bottom: 1rem; position: relative; }
+    .celulas-hero .section-eyebrow { position: relative; }
+    .celulas-hero p { color: var(--text-secondary); max-width: 620px; margin: 0 auto; font-size: 1.1rem; position: relative; }
 
-<div class="page-card">
-    <div class="page-header">
+    .celulas-section { padding: 4.5rem 0; }
+    .celulas-section.alt { background: var(--bg-secondary); }
+
+    .celula-card {
+        background: var(--bg-tertiary);
+        border: 1px solid rgba(255,255,255,.07);
+        border-radius: calc(var(--radius) * 1.5);
+        overflow: hidden;
+        height: 100%;
+        transition: transform var(--transition-smooth), box-shadow var(--transition-smooth), border-color var(--transition-smooth);
+    }
+    .celula-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-hover); border-color: var(--brand-gold-border); }
+    .celula-card img { width: 100%; height: 180px; object-fit: cover; display: block; }
+    .celula-card-body { padding: 1.25rem; }
+    .celula-card-body h3 { color: var(--text-primary); font-weight: 700; font-size: 1rem; margin-bottom: .5rem; }
+    .celula-card-body p { color: var(--text-secondary); font-size: .88rem; margin-bottom: .3rem; }
+
+    .dia-heading {
+        color: var(--brand-gold);
+        font-size: 1.5rem;
+        font-weight: 800;
+        margin-bottom: 1.5rem;
+        padding-bottom: .5rem;
+        border-bottom: 1px solid var(--brand-gold-border);
+    }
+
+    .mapa-wrap {
+        background: var(--bg-tertiary);
+        border: 1px solid rgba(255,255,255,.07);
+        border-radius: calc(var(--radius) * 1.5);
+        padding: 2rem;
+    }
+    .mapa-wrap h2 { color: var(--text-primary); font-weight: 700; margin-bottom: .5rem; }
+    #mapaCelulas { height: 420px; border-radius: var(--radius); z-index: 0; }
+
+    .cta-block {
+        background: var(--bg-secondary);
+        border-top: 1px solid var(--brand-gold-border);
+        padding: 5rem 0;
+        text-align: center;
+    }
+    .cta-block h2 { color: var(--text-primary); font-weight: 700; font-size: clamp(1.5rem,3vw,2rem); margin-bottom: .75rem; }
+    .cta-block p { color: var(--text-secondary); max-width: 540px; margin: 0 auto 2rem; }
+</style>
+
+<!-- Hero -->
+<div class="celulas-hero">
+    <div class="container">
         <span class="section-eyebrow">Igreja nos Lares</span>
-        <h1 class="page-title">Células</h1>
-        <p class="page-subtitle">
-            Confira as células em cada dia e participe das reuniões presenciais ou online. Pequenos grupos que crescem juntos.
-        </p>
-        <div class="mt-3">
-            <a href="/Lider/Login" class="btn btn-sm"
-               style="border:1px solid #c9a227;color:#c9a227;background:transparent;padding:.4rem 1rem;border-radius:8px;font-size:.85rem;">
-                <i class="fas fa-users-cog me-1"></i>Área dos Líderes
+        <h1>Células</h1>
+        <p>Confira as células em cada dia e participe das reuniões presenciais ou online. Pequenos grupos que crescem juntos.</p>
+    </div>
+</div>
+
+@if (celulasComMapa.Any())
+{
+    <!-- Mapa -->
+    <div class="celulas-section alt">
+        <div class="container">
+            <div class="mapa-wrap scroll-reveal">
+                <h2><i class="fas fa-map-marked-alt me-2 text-gold"></i>Células no mapa</h2>
+                <p class="text-secondary mb-3">Clique em um marcador para ver os detalhes da célula.</p>
+                <div class="mb-3 d-flex align-items-center gap-3 flex-wrap">
+                    <button class="btn btn-primary" id="btnMinhaLocalizacao" onclick="usarMinhaLocalizacao()">
+                        <i class="fas fa-location-arrow me-2"></i>Ver célula mais próxima de mim
+                    </button>
+                    <span id="localizacaoStatus" class="text-secondary small"></span>
+                </div>
+                <div id="mapaCelulas"></div>
+            </div>
+        </div>
+    </div>
+}
+
+<!-- Células por dia -->
+<div class="celulas-section">
+    <div class="container">
+
+        @if (!grupos.Any())
+        {
+            <div class="text-center py-5 scroll-reveal">
+                <p class="text-secondary">Nenhuma célula disponível no momento.</p>
+            </div>
+        }
+        else
+        {
+            <div class="d-flex justify-content-end mb-4">
+                <a href="/Lider/Login" class="btn btn-sm"
+                   style="border:1px solid var(--brand-gold-border);color:var(--brand-gold);background:transparent;padding:.4rem 1rem;border-radius:8px;font-size:.85rem;">
+                    <i class="fas fa-users-cog me-1"></i>Área dos Líderes
+                </a>
+            </div>
+
+            @foreach (var grupo in grupos)
+            {
+                <div class="mb-5 scroll-reveal">
+                    <p class="dia-heading"><i class="fas fa-calendar-day me-2"></i>@grupo.Key</p>
+                    <div class="row row-cols-1 row-cols-md-3 g-4">
+                        @foreach (var c in grupo)
+                        {
+                            <div class="col">
+                                <div class="celula-card">
+                                    <img src="@(c.ImagemUrl.StartsWith("/") ? c.ImagemUrl : $"/images/{c.ImagemUrl}")"
+                                         alt="Célula de crescimento @c.Nome – Igreja Batista Floramar, Belo Horizonte"
+                                         loading="lazy" />
+                                    <div class="celula-card-body">
+                                        <h3>@c.Nome</h3>
+                                        @if (!string.IsNullOrEmpty(c.Lideres))
+                                        {
+                                            <p><strong>Líder:</strong> @c.Lideres</p>
+                                        }
+                                        @if (!string.IsNullOrEmpty(c.Endereco))
+                                        {
+                                            <p>
+                                                <strong>Endereço:</strong> @c.Endereco
+                                                @if (c.Latitude.HasValue && c.Longitude.HasValue)
+                                                {
+                                                    <a href="https://www.google.com/maps/search/?api=1&query=@c.Latitude,@c.Longitude"
+                                                       target="_blank" class="ms-1 text-gold" title="Ver no Google Maps">
+                                                        <i class="fas fa-map-marker-alt"></i>
+                                                    </a>
+                                                }
+                                            </p>
+                                        }
+                                        @if (!string.IsNullOrEmpty(c.Contato))
+                                        {
+                                            <p><strong>Contato:</strong> @c.Contato</p>
+                                        }
+                                        @if (!string.IsNullOrEmpty(c.Descricao))
+                                        {
+                                            <p>@c.Descricao</p>
+                                        }
+                                        <p class="mb-0"><strong>Horário:</strong> @c.Horario</p>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>
+
+<!-- CTA -->
+<div class="cta-block">
+    <div class="container">
+        <h2>Quer participar de uma célula?</h2>
+        <p>Entre em contato conosco e te ajudamos a encontrar o grupo mais próximo de você.</p>
+        <div class="d-flex flex-wrap justify-content-center gap-3">
+            <a href="https://wa.me/5531992898901?text=Olá!%20Gostaria%20de%20participar%20de%20uma%20célula."
+               target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-lg">
+                <i class="fab fa-whatsapp me-2"></i> Falar no WhatsApp
+            </a>
+            <a href="/Napalavra" class="btn btn-outline-hero btn-lg">
+                <i class="fas fa-envelope me-2"></i> Enviar Mensagem
             </a>
         </div>
     </div>
-
-    @if (celulasComMapa.Any())
-    {
-        <div class="section-card mt-4">
-            <h2 class="text-gold mb-3"><i class="fas fa-map-marked-alt me-2"></i>Células no mapa</h2>
-            <p class="text-secondary mb-3">Clique em um marcador para ver os detalhes da célula.</p>
-            <div class="mb-3">
-                <button class="btn btn-primary" id="btnMinhaLocalizacao" onclick="usarMinhaLocalizacao()">
-                    <i class="fas fa-location-arrow me-2"></i>Ver célula mais próxima de mim
-                </button>
-                <span id="localizacaoStatus" class="text-secondary small ms-2"></span>
-            </div>
-            <div id="mapaCelulas" style="height: 420px; border-radius: 12px; z-index: 0;"></div>
-        </div>
-    }
-
-    @foreach (var grupo in grupos)
-    {
-        <div class="section-card mt-4">
-            <h2 class="text-gold">@grupo.Key</h2>
-
-            <div class="row row-cols-1 row-cols-md-3 g-4 mt-1">
-                @foreach (var c in grupo)
-                {
-                    <div class="col">
-                        <div class="section-card h-100">
-                            <img src="@(c.ImagemUrl.StartsWith("/") ? c.ImagemUrl : $"/images/{c.ImagemUrl}")" alt="Célula de crescimento @c.Nome – Igreja Batista Floramar, Belo Horizonte" class="img-fluid rounded mb-3" loading="lazy" />
-                            <h3>@c.Nome</h3>
-                            @if (!string.IsNullOrEmpty(c.Lideres))
-                            {
-                                <p class="text-secondary mb-1"><strong>Líder:</strong> @c.Lideres</p>
-                            }
-                            @if (!string.IsNullOrEmpty(c.Endereco))
-                            {
-                                <p class="text-secondary mb-1">
-                                    <strong>Endereço:</strong> @c.Endereco
-                                    @if (c.Latitude.HasValue && c.Longitude.HasValue)
-                                    {
-                                        <a href="https://www.google.com/maps/search/?api=1&query=@c.Latitude,@c.Longitude"
-                                           target="_blank" class="ms-1 text-gold" title="Ver no Google Maps">
-                                            <i class="fas fa-map-marker-alt"></i>
-                                        </a>
-                                    }
-                                </p>
-                            }
-                            @if (!string.IsNullOrEmpty(c.Contato))
-                            {
-                                <p class="text-secondary mb-1"><strong>Contato:</strong> @c.Contato</p>
-                            }
-                            @if (!string.IsNullOrEmpty(c.Descricao))
-                            {
-                                <p class="text-secondary mb-1">@c.Descricao</p>
-                            }
-                            <p class="text-secondary"><strong>Horário:</strong> @c.Horario</p>
-                        </div>
-                    </div>
-                }
-            </div>
-        </div>
-    }
-
-    @if (!grupos.Any())
-    {
-        <div class="section-card mt-4 text-center py-5">
-            <p class="text-secondary">Nenhuma célula disponível no momento.</p>
-        </div>
-    }
 </div>
 
 @if (celulasComMapa.Any())
@@ -149,7 +245,7 @@
                     ${c.lideres ? `<span style="color:#888;">Líder: ${c.lideres}</span><br>` : ''}
                     ${c.endereco ? `<i class="fas fa-map-marker-alt"></i> ${c.endereco}<br>` : ''}
                     <i class="fas fa-clock"></i> ${c.diaSemana} · ${c.horario}<br>
-                    ${c.contato ? `<i class="   fas fa-phone"></i> ${c.contato}<br>` : ''}
+                    ${c.contato ? `<i class="fas fa-phone"></i> ${c.contato}<br>` : ''}
                     <a href="https://www.google.com/maps/search/?api=1&query=${c.lat},${c.lng}" target="_blank" style="color:#c9a227;">
                         <i class="fas fa-directions"></i> Como chegar
                     </a>
@@ -166,7 +262,6 @@
             mapa.fitBounds(bounds, { padding: [40, 40] });
         }
 
-        // ─── Geolocalização ───────────────────────────────────────────────────────
         let marcadorUsuario = null;
         let circuloUsuario = null;
         let marcadorProxima = null;
@@ -198,16 +293,11 @@
                     const userLat = pos.coords.latitude;
                     const userLng = pos.coords.longitude;
 
-                    // Remove camadas anteriores
                     if (marcadorUsuario) mapa.removeLayer(marcadorUsuario);
                     if (circuloUsuario) mapa.removeLayer(circuloUsuario);
-                    if (marcadorProxima) {
-                        marcadorProxima.setIcon(icone);
-                        marcadorProxima = null;
-                    }
+                    if (marcadorProxima) { marcadorProxima.setIcon(icone); marcadorProxima = null; }
                     if (linhaProxima) { mapa.removeLayer(linhaProxima); linhaProxima = null; }
 
-                    // Marcador do usuário
                     marcadorUsuario = L.marker([userLat, userLng], { icon: iconeUsuario })
                         .addTo(mapa)
                         .bindPopup('<strong>Você está aqui</strong>')
@@ -215,13 +305,10 @@
 
                     circuloUsuario = L.circle([userLat, userLng], {
                         radius: 300,
-                        color: '#4a90e2',
-                        fillColor: '#4a90e2',
-                        fillOpacity: 0.1,
-                        weight: 1
+                        color: '#4a90e2', fillColor: '#4a90e2',
+                        fillOpacity: 0.1, weight: 1
                     }).addTo(mapa);
 
-                    // Encontra a célula mais próxima
                     let menorDist = Infinity;
                     let proxima = null;
                     let proximaIdx = -1;
@@ -231,11 +318,9 @@
                     });
 
                     if (proxima) {
-                        // Destaca a mais próxima com ícone verde
                         marcadores[proximaIdx].setIcon(iconeProxima);
                         marcadorProxima = marcadores[proximaIdx];
 
-                        // Linha pontilhada do usuário até a célula
                         linhaProxima = L.polyline(
                             [[userLat, userLng], [proxima.lat, proxima.lng]],
                             { color: '#27c9a2', weight: 2, dashArray: '6,8', opacity: 0.7 }
@@ -274,4 +359,3 @@
     </script>
     }
 }
-

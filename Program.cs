@@ -63,6 +63,14 @@ builder.Services.AddAuthentication("AdminCookie")
         options.ExpireTimeSpan = TimeSpan.FromHours(12);
         options.Cookie.HttpOnly = true;
         options.Cookie.Name = "LiderSession";
+    })
+    .AddCookie("BatismoCookie", options =>
+    {
+        options.LoginPath = "/AreaBatismo/Login";
+        options.AccessDeniedPath = "/AreaBatismo/Login";
+        options.ExpireTimeSpan = TimeSpan.FromHours(12);
+        options.Cookie.HttpOnly = true;
+        options.Cookie.Name = "BatismoSession";
     });
 
 var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
@@ -289,6 +297,36 @@ _ = Task.Run(async () =>
                 ""IntegranteId"" INTEGER NOT NULL REFERENCES ""Integrantes""(""Id"") ON DELETE RESTRICT,
                 ""Presente"" BOOLEAN NOT NULL DEFAULT FALSE,
                 ""Justificativa"" VARCHAR(500)
+            )
+        ");
+        await db.Database.ExecuteSqlRawAsync(@"
+            CREATE TABLE IF NOT EXISTS ""AulasBatismo"" (
+                ""Id"" SERIAL PRIMARY KEY,
+                ""Titulo"" VARCHAR(200) NOT NULL,
+                ""NumeroAula"" INTEGER NOT NULL,
+                ""DataAula"" TIMESTAMP NOT NULL,
+                ""ProfessorNome"" VARCHAR(150) NOT NULL,
+                ""Observacoes"" VARCHAR(1000),
+                ""CriadoEm"" TIMESTAMP NOT NULL DEFAULT NOW()
+            )
+        ");
+        await db.Database.ExecuteSqlRawAsync(@"
+            CREATE TABLE IF NOT EXISTS ""PresencasAulaBatismo"" (
+                ""Id"" SERIAL PRIMARY KEY,
+                ""AulaBatismoId"" INTEGER NOT NULL REFERENCES ""AulasBatismo""(""Id"") ON DELETE CASCADE,
+                ""NomePessoa"" VARCHAR(150) NOT NULL,
+                ""Presente"" BOOLEAN NOT NULL DEFAULT TRUE,
+                ""Observacao"" VARCHAR(500)
+            )
+        ");
+        await db.Database.ExecuteSqlRawAsync(@"
+            CREATE TABLE IF NOT EXISTS ""BatizadosHistorico"" (
+                ""Id"" SERIAL PRIMARY KEY,
+                ""Nome"" VARCHAR(150) NOT NULL,
+                ""DataBatismo"" TIMESTAMP NOT NULL,
+                ""WhatsApp"" VARCHAR(30),
+                ""Observacoes"" VARCHAR(500),
+                ""CriadoEm"" TIMESTAMP NOT NULL DEFAULT NOW()
             )
         ");
         }

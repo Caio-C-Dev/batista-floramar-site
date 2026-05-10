@@ -1,38 +1,117 @@
 @{
-    ViewBag.Title = "Ao Vivo";
+    ViewBag.Title = "Ao Vivo | Comunidade Batista Floramar BH";
     Layout = "_Layout";
+    ViewBag.FullWidth = true;
 }
+<style>
+    .aovivo-hero {
+        background: radial-gradient(ellipse at top, var(--bg-tertiary) 0%, var(--bg-primary) 60%);
+        padding: 5.5rem 0 4rem;
+        text-align: center;
+        border-bottom: 1px solid var(--brand-gold-border);
+        position: relative;
+        overflow: hidden;
+    }
+    .aovivo-hero::before {
+        content: '';
+        position: absolute; inset: 0;
+        background: radial-gradient(ellipse 60% 50% at 50% 100%, var(--brand-gold-light) 0%, transparent 70%);
+    }
+    .aovivo-hero h1 { font-size: clamp(2rem,5vw,3.2rem); font-weight: 800; color: var(--text-primary); margin-bottom: 1rem; position: relative; }
+    .aovivo-hero .section-eyebrow { position: relative; }
+    .aovivo-hero p { color: var(--text-secondary); max-width: 620px; margin: 0 auto; font-size: 1.1rem; position: relative; }
 
-<div class="page-card">
-    <div class="page-header">
+    .aovivo-section { padding: 4.5rem 0; }
+
+    .aovivo-card {
+        background: var(--bg-tertiary);
+        border: 1px solid rgba(255,255,255,.07);
+        border-radius: calc(var(--radius) * 1.5);
+        padding: 2rem;
+        height: 100%;
+        transition: border-color var(--transition-smooth);
+    }
+    .aovivo-card:hover { border-color: var(--brand-gold-border); }
+    .aovivo-card h3 { color: var(--text-primary); font-weight: 700; margin-bottom: .75rem; }
+
+    .aovivo-yt-card {
+        background: var(--bg-tertiary);
+        border: 1px solid rgba(255,255,255,.07);
+        border-radius: calc(var(--radius) * 1.5);
+        padding: 2.5rem 2rem;
+        height: 100%;
+        text-align: center;
+        display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1rem;
+        transition: border-color var(--transition-smooth);
+    }
+    .aovivo-yt-card:hover { border-color: var(--brand-gold-border); }
+    .aovivo-yt-icon {
+        width: 72px; height: 72px;
+        background: var(--brand-gold-light); border: 1px solid var(--brand-gold-border);
+        border-radius: 50%; display: flex; align-items: center; justify-content: center;
+        font-size: 1.8rem; color: var(--brand-gold);
+    }
+    .aovivo-yt-card h3 { color: var(--text-primary); font-weight: 700; margin: 0; }
+
+    .cta-block {
+        background: var(--bg-secondary);
+        border-top: 1px solid var(--brand-gold-border);
+        padding: 5rem 0;
+        text-align: center;
+    }
+    .cta-block h2 { color: var(--text-primary); font-weight: 700; font-size: clamp(1.5rem,3vw,2rem); margin-bottom: .75rem; }
+    .cta-block p { color: var(--text-secondary); max-width: 540px; margin: 0 auto 2rem; }
+</style>
+
+<!-- Hero -->
+<div class="aovivo-hero">
+    <div class="container">
         <span class="section-eyebrow">Transmissões Online</span>
-        <h1 class="page-title">Ao Vivo</h1>
-        <p class="page-subtitle">
-            Acompanhe os cultos e eventos da Comunidade Batista Floramar ao vivo pelo YouTube, de onde você estiver.
-        </p>
+        <h1>Ao Vivo</h1>
+        <p>Acompanhe os cultos e eventos da Comunidade Batista Floramar ao vivo pelo YouTube, de onde você estiver.</p>
     </div>
+</div>
 
-    <div class="row g-4 mt-2">
-        <div class="col-md-6">
-            <div class="section-card h-100">
-                <h3><i class="fas fa-broadcast-tower me-2 text-gold"></i>Transmissões da semana</h3>
-                <p class="text-secondary">Todos os cultos são transmitidos ao vivo com louvor, oração e mensagem Bíblica.</p>
-                <ul class="info-list mt-3">
-                    <li><i class="fas fa-sun"></i><span><strong>Domingo</strong> — 10h00 (Culto da Manhã)</span></li>
-                    <li><i class="fas fa-users"></i><span><strong>Quarta</strong> — 20h00 (Culto de Família)</span></li>
-                </ul>
+<!-- Conteúdo -->
+<div class="aovivo-section">
+    <div class="container">
+        <div class="row g-4 align-items-stretch">
+            <div class="col-md-6 scroll-reveal">
+                <div class="aovivo-card">
+                    <h3><i class="fas fa-broadcast-tower me-2 text-gold"></i>Transmissões da semana</h3>
+                    <p class="text-secondary">Todos os cultos são transmitidos ao vivo com louvor, oração e mensagem Bíblica.</p>
+                    <ul class="info-list mt-3">
+                        <li><i class="fas fa-sun"></i><span><strong>Domingo</strong> — 10h00 (Culto da Manhã)</span></li>
+                        <li><i class="fas fa-users"></i><span><strong>Quarta</strong> — 20h00 (Culto de Família)</span></li>
+                    </ul>
+                </div>
             </div>
-        </div>
-        <div class="col-md-6">
-            <div class="section-card h-100 text-center d-flex flex-column align-items-center justify-content-center gap-3">
-                <div class="about-pillar-icon-lg"><i class="fab fa-youtube"></i></div>
-                <h3>Canal Oficial</h3>
-                <p class="text-secondary">Inscreva-se no canal para receber notificações das transmissões ao vivo e acessar o arquivo de cultos anteriores.</p>
-                <a class="btn btn-primary btn-lg" href="https://www.youtube.com/@@comunidadebatistafloramar" target="_blank" rel="noopener noreferrer">
-                    <i class="fab fa-youtube me-2"></i> Ir para o Canal
-                </a>
+            <div class="col-md-6 scroll-reveal delay-1">
+                <div class="aovivo-yt-card">
+                    <div class="aovivo-yt-icon"><i class="fab fa-youtube"></i></div>
+                    <h3>Canal Oficial</h3>
+                    <p class="text-secondary mb-0">Inscreva-se no canal para receber notificações das transmissões ao vivo e acessar o arquivo de cultos anteriores.</p>
+                    <a class="btn btn-primary btn-lg" href="https://www.youtube.com/@@comunidadebatistafloramar" target="_blank" rel="noopener noreferrer">
+                        <i class="fab fa-youtube me-2"></i> Ir para o Canal
+                    </a>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
+<!-- CTA -->
+<div class="cta-block">
+    <div class="container">
+        <h2>Prefere participar presencialmente?</h2>
+        <p>Venha nos visitar! Teremos o maior prazer em recebê-lo na Comunidade Batista Floramar.</p>
+        <div class="d-flex flex-wrap justify-content-center gap-3">
+            <a href="/Visita" class="btn btn-primary btn-lg">
+                <i class="fas fa-map-marker-alt me-2"></i> Planejar Visita
+            </a>
+            <a href="/Cultos" class="btn btn-outline-hero btn-lg">
+                <i class="fas fa-church me-2"></i> Ver Horários de Culto
+            </a>
+        </div>
+    </div>
+</div>
