@@ -284,9 +284,7 @@ namespace BatistaFloramar.Controllers
             }
             if (ogImg != null)
             {
-                ViewBag.OgImage       = ogImg;
-                ViewBag.OgImageWidth  = "1200";
-                ViewBag.OgImageHeight = "630";
+                ViewBag.OgImage = ogImg;
             }
             return View(palavra);
         }

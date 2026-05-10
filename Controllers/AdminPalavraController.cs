@@ -145,7 +145,7 @@ namespace BatistaFloramar.Controllers
         private async Task<string> SalvarImagemAsync(IFormFile file)
         {
             var pasta = Path.Combine(_env.WebRootPath, "images", "uploads", "palavra");
-            var nome = await ImageOptimizer.SaveOptimizedAsync(file, pasta);
+            var nome = await ImageOptimizer.SaveOptimizedAsync(file, pasta, maxWidth: 1200, maxHeight: 630);
             return $"/images/uploads/palavra/{nome}";
         }
     }
