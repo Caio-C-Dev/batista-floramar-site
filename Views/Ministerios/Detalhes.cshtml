@@ -1,52 +1,137 @@
 @using BatistaFloramar.Domain.Entities
 @model Ministerio
 @{
-    ViewBag.Title = Model.Nome;
+    ViewBag.Title = Model.Nome + " | Ministérios";
     Layout = "_Layout";
-    var waMsg = Uri.EscapeDataString($"Olá! Tenho interesse em participar do Ministério {Model.Nome} da Comunidade Batista Floramar.");
-    var waLink = !string.IsNullOrEmpty(Model.WhatsApp)
-        ? $"https://wa.me/{Model.WhatsApp}?text={waMsg}"
-        : null;
+    ViewBag.FullWidth = true;
+    var waMsg  = Uri.EscapeDataString($"Olá! Tenho interesse em participar do Ministério {Model.Nome} da Comunidade Batista Floramar.");
+    var waLink = !string.IsNullOrEmpty(Model.WhatsApp) ? $"https://wa.me/{Model.WhatsApp}?text={waMsg}" : null;
 }
+<style>
+    .min-hero {
+        background: radial-gradient(ellipse at top, var(--bg-tertiary) 0%, var(--bg-primary) 60%);
+        padding: 5rem 0 3.5rem;
+        border-bottom: 1px solid var(--brand-gold-border);
+        position: relative;
+        overflow: hidden;
+    }
+    .min-hero::before {
+        content: '';
+        position: absolute; inset: 0;
+        background: radial-gradient(ellipse 60% 50% at 50% 100%, var(--brand-gold-light) 0%, transparent 70%);
+    }
+    .min-hero > .container { position: relative; }
+    .min-hero h1 { font-size: clamp(1.8rem,4vw,2.8rem); font-weight: 800; color: var(--text-primary); margin: .75rem 0 .5rem; }
+    .min-hero p { color: var(--text-secondary); font-size: 1.05rem; margin: 0; }
 
-<div class="page-card p-0 overflow-hidden">
+    .min-hero-icon {
+        width: 80px; height: 80px;
+        background: var(--brand-gold-light); border: 1px solid var(--brand-gold-border);
+        border-radius: 50%; display: flex; align-items: center; justify-content: center;
+        font-size: 2rem; color: var(--brand-gold); flex-shrink: 0;
+    }
 
-    
-    <div class="min-hero" style="background: linear-gradient(135deg,var(--bg-secondary),var(--bg-tertiary)); padding: 3rem 2.5rem 2rem; border-bottom: 1px solid rgba(255,255,255,.06);">
-        <div class="d-flex flex-wrap align-items-center gap-4">
-            <div class="min-hero-icon">
-                <i class="@Model.Icone"></i>
-            </div>
+    .min-section { padding: 4.5rem 0; }
+    .min-section.alt { background: var(--bg-secondary); }
+
+    .min-card {
+        background: var(--bg-tertiary);
+        border: 1px solid rgba(255,255,255,.07);
+        border-radius: calc(var(--radius) * 1.5);
+        padding: 2rem;
+        height: 100%;
+        transition: border-color var(--transition-smooth);
+    }
+    .min-card:hover { border-color: var(--brand-gold-border); }
+    .min-card h4 { color: var(--text-primary); font-weight: 700; margin-bottom: .75rem; }
+
+    .min-leader-avatar {
+        width: 56px; height: 56px;
+        background: rgba(230,193,90,.1);
+        border-radius: 50%; display: flex; align-items: center; justify-content: center;
+        font-size: 1.2rem; color: var(--brand-gold); flex-shrink: 0;
+        overflow: hidden; border: 2px solid var(--brand-gold-border);
+    }
+    .min-leader-photo { width: 100%; height: 100%; object-fit: cover; display: block; border-radius: 50%; }
+
+    .btn-participe {
+        display: inline-flex; align-items: center; gap: .5rem;
+        background: #25d366; color: #fff !important; font-weight: 700;
+        padding: .7rem 1.6rem; border-radius: 999px; font-size: .95rem;
+        text-decoration: none; white-space: nowrap;
+        transition: background var(--transition-fast), transform var(--transition-fast);
+    }
+    .btn-participe:hover { background: #1aae52; transform: translateY(-2px); }
+
+    .btn-wa-small {
+        display: inline-flex; align-items: center; gap: .45rem;
+        background: rgba(37,211,102,.12); color: #25d366 !important;
+        border: 1px solid rgba(37,211,102,.3); border-radius: 999px;
+        font-size: .85rem; font-weight: 600; padding: .45rem 1rem;
+        text-decoration: none; transition: background var(--transition-fast);
+    }
+    .btn-wa-small:hover { background: rgba(37,211,102,.22); }
+
+    .min-foto-thumb {
+        position: relative; border-radius: var(--radius); overflow: hidden;
+        cursor: pointer; aspect-ratio: 1; background: var(--bg-secondary);
+        transition: transform var(--transition-smooth), box-shadow var(--transition-smooth);
+    }
+    .min-foto-thumb:hover { transform: scale(1.04); box-shadow: 0 8px 24px rgba(0,0,0,.4); }
+    .min-foto-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .min-foto-label {
+        position: absolute; bottom: 0; left: 0; right: 0;
+        background: linear-gradient(transparent, rgba(0,0,0,.75));
+        color: #fff; font-size: .75rem; padding: .75rem .5rem .4rem; text-align: center;
+    }
+
+    .cta-block {
+        background: var(--bg-secondary);
+        border-top: 1px solid var(--brand-gold-border);
+        padding: 5rem 0;
+        text-align: center;
+    }
+    .cta-block h2 { color: var(--text-primary); font-weight: 700; font-size: clamp(1.5rem,3vw,2rem); margin-bottom: .75rem; }
+    .cta-block p { color: var(--text-secondary); max-width: 540px; margin: 0 auto 2rem; }
+</style>
+
+<!-- Hero -->
+<div class="min-hero">
+    <div class="container">
+        <a href="/Ministerios" class="section-eyebrow text-decoration-none" style="opacity:.75;">
+            <i class="fas fa-arrow-left me-1" style="font-size:.7rem;"></i> Ministérios
+        </a>
+        <div class="d-flex flex-wrap align-items-center gap-4 mt-3">
+            <div class="min-hero-icon"><i class="@Model.Icone"></i></div>
             <div class="flex-grow-1">
-                <a href="/Ministerios" class="section-eyebrow text-decoration-none" style="opacity:.7">
-                    <i class="fas fa-arrow-left me-1" style="font-size:.7rem"></i> Ministérios
-                </a>
-                <h1 class="page-title mb-1 mt-1">@Model.Nome</h1>
-                <p class="text-secondary mb-0" style="font-size:1.05rem">@Model.ResumoBreve</p>
+                <h1>@Model.Nome</h1>
+                @if (!string.IsNullOrEmpty(Model.ResumoBreve))
+                {
+                    <p>@Model.ResumoBreve</p>
+                }
             </div>
             @if (waLink != null)
             {
-                <a href="@waLink" target="_blank" rel="noopener"
-                   class="btn-participe d-flex align-items-center gap-2">
-                    <i class="fab fa-whatsapp" style="font-size:1.3rem"></i>
-                    <span>Participe</span>
+                <a href="@waLink" target="_blank" rel="noopener noreferrer" class="btn-participe">
+                    <i class="fab fa-whatsapp" style="font-size:1.3rem;"></i> Participe
                 </a>
             }
         </div>
     </div>
+</div>
 
-    <div class="p-4 p-md-5">
-
-        
-        <div class="row g-4 mb-5">
-            <div class="col-md-4">
-                <div class="min-leader-card">
-                    <p class="section-eyebrow mb-2">Liderança</p>
-                    <div class="d-flex align-items-center gap-3">
+<!-- Liderança + Descrição -->
+<div class="min-section">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-md-4 scroll-reveal">
+                <div class="min-card">
+                    <p class="section-eyebrow mb-3">Liderança</p>
+                    <div class="d-flex align-items-center gap-3 mb-3">
                         <div class="min-leader-avatar">
                             @if (!string.IsNullOrEmpty(Model.FotoLider))
                             {
-                                <img src="@Model.FotoLider" alt="@Model.Lideranca – Líerança do ministério @Model.Nome na Comunidade Batista Floramar" class="min-leader-photo" loading="lazy" />
+                                <img src="@Model.FotoLider" alt="@Model.Lideranca – Liderança do ministério @Model.Nome" class="min-leader-photo" loading="lazy" />
                             }
                             else
                             {
@@ -54,26 +139,22 @@
                             }
                         </div>
                         <div>
-                            <p class="mb-0 fw-semibold" style="color:var(--text-primary); font-size:1.05rem">@Model.Lideranca</p>
+                            <p class="mb-0 fw-semibold" style="color:var(--text-primary);font-size:1.05rem;">@Model.Lideranca</p>
                             <p class="mb-0 text-secondary small">@Model.Nome</p>
                         </div>
                     </div>
                     @if (waLink != null)
                     {
-                        <a href="@waLink" target="_blank" rel="noopener"
-                           class="btn-wa-small mt-3 d-flex align-items-center justify-content-center gap-2">
+                        <a href="@waLink" target="_blank" rel="noopener noreferrer" class="btn-wa-small w-100 justify-content-center">
                             <i class="fab fa-whatsapp"></i> Falar com o líder
                         </a>
                     }
                 </div>
             </div>
-
-            <div class="col-md-8">
-                <div class="section-card h-100">
-                    <h4 class="text-gold mb-3">
-                        <i class="fas fa-lightbulb me-2"></i>Por que existimos?
-                    </h4>
-                    <p class="section-text" style="white-space:pre-line">@Model.Descricao</p>
+            <div class="col-md-8 scroll-reveal delay-1">
+                <div class="min-card">
+                    <h4><i class="fas fa-lightbulb me-2 text-gold"></i>Por que existimos?</h4>
+                    <p class="text-secondary mb-0" style="white-space:pre-line;line-height:1.75;">@Model.Descricao</p>
                     @if (!string.IsNullOrEmpty(Model.Link) && Model.Link != "#")
                     {
                         <a href="@Model.Link" class="btn btn-secondary mt-3">
@@ -83,72 +164,66 @@
                 </div>
             </div>
         </div>
-
-        
-        <div class="mb-5">
-            <h3 class="section-heading mb-4">
-                <i class="fas fa-images text-gold me-2"></i>Galeria
-            </h3>
-            @if (Model.Fotos.Any())
-            {
-                <div class="row g-3">
-                    @foreach (var foto in Model.Fotos.OrderByDescending(f => f.DataUpload))
-                    {
-                        <div class="col-6 col-md-4 col-lg-3">
-                            <div class="min-foto-thumb" data-bs-toggle="modal" data-bs-target="#fotoModal"
-                                 data-src="@foto.CaminhoArquivo" data-legenda="@foto.Legenda">
-                                <img src="@foto.CaminhoArquivo" alt="@(foto.Legenda ?? Model.Nome + " – Comunidade Batista Floramar")" loading="lazy" />
-                                @if (!string.IsNullOrEmpty(foto.Legenda))
-                                {
-                                    <div class="min-foto-label">@foto.Legenda</div>
-                                }
-                            </div>
-                        </div>
-                    }
-                </div>
-            }
-            else
-            {
-                <div class="section-card text-center py-5 text-secondary">
-                    <i class="fas fa-camera fa-2x mb-3 opacity-40"></i>
-                    <p class="mb-0">Fotos em breve!</p>
-                </div>
-            }
-        </div>
-
-        
-        <div class="min-cta-card text-center">
-            <div class="min-hero-icon mb-3" style="margin:0 auto 1rem;">
-                <i class="@Model.Icone"></i>
-            </div>
-            <h3 class="text-gold mb-1">Quer fazer parte?</h3>
-            <p class="text-secondary mb-4" style="max-width:480px;margin:0 auto .75rem;">
-                Cada pessoa tem um dom. Se você sente o chamado para servir no Ministério @Model.Nome, entre em contato!
-            </p>
-            <div class="d-flex gap-3 justify-content-center flex-wrap">
-                @if (waLink != null)
-                {
-                    <a href="@waLink" target="_blank" rel="noopener" class="btn-participe">
-                        <i class="fab fa-whatsapp me-2" style="font-size:1.2rem"></i> Participe pelo WhatsApp
-                    </a>
-                }
-                <a href="/Napalavra" class="btn btn-secondary">
-                    <i class="fas fa-envelope me-2"></i> Enviar mensagem
-                </a>
-            </div>
-        </div>
-
     </div>
 </div>
 
+<!-- Galeria -->
+@if (Model.Fotos.Any())
+{
+    <div class="min-section alt">
+        <div class="container">
+            <div class="text-center mb-4 scroll-reveal">
+                <span class="section-eyebrow">Momentos</span>
+                <h2 class="section-heading">Galeria</h2>
+            </div>
+            <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-5 g-3">
+                @foreach (var foto in Model.Fotos.OrderByDescending(f => f.DataUpload))
+                {
+                    <div class="col scroll-reveal">
+                        <div class="min-foto-thumb" data-bs-toggle="modal" data-bs-target="#fotoModal"
+                             data-src="@foto.CaminhoArquivo" data-legenda="@foto.Legenda">
+                            <img src="@foto.CaminhoArquivo" alt="@(foto.Legenda ?? Model.Nome + " – Comunidade Batista Floramar")" loading="lazy" />
+                            @if (!string.IsNullOrEmpty(foto.Legenda))
+                            {
+                                <div class="min-foto-label">@foto.Legenda</div>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+}
 
+<!-- CTA -->
+<div class="cta-block">
+    <div class="container">
+        <div class="min-hero-icon mx-auto mb-3"><i class="@Model.Icone"></i></div>
+        <h2>Quer fazer parte?</h2>
+        <p>Cada pessoa tem um dom. Se você sente o chamado para servir no Ministério @Model.Nome, entre em contato!</p>
+        <div class="d-flex gap-3 justify-content-center flex-wrap">
+            @if (waLink != null)
+            {
+                <a href="@waLink" target="_blank" rel="noopener noreferrer" class="btn-participe">
+                    <i class="fab fa-whatsapp me-2" style="font-size:1.2rem;"></i> Participe pelo WhatsApp
+                </a>
+            }
+            <a href="/Napalavra" class="btn btn-outline-hero btn-lg">
+                <i class="fas fa-envelope me-2"></i> Enviar mensagem
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Modal foto -->
 <div class="modal fade" id="fotoModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" style="width:fit-content;max-width:min(92vw,900px);">
         <div class="modal-content bg-dark border-0" style="width:fit-content;margin:0 auto;position:relative;">
             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
-                style="position:absolute;top:0.6rem;right:0.6rem;z-index:10;"></button>
+                    style="position:absolute;top:.6rem;right:.6rem;z-index:10;"></button>
             <div class="modal-body p-2 text-center" style="padding-top:2.5rem!important;">
-                <img id="fotoModalImg" src="" alt="" class="rounded-3 d-block" style="max-height:82vh;max-width:min(88vw,860px);width:auto;height:auto;" />
+                <img id="fotoModalImg" src="" alt="" class="rounded-3 d-block"
+                     style="max-height:82vh;max-width:min(88vw,860px);width:auto;height:auto;" />
                 <p id="fotoModalLegenda" class="text-secondary mt-2 mb-1"></p>
             </div>
         </div>
@@ -164,110 +239,3 @@
         });
     });
 </script>
-
-<style>
-.min-hero-icon {
-    width: 80px;
-    height: 80px;
-    background: rgba(212,175,55,.12);
-    border: 1px solid rgba(212,175,55,.28);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 2rem;
-    color: var(--brand-gold);
-    flex-shrink: 0;
-}
-.btn-participe {
-    display: inline-flex;
-    align-items: center;
-    gap: .5rem;
-    background: #25d366;
-    color: #fff !important;
-    font-weight: 700;
-    padding: .7rem 1.6rem;
-    border-radius: 999px;
-    font-size: .95rem;
-    text-decoration: none;
-    transition: background .2s ease, transform .15s ease;
-    white-space: nowrap;
-}
-.btn-participe:hover {
-    background: #1aae52;
-    transform: translateY(-2px);
-}
-.btn-wa-small {
-    display: flex;
-    background: rgba(37,211,102,.12);
-    color: #25d366 !important;
-    border: 1px solid rgba(37,211,102,.3);
-    border-radius: 999px;
-    font-size: .85rem;
-    font-weight: 600;
-    padding: .45rem 1rem;
-    text-decoration: none;
-    transition: background .2s ease;
-}
-.btn-wa-small:hover { background: rgba(37,211,102,.22); }
-.min-leader-card {
-    background: var(--bg-secondary);
-    border: 1px solid var(--border-secondary);
-    border-radius: calc(var(--radius) * 1.4);
-    padding: 1.5rem;
-    height: 100%;
-}
-.min-leader-avatar {
-    width: 52px;
-    height: 52px;
-    background: rgba(230, 193, 90, 0.1);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.2rem;
-    color: var(--brand-gold);
-    flex-shrink: 0;
-    overflow: hidden;
-    border: 2px solid rgba(230, 193, 90, 0.3);
-}
-.min-leader-photo {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-    border-radius: 50%;
-}
-.min-foto-thumb {
-    position: relative;
-    border-radius: var(--radius);
-    overflow: hidden;
-    cursor: pointer;
-    aspect-ratio: 1;
-    background: var(--bg-secondary);
-    transition: transform .2s ease, box-shadow .2s ease;
-}
-.min-foto-thumb:hover { transform: scale(1.04); box-shadow: 0 8px 24px rgba(0,0,0,.4); }
-.min-foto-thumb img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-}
-.min-foto-label {
-    position: absolute;
-    bottom: 0; left: 0; right: 0;
-    background: linear-gradient(transparent, rgba(0,0,0,.75));
-    color: #fff;
-    font-size: .75rem;
-    padding: .75rem .5rem .4rem;
-    text-align: center;
-}
-.min-cta-card {
-    background: linear-gradient(135deg, rgba(212,175,55,.06), rgba(48,76,137,.1));
-    border: 1px solid rgba(212,175,55,.18);
-    border-radius: calc(var(--radius) * 1.8);
-    padding: 3rem 2rem;
-}
-</style>
-
