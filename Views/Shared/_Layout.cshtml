@@ -23,9 +23,9 @@
                                 ?? "https://www.batistafloramar.com.br" + normalizedPath;
         var ogImage         = ViewBag.OgImage as string
                                 ?? "https://www.batistafloramar.com.br/images/image_principal_2.jpeg";
-        // Dimensões padrão OG para imagem social (1200×630 ideal)
-        var ogImageWidth    = ViewBag.OgImageWidth  as string ?? "1200";
-        var ogImageHeight   = ViewBag.OgImageHeight as string ?? "630";
+        // Dimensões: usa valores reais quando disponíveis; fallback 1200×630 só para imagem padrão do site
+        var ogImageWidth    = ViewBag.OgImageWidth  as string ?? (ViewBag.OgImage == null ? "1200" : null);
+        var ogImageHeight   = ViewBag.OgImageHeight as string ?? (ViewBag.OgImage == null ? "630"  : null);
         // Detecta MIME pela extensão (WhatsApp rejeita og:image:type incoerente)
         var ogImageType = ViewBag.OgImageType as string;
         if (string.IsNullOrEmpty(ogImageType))
@@ -67,8 +67,8 @@
     <meta property="og:url"              content="@canonicalUrl" />
     <meta property="og:image"            content="@ogImage" />
     <meta property="og:image:secure_url" content="@ogImage" />
-    <meta property="og:image:width"      content="@ogImageWidth" />
-    <meta property="og:image:height"     content="@ogImageHeight" />
+    @if (ogImageWidth  != null) { <meta property="og:image:width"  content="@ogImageWidth" /> }
+    @if (ogImageHeight != null) { <meta property="og:image:height" content="@ogImageHeight" /> }
     <meta property="og:image:type"       content="@ogImageType" />
     <meta property="og:image:alt"        content="@pageTitle" />
 

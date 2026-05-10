@@ -2,8 +2,10 @@
 using BatistaFloramar.Domain.Entities;
 using BatistaFloramar.Infrastructure.Data;
 using BatistaFloramar.Models;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using SixLabors.ImageSharp;
 
 namespace BatistaFloramar.Controllers
 {
@@ -223,7 +225,12 @@ namespace BatistaFloramar.Controllers
     public class PalavraDoPastorController : Controller
     {
         private readonly BatistaFloramarDbContext _db;
-        public PalavraDoPastorController(BatistaFloramarDbContext db) => _db = db;
+        private readonly IWebHostEnvironment _env;
+        public PalavraDoPastorController(BatistaFloramarDbContext db, IWebHostEnvironment env)
+        {
+            _db = db;
+            _env = env;
+        }
 
         public async Task<IActionResult> Index()
         {
@@ -285,6 +292,19 @@ namespace BatistaFloramar.Controllers
             if (ogImg != null)
             {
                 ViewBag.OgImage = ogImg;
+
+                // Read actual dimensions so og:image:width/height are accurate
+                if (!string.IsNullOrEmpty(palavra.ImagemDestaque) && !palavra.ImagemDestaque.StartsWith("http"))
+                {
+                    var localPath = Path.Combine(_env.WebRootPath,
+                        palavra.ImagemDestaque.TrimStart('/').Replace('/', Path.DirectorySeparatorChar));
+                    if (System.IO.File.Exists(localPath))
+                    {
+                        using var img = Image.Load(localPath);
+                        ViewBag.OgImageWidth  = img.Width.ToString();
+                        ViewBag.OgImageHeight = img.Height.ToString();
+                    }
+                }
             }
             return View(palavra);
         }
