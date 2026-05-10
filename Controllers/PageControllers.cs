@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Formats.Jpeg;
+using SixLabors.ImageSharp.Processing;
 
 namespace BatistaFloramar.Controllers
 {
@@ -266,6 +268,35 @@ namespace BatistaFloramar.Controllers
                 : string.Format("Leia a mensagem ‘{0}’ do pastor da Comunidade Batista Floramar.", palavra.Titulo);
             ViewBag.CanonicalUrl = string.Format("https://www.batistafloramar.com.br/PalavraDoPastor/Detalhe/{0}", palavra.Slug);
             ViewBag.OgType = "article";
+
+            // Migrate legacy non-JPEG ImagemDestaque → convert to JPEG once and update DB
+            if (!string.IsNullOrEmpty(palavra.ImagemDestaque) &&
+                !palavra.ImagemDestaque.StartsWith("http") &&
+                !palavra.ImagemDestaque.EndsWith(".jpg", StringComparison.OrdinalIgnoreCase) &&
+                !palavra.ImagemDestaque.EndsWith(".jpeg", StringComparison.OrdinalIgnoreCase))
+            {
+                var legacyPath = Path.Combine(_env.WebRootPath,
+                    palavra.ImagemDestaque.TrimStart('/').Replace('/', Path.DirectorySeparatorChar));
+                if (System.IO.File.Exists(legacyPath))
+                {
+                    var pasta = Path.Combine(_env.WebRootPath, "images", "uploads", "palavra");
+                    Directory.CreateDirectory(pasta);
+                    var newFileName = $"{Guid.NewGuid()}.jpg";
+                    var newFullPath = Path.Combine(pasta, newFileName);
+                    using (var img = await Image.LoadAsync(legacyPath))
+                    {
+                        if (img.Width > 1200 || img.Height > 630)
+                            img.Mutate(x => x.Resize(new ResizeOptions
+                            {
+                                Size = new Size(1200, 630),
+                                Mode = ResizeMode.Max
+                            }));
+                        await img.SaveAsync(newFullPath, new JpegEncoder { Quality = 82 });
+                    }
+                    palavra.ImagemDestaque = $"/images/uploads/palavra/{newFileName}";
+                    await _db.SaveChangesAsync();
+                }
+            }
 
             // Resolve og:image: featured image → first <img> in content → site default
             string? ogImg = null;
