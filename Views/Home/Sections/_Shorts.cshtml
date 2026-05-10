@@ -125,33 +125,34 @@
             </div>
         </div>
 
-        <!-- Modal player Shorts (9:16) -->
-        <div id="shortModal" class="short-modal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="shortModalTitle">
-            <button type="button" class="short-modal-close" aria-label="Fechar vídeo" onclick="fecharShortModal()">
-                <i class="fas fa-times" aria-hidden="true"></i>
-            </button>
-            <button type="button" class="short-modal-nav prev" aria-label="Vídeo anterior" onclick="navegarShort(-1)">
-                <i class="fas fa-chevron-left" aria-hidden="true"></i>
-            </button>
-            <div class="short-modal-frame">
-                <div class="short-modal-iframe-wrap">
-                    <iframe id="shortIframe" src="" frameborder="0"
-                            allow="autoplay; encrypted-media; picture-in-picture; clipboard-write"
-                            allowfullscreen
-                            title="Reprodutor de vídeo"></iframe>
-                </div>
-                <div class="short-modal-meta">
-                    <p class="short-modal-title" id="shortModalTitle"></p>
-                    <a id="shortModalLink" href="#" target="_blank" rel="noopener noreferrer" class="short-modal-link">
-                        Abrir no YouTube <i class="fas fa-arrow-up-right-from-square ms-1" aria-hidden="true"></i>
-                    </a>
-                </div>
-            </div>
-            <button type="button" class="short-modal-nav next" aria-label="Próximo vídeo" onclick="navegarShort(1)">
-                <i class="fas fa-chevron-right" aria-hidden="true"></i>
-            </button>
-        </div>
     </section>
+
+    <!-- Modal fora da section para não ficar preso no stacking context de isolation:isolate -->
+    <div id="shortModal" class="short-modal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="shortModalTitle">
+        <button type="button" class="short-modal-close" aria-label="Fechar vídeo" onclick="fecharShortModal()">
+            <i class="fas fa-times" aria-hidden="true"></i>
+        </button>
+        <button type="button" class="short-modal-nav prev" aria-label="Vídeo anterior" onclick="navegarShort(-1)">
+            <i class="fas fa-chevron-left" aria-hidden="true"></i>
+        </button>
+        <div class="short-modal-frame">
+            <div class="short-modal-iframe-wrap">
+                <iframe id="shortIframe" src="" frameborder="0"
+                        allow="autoplay; encrypted-media; picture-in-picture; clipboard-write"
+                        allowfullscreen
+                        title="Reprodutor de vídeo"></iframe>
+            </div>
+            <div class="short-modal-meta">
+                <p class="short-modal-title" id="shortModalTitle"></p>
+                <a id="shortModalLink" href="#" target="_blank" rel="noopener noreferrer" class="short-modal-link">
+                    Abrir no YouTube <i class="fas fa-arrow-up-right-from-square ms-1" aria-hidden="true"></i>
+                </a>
+            </div>
+        </div>
+        <button type="button" class="short-modal-nav next" aria-label="Próximo vídeo" onclick="navegarShort(1)">
+            <i class="fas fa-chevron-right" aria-hidden="true"></i>
+        </button>
+    </div>
 
     <style>
         /* ── Background harmônico ── */
