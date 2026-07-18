@@ -31,6 +31,7 @@ namespace BatistaFloramar.Infrastructure.Data
         public DbSet<AulaBatismo> AulasBatismo => Set<AulaBatismo>();
         public DbSet<PresencaAulaBatismo> PresencasAulaBatismo => Set<PresencaAulaBatismo>();
         public DbSet<BatizadoHistorico> BatizadosHistorico => Set<BatizadoHistorico>();
+        public DbSet<Produto> Produtos => Set<Produto>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -270,6 +271,18 @@ namespace BatistaFloramar.Infrastructure.Data
                 e.Property(x => x.Nome).HasMaxLength(150).IsRequired();
                 e.Property(x => x.WhatsApp).HasMaxLength(30);
                 e.Property(x => x.Observacoes).HasMaxLength(500);
+            });
+
+            modelBuilder.Entity<Produto>(e =>
+            {
+                e.ToTable("Produtos");
+                e.HasKey(x => x.Id);
+                e.Property(x => x.Nome).HasMaxLength(200).IsRequired();
+                e.Property(x => x.Slug).HasMaxLength(220).IsRequired().HasDefaultValue("");
+                e.HasIndex(x => x.Slug).IsUnique();
+                e.Property(x => x.Descricao).HasMaxLength(2000).IsRequired();
+                e.Property(x => x.Preco).HasColumnType("decimal(18,2)").IsRequired();
+                e.Property(x => x.Imagem).HasMaxLength(500);
             });
         }
     }

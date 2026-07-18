@@ -1,16 +1,140 @@
+@using BatistaFloramar.Domain.Entities
+@model IEnumerable<Produto>
 @{
-    ViewBag.Title = "Loja";
     Layout = "_Layout";
+    ViewBag.FullWidth = true;
 }
+<style>
+    .loja-hero {
+        background: radial-gradient(ellipse at top, var(--bg-tertiary) 0%, var(--bg-primary) 60%);
+        padding: 5.5rem 0 4rem;
+        text-align: center;
+        border-bottom: 1px solid var(--brand-gold-border);
+        position: relative;
+        overflow: hidden;
+    }
+    .loja-hero::before {
+        content: '';
+        position: absolute; inset: 0;
+        background: radial-gradient(ellipse 60% 50% at 50% 100%, var(--brand-gold-light) 0%, transparent 70%);
+    }
+    .loja-hero h1 { font-size: clamp(2rem,5vw,3.2rem); font-weight: 800; color: var(--text-primary); margin-bottom: 1rem; position: relative; }
+    .loja-hero p { color: var(--text-secondary); max-width: 640px; margin: 0 auto; font-size: 1.05rem; position: relative; }
+    .loja-hero .payment-hint { margin-top: 1.5rem; display: inline-flex; gap: .75rem; flex-wrap: wrap; justify-content: center; position: relative; }
+    .loja-hero .payment-hint span {
+        background: var(--brand-gold-light);
+        border: 1px solid var(--brand-gold-border);
+        color: var(--text-primary);
+        padding: .4rem .9rem;
+        border-radius: 999px;
+        font-size: .82rem;
+        font-weight: 600;
+    }
 
-<div class="page-card text-center">
-    <h1>Loja</h1>
-    <p class="lead text-secondary">Em breve teremos uma loja com livros, materiais e produtos espirituais.</p>
-    <div class="placeholder-card mt-4 py-5">
-        <div>
-            <h2 class="text-gold">Em Breve!</h2>
-            <p class="text-secondary mb-3">A loja ser· lanÁada em breve com novidades especiais para a comunidade.</p>
+    .loja-section { padding: 4.5rem 0; }
+
+    .produto-card {
+        background: var(--bg-tertiary);
+        border: 1px solid rgba(255,255,255,.07);
+        border-radius: calc(var(--radius) * 1.5);
+        overflow: hidden;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        transition: transform var(--transition-smooth), box-shadow var(--transition-smooth), border-color var(--transition-smooth);
+    }
+    .produto-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-hover); border-color: var(--brand-gold-border); }
+    .produto-card .img-wrap {
+        aspect-ratio: 4/3;
+        background: linear-gradient(135deg, #1a1a2e, #0b1224);
+        display: flex; align-items: center; justify-content: center;
+        overflow: hidden;
+    }
+    .produto-card .img-wrap img { width: 100%; height: 100%; object-fit: cover; }
+    .produto-card .img-wrap .placeholder { font-size: 2.5rem; color: var(--brand-gold); opacity: .6; }
+    .produto-card .body { padding: 1.25rem 1.4rem 1.5rem; display: flex; flex-direction: column; flex: 1; }
+    .produto-card h3 { font-size: 1.15rem; font-weight: 700; color: var(--text-primary); margin: 0 0 .5rem; }
+    .produto-card .resumo { color: var(--text-secondary); font-size: .9rem; margin: 0 0 1rem; flex: 1;
+        display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+    .produto-card .preco { color: var(--brand-gold); font-size: 1.4rem; font-weight: 800; margin-bottom: 1rem; }
+    .produto-card .btn-ver {
+        display: inline-flex; align-items: center; justify-content: center; gap: .5rem;
+        background: linear-gradient(135deg, #E6C15A, #c9a63c);
+        color: #1a1a1a;
+        font-weight: 700;
+        padding: .55rem 1rem;
+        border-radius: 999px;
+        text-decoration: none;
+        transition: opacity .2s;
+    }
+    .produto-card .btn-ver:hover { opacity: .9; color: #1a1a1a; }
+
+    .empty-box {
+        background: var(--bg-tertiary);
+        border: 1px dashed var(--brand-gold-border);
+        border-radius: calc(var(--radius) * 1.5);
+        padding: 3rem 2rem;
+        text-align: center;
+        max-width: 640px;
+        margin: 0 auto;
+    }
+    .empty-box i { font-size: 2.5rem; color: var(--brand-gold); display: block; margin-bottom: 1rem; }
+    .empty-box h3 { color: var(--text-primary); font-weight: 700; }
+    .empty-box p { color: var(--text-secondary); margin: 0; }
+</style>
+
+<div class="loja-hero">
+    <div class="container">
+        <span class="section-eyebrow">Loja da Igreja</span>
+        <h1>Livros e materiais</h1>
+        <p>Recursos escolhidos pela Comunidade Batista Floramar para o seu crescimento na Palavra. Pagamento e retirada combinados diretamente pelo WhatsApp com o Pastor Rodrigo.</p>
+        <div class="payment-hint">
+            <span><i class="fas fa-qrcode me-1"></i>Pix na igreja</span>
+            <span><i class="fas fa-credit-card me-1"></i>Cart√£o na igreja</span>
+            <span><i class="fab fa-whatsapp me-1"></i>Retirada por WhatsApp</span>
         </div>
     </div>
 </div>
 
+<div class="loja-section">
+    <div class="container">
+        @if (!Model.Any())
+        {
+            <div class="empty-box">
+                <i class="fas fa-book"></i>
+                <h3>Em breve!</h3>
+                <p>Novos itens ser√£o disponibilizados aqui em breve. Fique atento.</p>
+            </div>
+        }
+        else
+        {
+            <div class="row g-4">
+                @foreach (var p in Model)
+                {
+                    <div class="col-sm-6 col-lg-4">
+                        <div class="produto-card">
+                            <div class="img-wrap">
+                                @if (!string.IsNullOrEmpty(p.Imagem))
+                                {
+                                    <img src="@p.Imagem" alt="@p.Nome" loading="lazy" />
+                                }
+                                else
+                                {
+                                    <i class="fas fa-book placeholder"></i>
+                                }
+                            </div>
+                            <div class="body">
+                                <h3>@p.Nome</h3>
+                                <p class="resumo">@p.Descricao</p>
+                                <div class="preco">R$ @p.Preco.ToString("N2", new System.Globalization.CultureInfo("pt-BR"))</div>
+                                <a href="@Url.Action("Detalhe", "Loja", new { id = p.Slug })" class="btn-ver">
+                                    Ver detalhes <i class="fas fa-arrow-right"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>

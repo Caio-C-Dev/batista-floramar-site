@@ -359,14 +359,14 @@ button {
   bottom: calc(2rem + env(safe-area-inset-bottom, 0px));
 }
 .float-nav {
-  bottom: calc(2rem + env(safe-area-inset-bottom, 0px));
+  top: calc(5.5rem + env(safe-area-inset-top, 0px));
 }
 @@media (max-width: 767px) {
   .whatsapp-float {
     bottom: calc(1.25rem + env(safe-area-inset-bottom, 0px));
   }
   .float-nav {
-    bottom: calc(1.25rem + env(safe-area-inset-bottom, 0px));
+    top: calc(4.5rem + env(safe-area-inset-top, 0px));
   }
 }
 
@@ -1071,7 +1071,7 @@ textarea {
 /* --- Botão de navegação flutuante ------------------------------- */
 .float-nav {
   position: fixed;
-  bottom: 2rem;
+  top: 5.5rem;
   right: 1.5rem;
   z-index: 1050;
   display: flex;
@@ -1117,7 +1117,7 @@ textarea {
   padding: 0.5rem;
   min-width: 150px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-  transform-origin: bottom right;
+  transform-origin: top right;
   transform: scale(0.85);
   opacity: 0;
   pointer-events: none;
@@ -1705,6 +1705,113 @@ a.btn-nav-visit:focus,
 @media (max-width: 991.98px) {
   .nav-item:has(.btn-nav-pastor) {
     margin-top: 0.6rem;
+  }
+}
+
+/* ── Loja CTA button ───────────────── */
+.main-navbar .nav-link.btn-nav-loja,
+.btn-nav-loja {
+  background: linear-gradient(135deg, #e6c15a 0%, #c9a63c 100%) !important;
+  color: #1a1a1a !important;
+  padding: 0.42rem 1.2rem !important;
+  border-radius: 999px !important;
+  border: 1px solid rgba(230, 193, 90, 0.6) !important;
+  font-weight: 800 !important;
+  font-size: 0.85rem !important;
+  letter-spacing: 0.02em !important;
+  text-shadow: none !important;
+  transition: all 0.25s ease !important;
+}
+
+.btn-nav-loja::after {
+  display: none !important;
+}
+
+.main-navbar .nav-item .btn-nav-loja:hover,
+.main-navbar .nav-item .btn-nav-loja:focus,
+.navbar .nav-item .btn-nav-loja:hover,
+.navbar .nav-item .btn-nav-loja:focus {
+  background: linear-gradient(135deg, #f0cd6f 0%, #d4af3e 100%) !important;
+  color: #000 !important;
+  box-shadow: 0 0 22px rgba(230, 193, 90, 0.55) !important;
+  opacity: 1 !important;
+  transform: translateY(-1px);
+}
+
+.navbar .nav-item .btn-nav-loja i {
+  color: #1a1a1a !important;
+}
+
+/* ── Área do Pastor: ícone redondo ───────────────── */
+.btn-nav-pastor-icon {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 40px !important;
+  height: 40px !important;
+  padding: 0 !important;
+  border-radius: 50% !important;
+  background-color: transparent !important;
+  color: var(--brand-gold) !important;
+  border: 1px solid rgba(230, 193, 90, 0.5) !important;
+  font-size: 0.95rem !important;
+  transition: all 0.25s ease !important;
+}
+
+.btn-nav-pastor-icon::after {
+  display: none !important;
+}
+
+.navbar .nav-item .btn-nav-pastor-icon:hover,
+.navbar .nav-item .btn-nav-pastor-icon:focus {
+  background-color: rgba(230, 193, 90, 0.12) !important;
+  color: var(--brand-gold) !important;
+  border-color: var(--brand-gold) !important;
+  box-shadow: 0 0 14px rgba(230, 193, 90, 0.22) !important;
+}
+
+.navbar .nav-item .btn-nav-pastor-icon:hover i,
+.navbar .nav-item .btn-nav-pastor-icon:focus i {
+  color: var(--brand-gold) !important;
+}
+
+/* ── Área do Pastor: ícone isolado no canto superior direito ── */
+.site-pastor-corner {
+  position: fixed;
+  top: 0.85rem;
+  right: 1.25rem;
+  z-index: 1200;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background-color: rgba(8, 8, 12, 0.72);
+  -webkit-backdrop-filter: blur(14px) saturate(1.4);
+  backdrop-filter: blur(14px) saturate(1.4);
+  color: var(--brand-gold);
+  border: 1px solid rgba(230, 193, 90, 0.5);
+  font-size: 0.95rem;
+  text-decoration: none;
+  transition: all 0.25s ease;
+}
+
+.site-pastor-corner:hover,
+.site-pastor-corner:focus {
+  background-color: rgba(230, 193, 90, 0.15);
+  color: var(--brand-gold);
+  border-color: var(--brand-gold);
+  box-shadow: 0 0 14px rgba(230, 193, 90, 0.3);
+}
+
+.site-pastor-corner i {
+  pointer-events: none;
+}
+
+/* Reserva espaço à direita da navbar pra não colidir com o ícone do canto */
+@media (min-width: 992px) {
+  .main-navbar > .container {
+    padding-right: 4.25rem;
   }
 }
 
@@ -3685,7 +3792,7 @@ a.btn-nav-visit:focus,
 
   /* Float nav */
   .float-nav {
-    bottom: 1.25rem;
+    top: 4.5rem;
     right: 1rem;
   }
 

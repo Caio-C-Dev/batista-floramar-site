@@ -1,0 +1,104 @@
+@using BatistaFloramar.Domain.Entities
+@model Produto
+@{
+    Layout = "_Layout";
+    ViewBag.FullWidth = true;
+    var precoFmt = Model.Preco.ToString("N2", new System.Globalization.CultureInfo("pt-BR"));
+    var msg = $"Olá Pastor Rodrigo! Tenho interesse no produto da loja: *{Model.Nome}* (R$ {precoFmt}). Como faço para pagar e retirar?";
+    var waUrl = "https://wa.me/5531985560773?text=" + Uri.EscapeDataString(msg);
+}
+<style>
+    .produto-detalhe-wrap { padding: 4rem 0 5rem; background: var(--bg-primary); }
+    .produto-detalhe {
+        background: var(--bg-tertiary);
+        border: 1px solid rgba(255,255,255,.07);
+        border-radius: calc(var(--radius) * 1.5);
+        overflow: hidden;
+    }
+    .produto-detalhe .img-lado {
+        background: linear-gradient(135deg, #1a1a2e, #0b1224);
+        display: flex; align-items: center; justify-content: center;
+        min-height: 320px;
+        padding: 1rem;
+    }
+    .produto-detalhe .img-lado img { width: 100%; height: 100%; object-fit: contain; max-height: 480px; }
+    .produto-detalhe .img-lado .placeholder { font-size: 5rem; color: var(--brand-gold); opacity: .55; }
+    .produto-detalhe .info { padding: 2.5rem 2.25rem; }
+    .produto-detalhe h1 { font-size: clamp(1.6rem,3.5vw,2.2rem); font-weight: 800; color: var(--text-primary); margin-bottom: 1rem; }
+    .produto-detalhe .preco { color: var(--brand-gold); font-size: 2rem; font-weight: 800; margin-bottom: 1.5rem; }
+    .produto-detalhe .descricao { color: var(--text-secondary); font-size: 1rem; line-height: 1.7; margin-bottom: 2rem; white-space: pre-wrap; }
+
+    .pagamento-box {
+        background: var(--brand-gold-light);
+        border: 1px solid var(--brand-gold-border);
+        border-radius: calc(var(--radius) * 1.2);
+        padding: 1.5rem;
+        margin-bottom: 1.75rem;
+    }
+    .pagamento-box h4 { color: var(--text-primary); font-weight: 700; margin-bottom: .75rem; font-size: 1rem; }
+    .pagamento-box ul { margin: 0; padding-left: 1.1rem; color: var(--text-secondary); font-size: .92rem; }
+    .pagamento-box li { margin-bottom: .35rem; }
+
+    .btn-whatsapp {
+        display: inline-flex; align-items: center; justify-content: center; gap: .6rem;
+        background: #25d366;
+        color: #fff;
+        font-weight: 700;
+        padding: .95rem 1.6rem;
+        border-radius: 999px;
+        text-decoration: none;
+        font-size: 1.05rem;
+        box-shadow: 0 4px 18px rgba(37,211,102,.45);
+        transition: transform .2s, box-shadow .2s;
+    }
+    .btn-whatsapp:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(37,211,102,.7); color: #fff; }
+
+    .btn-voltar-loja {
+        display: inline-flex; align-items: center; gap: .4rem;
+        color: var(--text-secondary);
+        text-decoration: none;
+        font-size: .9rem;
+        margin-bottom: 1.5rem;
+    }
+    .btn-voltar-loja:hover { color: var(--brand-gold); }
+</style>
+
+<div class="produto-detalhe-wrap">
+    <div class="container">
+        <a href="@Url.Action("Index", "Loja")" class="btn-voltar-loja">
+            <i class="fas fa-arrow-left"></i> Voltar para a loja
+        </a>
+        <div class="produto-detalhe">
+            <div class="row g-0">
+                <div class="col-md-6 img-lado">
+                    @if (!string.IsNullOrEmpty(Model.Imagem))
+                    {
+                        <img src="@Model.Imagem" alt="@Model.Nome" />
+                    }
+                    else
+                    {
+                        <i class="fas fa-book placeholder"></i>
+                    }
+                </div>
+                <div class="col-md-6 info">
+                    <h1>@Model.Nome</h1>
+                    <div class="preco">R$ @precoFmt</div>
+                    <div class="descricao">@Model.Descricao</div>
+
+                    <div class="pagamento-box">
+                        <h4><i class="fas fa-info-circle me-1" style="color:var(--brand-gold);"></i> Como funciona</h4>
+                        <ul>
+                            <li>Pagamento via <strong>Pix</strong> ou <strong>cartão de crédito</strong>, feito diretamente na igreja.</li>
+                            <li>Retirada e envio combinados com o <strong>Pastor Rodrigo</strong> pelo WhatsApp.</li>
+                            <li>Basta clicar no botão abaixo — a mensagem já vai preenchida.</li>
+                        </ul>
+                    </div>
+
+                    <a href="@waUrl" target="_blank" rel="noopener noreferrer" class="btn-whatsapp">
+                        <i class="fab fa-whatsapp"></i> Falar com o Pastor Rodrigo
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

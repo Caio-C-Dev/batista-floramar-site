@@ -155,6 +155,11 @@
 </head>
 <body>
     <header>
+        <!-- Ícone Área do Pastor — isolado no canto superior direito (desktop) -->
+        <a class="site-pastor-corner d-none d-lg-flex" href="/Admin/Login"
+           title="Área do Pastor" aria-label="Área do Pastor">
+            <i class="fas fa-cross"></i>
+        </a>
         <nav class="navbar navbar-expand-lg navbar-dark main-navbar shadow-sm">
             <div class="container">
                 <a class="navbar-brand d-flex align-items-center gap-2" href="/">
@@ -229,6 +234,11 @@
                                         <i class="fas fa-heart"></i>Doações
                                     </a>
                                 </li>
+                                <li>
+                                    <a class="dropdown-item" href="/Loja">
+                                        <i class="fas fa-shopping-bag"></i>Loja
+                                    </a>
+                                </li>
                                 <li><hr class="dropdown-divider nav-dropdown-divider" /></li>
                                 <li>
                                     <a class="dropdown-item" href="/Contato/Batismo">
@@ -258,8 +268,15 @@
                             </a>
                         </li>
 
-                        <!-- Botão secundário: Área do Pastor -->
+                        <!-- Botão: Loja -->
                         <li class="nav-item">
+                            <a class="nav-link btn-nav-loja" href="/Loja">
+                                <i class="fas fa-shopping-bag me-1"></i>Loja
+                            </a>
+                        </li>
+
+                        <!-- Área do Pastor: item no menu colapsado (mobile) -->
+                        <li class="nav-item d-lg-none">
                             <a class="nav-link btn-nav-pastor" href="/Admin/Login">
                                 <i class="fas fa-cross me-1"></i>Área do Pastor
                             </a>
@@ -322,6 +339,7 @@
                                 <li><a href="/PalavraDoPastor">Palavra do Pastor</a></li>
                                 <li><a href="/Series">Séries</a></li>
                                 <li><a href="/Doacao">Doações</a></li>
+                                <li><a href="/Loja">Loja</a></li>
                                 <li><a href="/Galeria">Galeria</a></li>
                                 <li><a href="/Visita">Planejar Visita</a></li>
                                 <li><a href="/Contato/Batismo">Batismo &amp; Filiação</a></li>

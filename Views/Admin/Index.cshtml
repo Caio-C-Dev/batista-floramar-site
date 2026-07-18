@@ -104,6 +104,17 @@
             </div>
         </a>
     </div>
+    <div class="col-sm-6 col-xl-3">
+        <a href="@Url.Action("Index","AdminLoja")" class="text-decoration-none">
+            <div class="admin-stat-card">
+                <div class="admin-stat-icon" style="background:rgba(34,197,94,0.15);color:#22c55e;"><i class="fas fa-shopping-bag"></i></div>
+                <div class="admin-stat-info">
+                    <h2>@ViewBag.TotalProdutos</h2>
+                    <p>Produtos na loja</p>
+                </div>
+            </div>
+        </a>
+    </div>
 
 <div class="row g-3">
     <div class="col-md-6">
@@ -118,6 +129,7 @@
                 <a href="@Url.Action("Novo","AdminEventosSemanal")" class="btn-admin"><i class="fas fa-plus"></i> Novo Evento Semanal</a>
                 <a href="@Url.Action("Index","AdminBatismo")" class="btn-admin"><i class="fas fa-water"></i> Ver Batismos Pendentes</a>
                 <a href="@Url.Action("NovoAlbum","AdminGaleria")" class="btn-admin"><i class="fas fa-plus"></i> Novo Álbum na Galeria</a>
+                <a href="@Url.Action("Create","AdminLoja")" class="btn-admin"><i class="fas fa-plus"></i> Novo Produto na Loja</a>
             </div>
         </div>
     </div>

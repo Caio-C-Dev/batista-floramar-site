@@ -74,6 +74,11 @@
                 <i class="fas fa-images"></i>
                 <span>Galeria</span>
             </a>
+            <a href="@Url.Action("Index", "AdminLoja")"
+               class="@(ViewBag.AdminSection == "loja" ? "active" : "")">
+                <i class="fas fa-shopping-bag"></i>
+                <span>Loja</span>
+            </a>
             @if (User.Identity?.Name == "AdmCaio")
             {
             <a href="@Url.Action("Index", "AdminUsuarios")"

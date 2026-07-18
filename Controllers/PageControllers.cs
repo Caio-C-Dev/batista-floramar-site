@@ -218,9 +218,43 @@ namespace BatistaFloramar.Controllers
 
     public class LojaController : Controller
     {
-        public IActionResult Index()
+        private readonly BatistaFloramarDbContext _db;
+        public LojaController(BatistaFloramarDbContext db) => _db = db;
+
+        public async Task<IActionResult> Index()
         {
-            return View();
+            ViewBag.Title = "Loja da Igreja | Livros e Materiais | Batista Floramar BH";
+            ViewBag.MetaDescription = "Loja da Comunidade Batista Floramar: livros e materiais espirituais. Pagamento via Pix ou cartão na igreja, retirada combinada por WhatsApp.";
+            var produtos = await _db.Produtos
+                .Where(p => p.Ativo)
+                .OrderBy(p => p.Ordem)
+                .ThenByDescending(p => p.CriadoEm)
+                .ToListAsync();
+            return View(produtos);
+        }
+
+        public async Task<IActionResult> Detalhe(string id)
+        {
+            if (string.IsNullOrWhiteSpace(id)) return NotFound();
+
+            var produto = await _db.Produtos
+                .FirstOrDefaultAsync(p => p.Slug == id && p.Ativo);
+
+            if (produto == null && int.TryParse(id, out var legacyId))
+                produto = await _db.Produtos.FirstOrDefaultAsync(p => p.Id == legacyId && p.Ativo);
+
+            if (produto == null) return NotFound();
+
+            if (id != produto.Slug)
+                return RedirectToActionPermanent(nameof(Detalhe), new { id = produto.Slug });
+
+            ViewBag.Title = produto.Nome + " | Loja Batista Floramar";
+            ViewBag.MetaDescription = produto.Descricao.Length > 160
+                ? produto.Descricao[..157] + "..."
+                : produto.Descricao;
+            if (!string.IsNullOrEmpty(produto.Imagem))
+                ViewBag.OgImage = "https://www.batistafloramar.com.br" + produto.Imagem;
+            return View(produto);
         }
     }
 

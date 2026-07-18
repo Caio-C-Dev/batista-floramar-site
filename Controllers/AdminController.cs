@@ -31,6 +31,7 @@ namespace BatistaFloramar.Controllers
             ViewBag.TotalEventosSemanais = await _db.EventosSemanais.CountAsync(e => e.Ativo);
             ViewBag.TotalBatismosPendentes = await _db.SolicitacoesBatismo.CountAsync(s => !s.Atendido);
             ViewBag.TotalAlbuns = await _db.GaleriaAlbuns.CountAsync();
+            ViewBag.TotalProdutos = await _db.Produtos.CountAsync(p => p.Ativo);
             return View();
         }
 

@@ -1,0 +1,86 @@
+@using BatistaFloramar.Domain.Entities
+@model IEnumerable<Produto>
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewBag.Title = "Loja";
+    ViewBag.AdminSection = "loja";
+}
+
+@section TopbarActions {
+    <a href="@Url.Action("Create")" class="btn-admin">
+        <i class="fas fa-plus"></i> Novo Produto
+    </a>
+}
+
+<div class="admin-card p-0">
+    <div class="table-responsive">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th style="width:80px;">Imagem</th>
+                    <th>Nome</th>
+                    <th>Preço</th>
+                    <th>Ordem</th>
+                    <th>Status</th>
+                    <th style="width:180px;">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var p in Model)
+                {
+                    <tr>
+                        <td>
+                            @if (!string.IsNullOrEmpty(p.Imagem))
+                            {
+                                <img src="@p.Imagem" alt="@p.Nome" style="width:60px;height:60px;object-fit:cover;border-radius:6px;" />
+                            }
+                            else
+                            {
+                                <i class="fas fa-book" style="font-size:1.6rem;color:var(--admin-accent);"></i>
+                            }
+                        </td>
+                        <td>
+                            <strong>@p.Nome</strong><br />
+                            <small style="color:var(--admin-text-muted);">@p.Slug</small>
+                        </td>
+                        <td>R$ @p.Preco.ToString("N2", new System.Globalization.CultureInfo("pt-BR"))</td>
+                        <td>@p.Ordem</td>
+                        <td>
+                            @if (p.Ativo)
+                            {
+                                <span class="badge-ativo">Ativo</span>
+                            }
+                            else
+                            {
+                                <span class="badge-inativo">Inativo</span>
+                            }
+                        </td>
+                        <td>
+                            <div class="d-flex gap-1">
+                                <a href="@Url.Action("Edit", new { id = p.Id })" class="btn-admin-outline" title="Editar">
+                                    <i class="fas fa-pen"></i>
+                                </a>
+                                <form method="post" asp-action="ToggleAtivo" asp-route-id="@p.Id" style="display:inline;">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="@(p.Ativo ? "btn-admin-danger" : "btn-admin-outline")" title="@(p.Ativo ? "Inativar" : "Ativar")">
+                                        <i class="fas @(p.Ativo ? "fa-toggle-off" : "fa-toggle-on")"></i>
+                                    </button>
+                                </form>
+                                <form method="post" asp-action="Delete" asp-route-id="@p.Id" style="display:inline;" onsubmit="return confirm('Remover este produto? Esta ação não pode ser desfeita.');">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn-admin-danger" title="Excluir">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                }
+                @if (!Model.Any())
+                {
+                    <tr><td colspan="6" class="text-center" style="color: var(--admin-text-muted); padding: 32px;">Nenhum produto cadastrado.</td></tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
