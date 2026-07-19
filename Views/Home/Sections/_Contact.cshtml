@@ -1,4 +1,4 @@
-<section class="page-section" id="contato">
+<section class="page-section contato-section" id="contato">
     <div class="container">
         <div class="text-center mb-5 scroll-reveal">
             <span class="section-eyebrow">Contato</span>
@@ -59,6 +59,20 @@
 </section>
 
 <style>
+    .contato-section {
+        position: relative;
+        background-image:
+            linear-gradient(rgba(8, 8, 12, 0.82), rgba(8, 8, 12, 0.92)),
+            url('/images/fachada.jpeg');
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+    }
+    @@media (max-width: 991.98px) {
+        /* fixed background trava/estica em mobile — usar scroll */
+        .contato-section { background-attachment: scroll; }
+    }
+    .contato-section > .container { position: relative; z-index: 1; }
     .mapa-wrap { border-radius: 16px; overflow: hidden; box-shadow: 0 8px 32px rgba(0,0,0,.4); }
 </style>
 
