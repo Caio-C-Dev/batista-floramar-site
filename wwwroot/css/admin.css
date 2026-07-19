@@ -572,3 +572,29 @@ html, body.admin-body {
     border-bottom-color: var(--admin-accent);
   }
 }
+
+/* ============================================================
+   Scrollbars customizadas (douradas) — todo o painel admin
+   ============================================================ */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--admin-accent) var(--admin-bg);
+}
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--admin-bg);
+}
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, var(--admin-accent) 0%, #a8892f 100%);
+  border-radius: 5px;
+  border: 2px solid var(--admin-bg);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, var(--admin-accent-hover) 0%, var(--admin-accent) 100%);
+}
+::-webkit-scrollbar-corner {
+  background: var(--admin-bg);
+}

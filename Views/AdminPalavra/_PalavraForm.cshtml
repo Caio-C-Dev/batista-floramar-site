@@ -1,0 +1,342 @@
+@model BatistaFloramar.Domain.Entities.PalavraDoPastor
+@{
+    bool isEdit = Model.Id > 0;
+    string action = isEdit ? "Editar" : "Nova";
+}
+
+<div class="admin-card" style="max-width:1200px;">
+    <form method="post" enctype="multipart/form-data" action="@Url.Action(action, new { id = Model.Id })">
+        @Html.AntiForgeryToken()
+
+        <div class="row g-3 mb-3">
+            <div class="col-md-8">
+                <label class="form-label">Título *</label>
+                <input type="text" name="Titulo" value="@Model.Titulo" class="form-control"
+                       placeholder="Ex: A Fé que Move Montanhas" required />
+                @if (ViewData.ModelState["Titulo"]?.Errors.Count > 0)
+                {
+                    <div class="text-danger small mt-1">@ViewData.ModelState["Titulo"]!.Errors[0].ErrorMessage</div>
+                }
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Tipo</label>
+                <select name="Tipo" class="form-select">
+                    @if (Model.Tipo == BatistaFloramar.Domain.Entities.TipoPalavra.Devocional)
+                    {
+                        <option value="1" selected="selected">Devocional</option>
+                        <option value="0">Sermão</option>
+                    }
+                    else
+                    {
+                        <option value="0" selected="selected">Sermão</option>
+                        <option value="1">Devocional</option>
+                    }
+                </select>
+            </div>
+        </div>
+
+        <div class="row g-3 mb-3">
+            <div class="col-md-6">
+                <label class="form-label">Autor</label>
+                <input type="text" name="AutorNome" value="@Model.AutorNome" class="form-control"
+                       placeholder="Pr. Rodrigo N. Ferreira" />
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Data</label>
+                <input type="date" name="DataPublicacao"
+                       value="@Model.DataPublicacao.ToString("yyyy-MM-dd")"
+                       class="form-control" />
+            </div>
+            <div class="col-md-3 d-flex align-items-end">
+                <div class="form-check pb-2">
+                    @if (Model.Publicado)
+                    {
+                        <input type="checkbox" name="Publicado" value="true" class="form-check-input" id="chkPub" checked="checked" />
+                    }
+                    else
+                    {
+                        <input type="checkbox" name="Publicado" value="true" class="form-check-input" id="chkPub" />
+                    }
+                    <label class="form-check-label" for="chkPub" style="color:var(--admin-text);">Publicar no site</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Imagem de destaque</label>
+            @if (!string.IsNullOrEmpty(Model.ImagemDestaque))
+            {
+                <div class="mb-2">
+                    <img src="@Model.ImagemDestaque" style="max-height:160px;border-radius:8px;object-fit:cover;" />
+                    <div class="form-text" style="color:var(--admin-text-muted);">Imagem atual. Faça upload para substituir.</div>
+                </div>
+            }
+            <input type="file" name="imagem" accept="image/*" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Conteúdo *</label>
+            <div class="editor-dica">
+                <i class="fas fa-lightbulb"></i>
+                <span>
+                    <strong>Dica:</strong> selecione um trecho e escolha <strong>Título</strong> (no menu do editor)
+                    para deixá-lo <strong>maior e em destaque</strong> dentro do texto.
+                    <em>Título 2</em> = seção grande · <em>Título 3</em> = subtítulo dourado.
+                    Este editor já mostra como o texto vai <strong>aparecer no site</strong>.
+                </span>
+            </div>
+            <div class="editor-toolbar-row">
+                <button type="button" id="togglePreview" class="btn-toggle-preview" title="Mostrar/ocultar pré-visualização">
+                    <i class="fas fa-eye"></i> <span>Ocultar preview</span>
+                </button>
+            </div>
+            <div class="editor-splitview" id="editorSplit">
+                <div class="editor-pane">
+                    <div class="pane-label"><i class="fas fa-pen"></i> Escrever</div>
+                    <div id="editor" style="min-height:340px;"></div>
+                </div>
+                <div class="preview-pane">
+                    <div class="pane-label"><i class="fas fa-eye"></i> Como fica no site</div>
+                    <div class="site-preview">
+                        <div class="sp-inner" id="livePreview"></div>
+                    </div>
+                </div>
+            </div>
+            <input type="hidden" name="Conteudo" id="hiddenConteudo" value="@Model.Conteudo" />
+            @if (ViewData.ModelState["Conteudo"]?.Errors.Count > 0)
+            {
+                <div class="text-danger small mt-1">@ViewData.ModelState["Conteudo"]!.Errors[0].ErrorMessage</div>
+            }
+        </div>
+
+        <div class="d-flex gap-3">
+            <button type="submit" class="btn-admin btn-admin-success">
+                <i class="fas fa-save me-1"></i> @(isEdit ? "Salvar Alterações" : "Salvar")
+            </button>
+            <a href="@Url.Action("Index")" class="btn-admin btn-admin-outline" style="color:var(--admin-text);">Cancelar</a>
+        </div>
+    </form>
+</div>
+
+<link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet" />
+<script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap" rel="stylesheet">
+<style>
+    /* Dica acima do editor */
+    .editor-dica {
+        display: flex; align-items: flex-start; gap: .6rem;
+        background: rgba(230,193,90,.08);
+        border: 1px solid rgba(230,193,90,.3);
+        border-radius: 8px;
+        padding: .7rem .9rem;
+        margin-bottom: .6rem;
+        font-size: .85rem;
+        color: #d4e2f0;
+        line-height: 1.5;
+    }
+    .editor-dica i { color: #e6c15a; margin-top: .15rem; }
+    .editor-dica strong { color: #fff; }
+    .editor-dica em { color: #e6c15a; font-style: normal; font-weight: 600; }
+
+    /* Toolbar */
+    .ql-toolbar { background:#1a2844; border-color:#3a4a6a !important; border-radius:8px 8px 0 0; }
+    .ql-toolbar .ql-stroke { stroke:#c0d0e8; }
+    .ql-toolbar .ql-fill { fill:#c0d0e8; }
+    .ql-toolbar .ql-picker { color:#c0d0e8; }
+    .ql-toolbar .ql-picker-options { background:#1a2844; border-color:#3a4a6a; }
+    .ql-toolbar .ql-active .ql-stroke { stroke:#e6c15a; }
+    .ql-toolbar .ql-active .ql-fill { fill:#e6c15a; }
+    .ql-toolbar .ql-picker-label:hover, .ql-toolbar button:hover .ql-stroke { stroke:#e6c15a; }
+
+    /* Rótulos em português — menu Título */
+    .ql-snow .ql-picker.ql-header .ql-picker-label::before,
+    .ql-snow .ql-picker.ql-header .ql-picker-item::before { content: 'Normal'; }
+    .ql-snow .ql-picker.ql-header .ql-picker-label[data-value="2"]::before,
+    .ql-snow .ql-picker.ql-header .ql-picker-item[data-value="2"]::before { content: 'Título 2'; }
+    .ql-snow .ql-picker.ql-header .ql-picker-label[data-value="3"]::before,
+    .ql-snow .ql-picker.ql-header .ql-picker-item[data-value="3"]::before { content: 'Título 3'; }
+    .ql-snow .ql-picker.ql-header { width: 108px; }
+
+    /* Rótulos em português — menu Tamanho */
+    .ql-snow .ql-picker.ql-size .ql-picker-label::before,
+    .ql-snow .ql-picker.ql-size .ql-picker-item::before { content: 'Tamanho normal'; }
+    .ql-snow .ql-picker.ql-size .ql-picker-label[data-value="small"]::before,
+    .ql-snow .ql-picker.ql-size .ql-picker-item[data-value="small"]::before { content: 'Pequeno'; }
+    .ql-snow .ql-picker.ql-size .ql-picker-label[data-value="large"]::before,
+    .ql-snow .ql-picker.ql-size .ql-picker-item[data-value="large"]::before { content: 'Grande'; }
+    .ql-snow .ql-picker.ql-size .ql-picker-label[data-value="huge"]::before,
+    .ql-snow .ql-picker.ql-size .ql-picker-item[data-value="huge"]::before { content: 'Enorme'; }
+    .ql-snow .ql-picker.ql-size { width: 130px; }
+
+    /* Tamanhos inline no editor e no preview */
+    .ql-editor .ql-size-small, .sp-inner .ql-size-small { font-size: 0.75em; }
+    .ql-editor .ql-size-large, .sp-inner .ql-size-large { font-size: 1.5em; }
+    .ql-editor .ql-size-huge, .sp-inner .ql-size-huge { font-size: 2.2em; }
+
+    /* ─── Barra de ferramentas do editor ─── */
+    .editor-toolbar-row {
+        display: flex; justify-content: flex-end;
+        margin-bottom: .5rem;
+    }
+    .btn-toggle-preview {
+        display: inline-flex; align-items: center; gap: .45rem;
+        background: rgba(230,193,90,.1);
+        border: 1px solid rgba(230,193,90,.4);
+        color: #e6c15a;
+        border-radius: 999px;
+        padding: .35rem .9rem;
+        font-size: .8rem; font-weight: 600;
+        cursor: pointer;
+        transition: all .2s ease;
+    }
+    .btn-toggle-preview:hover { background: rgba(230,193,90,.2); border-color: #e6c15a; }
+
+    /* ─── Layout de duas colunas: escrever | preview ─── */
+    .editor-splitview {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        align-items: start;
+    }
+    @@media (max-width: 1100px) {
+        .editor-splitview { grid-template-columns: 1fr; }
+    }
+    /* Preview oculto: editor ocupa tudo */
+    .editor-splitview.preview-off { grid-template-columns: 1fr; }
+    .editor-splitview.preview-off .preview-pane { display: none; }
+
+    /* ─── Scrollbars customizadas (douradas, como o site) ─── */
+    .site-preview, .ql-container {
+        scrollbar-width: thin;
+        scrollbar-color: #e6c15a #141c2e;
+    }
+    .site-preview::-webkit-scrollbar,
+    .ql-container::-webkit-scrollbar { width: 8px; height: 8px; }
+    .site-preview::-webkit-scrollbar-track,
+    .ql-container::-webkit-scrollbar-track { background: #141c2e; }
+    .site-preview::-webkit-scrollbar-thumb,
+    .ql-container::-webkit-scrollbar-thumb {
+        background: linear-gradient(180deg, #e6c15a 0%, #c9a63c 100%);
+        border-radius: 4px;
+        border: 2px solid #141c2e;
+    }
+    .site-preview::-webkit-scrollbar-thumb:hover,
+    .ql-container::-webkit-scrollbar-thumb:hover {
+        background: linear-gradient(180deg, #f0d06e 0%, #e6c15a 100%);
+    }
+    .site-preview::-webkit-scrollbar-corner,
+    .ql-container::-webkit-scrollbar-corner { background: #141c2e; }
+    .pane-label {
+        font-size: .78rem; font-weight: 600; letter-spacing: .03em;
+        text-transform: uppercase;
+        color: #8fa6c8; margin-bottom: .4rem;
+        display: flex; align-items: center; gap: .4rem;
+    }
+    .pane-label i { color: #e6c15a; }
+
+    .site-preview {
+        background: #141c2e;
+        border: 1px solid #3a4a6a;
+        border-radius: 8px;
+        min-height: 388px;
+        max-height: 640px;
+        overflow-y: auto;
+        padding: 2rem 1.75rem;
+    }
+    .sp-inner { max-width: 68ch; margin: 0 auto; }
+    .sp-inner:empty::before {
+        content: 'O texto vai aparecer aqui, do jeitinho que fica no site…';
+        color: #5a7aaa; font-style: italic;
+    }
+
+    /* ─── Tipografia compartilhada: editor + preview = espelho do site ─── */
+    .ql-container {
+        border-color:#3a4a6a !important;
+        border-radius:0 0 8px 8px;
+        background: #141c2e;
+    }
+    .ql-editor {
+        min-height: 340px;
+        max-width: 68ch;
+        margin: 0 auto;
+        padding: 2rem 1.75rem;
+    }
+    .ql-editor, .sp-inner {
+        font-family: 'Lora', Georgia, serif;
+        font-size: 1.15rem;
+        line-height: 1.9;
+        color: #d4e2f0;
+    }
+    .ql-editor.ql-blank::before { color:#5a7aaa; font-style: italic; left: 1.75rem; }
+    .ql-editor p, .sp-inner p { margin-bottom: 1.4rem; }
+    .ql-editor h1, .sp-inner h1 { font-size: 1.9rem; font-weight: 800; color:#fff; line-height:1.25; margin: 1.5rem 0 1rem; }
+    .ql-editor h2, .sp-inner h2 { font-size: 1.6rem; font-weight: 700; color:#fff; line-height:1.3; margin: 2rem 0 1rem; }
+    .ql-editor h3, .sp-inner h3 { font-size: 1.35rem; font-weight: 700; color:#e6c15a; line-height:1.3; margin: 1.75rem 0 .9rem; }
+    .ql-editor strong, .sp-inner strong { color:#fff; font-weight: 700; }
+    .ql-editor a, .sp-inner a { color:#e6c15a; }
+    .ql-editor blockquote, .sp-inner blockquote {
+        border-left: 4px solid #e6c15a !important;
+        background: rgba(230,193,90,.06);
+        border-radius: 0 10px 10px 0;
+        padding: 1rem 1.5rem !important;
+        margin: 1.75rem 0;
+        color:#e8eef5;
+        font-style: italic;
+    }
+    .ql-editor ul, .ql-editor ol, .sp-inner ul, .sp-inner ol { margin-bottom: 1.4rem; padding-left: 1.5rem; }
+    .ql-editor li, .sp-inner li { margin-bottom: .5rem; }
+</style>
+<script>
+    var quill = new Quill('#editor', {
+        theme: 'snow',
+        placeholder: 'Escreva o sermão ou devocional aqui... (use Título para destacar seções)',
+        modules: {
+            toolbar: [
+                [{ 'header': [2, 3, false] }],
+                [{ 'size': ['small', false, 'large', 'huge'] }],
+                ['bold', 'italic', 'underline'],
+                [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                ['blockquote', 'link'],
+                ['clean']
+            ]
+        }
+    });
+
+    // Carregar conteúdo existente ao editar
+    var existingContent = document.getElementById('hiddenConteudo').value;
+    if (existingContent && existingContent.trim() !== '') {
+        quill.root.innerHTML = existingContent;
+    }
+
+    // Preview ao vivo — espelha o conteúdo enquanto escreve
+    var livePreview = document.getElementById('livePreview');
+    function atualizarPreview() {
+        var html = quill.root.innerHTML;
+        // Quill deixa <p><br></p> quando vazio — trata como vazio
+        livePreview.innerHTML = (quill.getText().trim() === '') ? '' : html;
+    }
+    quill.on('text-change', atualizarPreview);
+    atualizarPreview();
+
+    // Alternar visibilidade do preview (com memória)
+    var split = document.getElementById('editorSplit');
+    var toggleBtn = document.getElementById('togglePreview');
+    function aplicarPreviewEstado(off) {
+        split.classList.toggle('preview-off', off);
+        toggleBtn.innerHTML = off
+            ? '<i class="fas fa-eye-slash"></i> <span>Mostrar preview</span>'
+            : '<i class="fas fa-eye"></i> <span>Ocultar preview</span>';
+        localStorage.setItem('palavraPreviewOff', off ? '1' : '0');
+    }
+    toggleBtn.addEventListener('click', function () {
+        aplicarPreviewEstado(!split.classList.contains('preview-off'));
+    });
+    aplicarPreviewEstado(localStorage.getItem('palavraPreviewOff') === '1');
+
+    // Sincronizar com o hidden input antes do submit
+    document.querySelector('form').addEventListener('submit', function () {
+        document.getElementById('hiddenConteudo').value = quill.root.innerHTML;
+    });
+</script>

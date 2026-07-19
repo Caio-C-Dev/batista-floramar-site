@@ -9,7 +9,25 @@
     var isSermao = Model.Tipo == BatistaFloramar.Domain.Entities.TipoPalavra.Sermao;
     var dataFormatada = Model.DataPublicacao.ToString("dd 'de' MMMM 'de' yyyy", new System.Globalization.CultureInfo("pt-BR"));
 }
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap" rel="stylesheet">
+
+<!-- Barra de progresso de leitura -->
+<div class="reading-progress" id="reading-progress"></div>
+
 <style>
+    .reading-progress {
+        position: fixed;
+        top: 0; left: 0;
+        height: 4px;
+        width: 0%;
+        background: linear-gradient(90deg, #e6c15a, #d4af3e);
+        box-shadow: 0 0 10px rgba(230,193,90,.6);
+        z-index: 2000;
+        transition: width .1s linear;
+    }
+
     .palavra-detalhe-hero {
         background: radial-gradient(ellipse at top, var(--bg-tertiary) 0%, var(--bg-primary) 60%);
         padding: 5rem 0 3.5rem;
@@ -39,14 +57,14 @@
     .palavra-meta i { color: var(--brand-gold); }
 
     .palavra-detalhe-cover {
-        max-width: 760px;
+        max-width: 960px;
         margin: 0 auto;
         padding: 0 1rem;
         transform: translateY(-2rem);
     }
     .palavra-detalhe-cover img {
         width: 100%;
-        max-height: 380px;
+        max-height: 420px;
         object-fit: cover;
         border-radius: calc(var(--radius) * 1.5);
         border: 1px solid rgba(255,255,255,.08);
@@ -55,7 +73,7 @@
     }
 
     .palavra-detalhe-body {
-        max-width: 720px;
+        max-width: 960px;
         margin: 0 auto;
         padding: 2rem 1rem 4rem;
     }
@@ -63,11 +81,108 @@
         background: var(--bg-tertiary);
         border: 1px solid rgba(255,255,255,.07);
         border-radius: calc(var(--radius) * 1.5);
-        padding: 2.5rem;
-        font-size: 1.05rem;
-        line-height: 1.85;
-        color: #c8d8e8;
+        padding: 3.25rem 3.5rem;
+        font-family: 'Lora', Georgia, 'Times New Roman', serif;
+        font-size: var(--reading-fs, 1.2rem);
+        line-height: 1.9;
+        color: #d4e2f0;
+        letter-spacing: .002em;
+        text-wrap: pretty;
+        hyphens: auto;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
     }
+    /* medida de leitura confortável: card largo, mas texto numa coluna de ~68ch centralizada */
+    .palavra-detalhe-body .prose-inner {
+        width: 100%;
+        max-width: 68ch;
+    }
+    .palavra-detalhe-body .prose ::selection {
+        background: rgba(230,193,90,.3);
+        color: #fff;
+    }
+    /* Tamanhos inline vindos do editor (Quill) */
+    .palavra-detalhe-body .prose .ql-size-small { font-size: 0.75em; }
+    .palavra-detalhe-body .prose .ql-size-large { font-size: 1.5em; }
+    .palavra-detalhe-body .prose .ql-size-huge  { font-size: 2.2em; }
+
+    /* Tipografia de leitura dentro do conteúdo */
+    .palavra-detalhe-body .prose-inner > *:first-child { margin-top: 0; }
+    .palavra-detalhe-body .prose-inner > *:last-child { margin-bottom: 0; }
+    .palavra-detalhe-body .prose p { margin-top: 0; margin-bottom: 1.5rem; }
+    .palavra-detalhe-body .prose h1,
+    .palavra-detalhe-body .prose h2,
+    .palavra-detalhe-body .prose h3,
+    .palavra-detalhe-body .prose h4 {
+        color: var(--text-primary);
+        font-weight: 700;
+        line-height: 1.3;
+        margin-top: 2.5rem;
+        margin-bottom: 1rem;
+    }
+    .palavra-detalhe-body .prose h2 { font-size: 1.6rem; }
+    .palavra-detalhe-body .prose h3 { font-size: 1.35rem; color: var(--brand-gold); }
+    .palavra-detalhe-body .prose h4 { font-size: 1.15rem; }
+    .palavra-detalhe-body .prose strong { color: #fff; font-weight: 700; }
+    .palavra-detalhe-body .prose a { color: var(--brand-gold); text-decoration: underline; text-underline-offset: 3px; }
+    .palavra-detalhe-body .prose ul,
+    .palavra-detalhe-body .prose ol { margin-top: 0; margin-bottom: 1.5rem; padding-left: 1.5rem; }
+    .palavra-detalhe-body .prose li { margin-bottom: .6rem; }
+    .palavra-detalhe-body .prose blockquote {
+        margin-top: 2rem;
+        margin-bottom: 2rem;
+        padding: 1.25rem 1.75rem;
+        border-left: 4px solid var(--brand-gold);
+        background: rgba(230,193,90,.06);
+        border-radius: 0 10px 10px 0;
+        color: #e8eef5;
+        font-style: italic;
+    }
+    .palavra-detalhe-body .prose blockquote p:last-child { margin-bottom: 0; }
+    .palavra-detalhe-body .prose img {
+        max-width: 100%;
+        height: auto;
+        border-radius: 10px;
+        margin: 1.5rem 0;
+    }
+    .palavra-detalhe-body .prose hr {
+        border: 0;
+        border-top: 1px solid rgba(255,255,255,.1);
+        margin: 2.5rem 0;
+    }
+
+    .reading-toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: .6rem;
+        margin-bottom: 1rem;
+    }
+    .reading-toolbar span {
+        color: var(--text-secondary);
+        font-size: .78rem;
+        margin-right: .1rem;
+    }
+    .fs-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 38px; height: 38px;
+        border-radius: 999px;
+        background: rgba(255,255,255,.06);
+        border: 1px solid rgba(255,255,255,.14);
+        color: #d4e2f0;
+        cursor: pointer;
+        transition: all .2s ease;
+        line-height: 1;
+    }
+    .fs-btn .fa-font { pointer-events: none; }
+    .fs-btn.small { font-size: .72rem; }
+    .fs-btn.large { font-size: 1.02rem; }
+    .fs-btn:hover { background: rgba(230,193,90,.14); border-color: rgba(230,193,90,.45); color: #e6c15a; }
+    .fs-btn:disabled { opacity: .35; cursor: default; }
+    .fs-btn:disabled:hover { background: rgba(255,255,255,.06); border-color: rgba(255,255,255,.14); color: #d4e2f0; }
 
     .palavra-nav-row {
         display: flex;
@@ -128,10 +243,14 @@
     .cta-block h2 { color: var(--text-primary); font-weight: 700; font-size: clamp(1.5rem,3vw,2rem); margin-bottom: .75rem; }
     .cta-block p { color: var(--text-secondary); max-width: 540px; margin: 0 auto 2rem; }
 
+    @@media (max-width: 767px) {
+        .palavra-detalhe-body .prose { padding: 1.75rem 1.5rem; font-size: 1.08rem; }
+        .palavra-detalhe-body .prose h2 { font-size: 1.4rem; }
+        .palavra-detalhe-body .prose h3 { font-size: 1.2rem; }
+    }
     @@media (max-width: 480px) {
         .btn-share-label { display: none; }
         .btn-share-pill { padding: .4rem .7rem; }
-        .palavra-detalhe-body .prose { padding: 1.5rem; }
     }
 </style>
 
@@ -166,8 +285,21 @@
 
 <!-- Conteúdo -->
 <div class="palavra-detalhe-body">
+    <!-- Controle de tamanho da fonte -->
+    <div class="reading-toolbar">
+        <span>Tamanho do texto</span>
+        <button type="button" class="fs-btn small" id="fs-decrease" title="Diminuir texto" aria-label="Diminuir texto">
+            <i class="fas fa-font"></i>
+        </button>
+        <button type="button" class="fs-btn large" id="fs-increase" title="Aumentar texto" aria-label="Aumentar texto">
+            <i class="fas fa-font"></i>
+        </button>
+    </div>
+
     <div class="prose">
-        @Html.Raw(Model.Conteudo)
+        <div class="prose-inner">
+            @Html.Raw(Model.Conteudo)
+        </div>
     </div>
 
     <!-- Navegação + Share -->
@@ -243,4 +375,45 @@
             mostrarToast('✓ Link copiado!');
         }
     }
+
+    /* ── Barra de progresso de leitura ── */
+    (function () {
+        var bar = document.getElementById('reading-progress');
+        var article = document.querySelector('.palavra-detalhe-body');
+        if (!bar || !article) return;
+
+        function updateProgress() {
+            var start = article.offsetTop;
+            var total = article.offsetHeight - window.innerHeight;
+            var scrolled = window.scrollY - start;
+            var pct = total > 0 ? (scrolled / total) * 100 : 0;
+            pct = Math.max(0, Math.min(100, pct));
+            bar.style.width = pct + '%';
+        }
+        window.addEventListener('scroll', updateProgress, { passive: true });
+        window.addEventListener('resize', updateProgress);
+        updateProgress();
+    })();
+
+    /* ── Controle de tamanho do texto (A- / A+) ── */
+    (function () {
+        var prose = document.querySelector('.palavra-detalhe-body .prose');
+        var btnDec = document.getElementById('fs-decrease');
+        var btnInc = document.getElementById('fs-increase');
+        if (!prose || !btnDec || !btnInc) return;
+
+        var MIN = 1.0, MAX = 1.7, STEP = 0.1, DEFAULT = 1.2;
+        var size = parseFloat(localStorage.getItem('palavraFontSize')) || DEFAULT;
+
+        function apply() {
+            size = Math.round(size * 10) / 10;
+            prose.style.setProperty('--reading-fs', size + 'rem');
+            localStorage.setItem('palavraFontSize', size);
+            btnDec.disabled = size <= MIN + 0.001;
+            btnInc.disabled = size >= MAX - 0.001;
+        }
+        btnDec.addEventListener('click', function () { if (size > MIN) { size -= STEP; apply(); } });
+        btnInc.addEventListener('click', function () { if (size < MAX) { size += STEP; apply(); } });
+        apply();
+    })();
 </script>
