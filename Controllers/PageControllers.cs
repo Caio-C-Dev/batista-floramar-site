@@ -304,30 +304,48 @@ namespace BatistaFloramar.Controllers
             // visitante (estável por navegador, sobrevive ao F5) + cache no servidor.
             try
             {
-                var visitorId = Request.Cookies["bf_vid"];
-                if (string.IsNullOrEmpty(visitorId))
+                // Ignora bots/crawlers e robôs de preview de link (WhatsApp/Facebook/Google
+                // etc.) — eles abrem a URL sem que ninguém tenha "entrado" de fato.
+                var uaRaw = Request.Headers.UserAgent.ToString();
+                var ua = uaRaw.ToLowerInvariant();
+                bool ehBot = string.IsNullOrWhiteSpace(uaRaw) || new[]
                 {
-                    visitorId = Guid.NewGuid().ToString("N");
-                    Response.Cookies.Append("bf_vid", visitorId, new CookieOptions
+                    "bot", "crawl", "spider", "slurp", "facebookexternalhit", "whatsapp",
+                    "telegrambot", "twitterbot", "discordbot", "linkedinbot", "embedly",
+                    "pinterest", "redditbot", "applebot", "googlebot", "bingbot", "yandex",
+                    "baidu", "duckduck", "ahrefs", "semrush", "mj12", "dotbot", "petalbot",
+                    "headless", "monitor", "uptime", "preview", "curl", "wget", "python",
+                    "go-http", "java/", "node-fetch", "axios", "okhttp", "http-client"
+                }.Any(t => ua.Contains(t));
+
+                // Só conta se for visitante real (não bot)
+                if (!ehBot)
+                {
+                    var visitorId = Request.Cookies["bf_vid"];
+                    if (string.IsNullOrEmpty(visitorId))
                     {
-                        Expires = DateTimeOffset.UtcNow.AddYears(1),
-                        IsEssential = true,
-                        HttpOnly = true,
-                        SameSite = SameSiteMode.Lax
-                    });
-                }
+                        visitorId = Guid.NewGuid().ToString("N");
+                        Response.Cookies.Append("bf_vid", visitorId, new CookieOptions
+                        {
+                            Expires = DateTimeOffset.UtcNow.AddYears(1),
+                            IsEssential = true,
+                            HttpOnly = true,
+                            SameSite = SameSiteMode.Lax
+                        });
+                    }
 
-                var dedupeKey = $"palavra-view:{palavra.Id}:{visitorId}";
-                if (!_cache.TryGetValue(dedupeKey, out _))
-                {
-                    _cache.Set(dedupeKey, true, TimeSpan.FromSeconds(10));
+                    var dedupeKey = $"palavra-view:{palavra.Id}:{visitorId}";
+                    if (!_cache.TryGetValue(dedupeKey, out _))
+                    {
+                        _cache.Set(dedupeKey, true, TimeSpan.FromSeconds(10));
 
-                    var isPg = _db.Database.IsNpgsql();
-                    var sql = isPg
-                        ? "UPDATE \"PalavrasDoPastor\" SET \"Visualizacoes\" = \"Visualizacoes\" + 1 WHERE \"Id\" = {0}"
-                        : "UPDATE [PalavrasDoPastor] SET [Visualizacoes] = [Visualizacoes] + 1 WHERE [Id] = {0}";
-                    await _db.Database.ExecuteSqlRawAsync(sql, palavra.Id);
-                    palavra.Visualizacoes++; // reflete na view sem reconsultar
+                        var isPg = _db.Database.IsNpgsql();
+                        var sql = isPg
+                            ? "UPDATE \"PalavrasDoPastor\" SET \"Visualizacoes\" = \"Visualizacoes\" + 1 WHERE \"Id\" = {0}"
+                            : "UPDATE [PalavrasDoPastor] SET [Visualizacoes] = [Visualizacoes] + 1 WHERE [Id] = {0}";
+                        await _db.Database.ExecuteSqlRawAsync(sql, palavra.Id);
+                        palavra.Visualizacoes++; // reflete na view sem reconsultar
+                    }
                 }
             }
             catch { /* contagem não é crítica — nunca quebra a página */ }
