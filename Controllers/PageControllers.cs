@@ -299,14 +299,25 @@ namespace BatistaFloramar.Controllers
             if (id != palavra.Slug)
                 return RedirectToActionPermanent(nameof(Detalhe), new { id = palavra.Slug });
 
-            // Conta a visualização — mas deduplica hits repetidos do mesmo visitante
-            // numa janela curta (navegadores disparam prefetch/preload = 2 requests por clique)
+            // Conta a visualização — mas deduplica hits repetidos do mesmo visitante numa
+            // janela curta (F5, prefetch/preload disparam 2+ requests). Usa cookie de
+            // visitante (estável por navegador, sobrevive ao F5) + cache no servidor.
             try
             {
-                var ip = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "?";
-                var ua = Request.Headers.UserAgent.ToString();
-                var dedupeKey = $"palavra-view:{palavra.Id}:{ip}:{ua.GetHashCode()}";
+                var visitorId = Request.Cookies["bf_vid"];
+                if (string.IsNullOrEmpty(visitorId))
+                {
+                    visitorId = Guid.NewGuid().ToString("N");
+                    Response.Cookies.Append("bf_vid", visitorId, new CookieOptions
+                    {
+                        Expires = DateTimeOffset.UtcNow.AddYears(1),
+                        IsEssential = true,
+                        HttpOnly = true,
+                        SameSite = SameSiteMode.Lax
+                    });
+                }
 
+                var dedupeKey = $"palavra-view:{palavra.Id}:{visitorId}";
                 if (!_cache.TryGetValue(dedupeKey, out _))
                 {
                     _cache.Set(dedupeKey, true, TimeSpan.FromSeconds(10));
