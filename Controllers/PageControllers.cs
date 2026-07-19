@@ -5,6 +5,7 @@ using BatistaFloramar.Models;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Jpeg;
 using SixLabors.ImageSharp.Processing;
@@ -262,10 +263,13 @@ namespace BatistaFloramar.Controllers
     {
         private readonly BatistaFloramarDbContext _db;
         private readonly IWebHostEnvironment _env;
-        public PalavraDoPastorController(BatistaFloramarDbContext db, IWebHostEnvironment env)
+        private readonly Microsoft.Extensions.Caching.Memory.IMemoryCache _cache;
+        public PalavraDoPastorController(BatistaFloramarDbContext db, IWebHostEnvironment env,
+            Microsoft.Extensions.Caching.Memory.IMemoryCache cache)
         {
             _db = db;
             _env = env;
+            _cache = cache;
         }
 
         public async Task<IActionResult> Index()
@@ -294,6 +298,28 @@ namespace BatistaFloramar.Controllers
             // Redirect to canonical slug URL if accessed via numeric ID
             if (id != palavra.Slug)
                 return RedirectToActionPermanent(nameof(Detalhe), new { id = palavra.Slug });
+
+            // Conta a visualização — mas deduplica hits repetidos do mesmo visitante
+            // numa janela curta (navegadores disparam prefetch/preload = 2 requests por clique)
+            try
+            {
+                var ip = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "?";
+                var ua = Request.Headers.UserAgent.ToString();
+                var dedupeKey = $"palavra-view:{palavra.Id}:{ip}:{ua.GetHashCode()}";
+
+                if (!_cache.TryGetValue(dedupeKey, out _))
+                {
+                    _cache.Set(dedupeKey, true, TimeSpan.FromSeconds(10));
+
+                    var isPg = _db.Database.IsNpgsql();
+                    var sql = isPg
+                        ? "UPDATE \"PalavrasDoPastor\" SET \"Visualizacoes\" = \"Visualizacoes\" + 1 WHERE \"Id\" = {0}"
+                        : "UPDATE [PalavrasDoPastor] SET [Visualizacoes] = [Visualizacoes] + 1 WHERE [Id] = {0}";
+                    await _db.Database.ExecuteSqlRawAsync(sql, palavra.Id);
+                    palavra.Visualizacoes++; // reflete na view sem reconsultar
+                }
+            }
+            catch { /* contagem não é crítica — nunca quebra a página */ }
 
             ViewBag.Title = palavra.Titulo;
             var _plain = System.Text.RegularExpressions.Regex.Replace(palavra.Conteudo ?? string.Empty, "<.*?>", string.Empty);

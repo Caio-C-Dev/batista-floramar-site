@@ -55,6 +55,13 @@
     }
     .palavra-meta { color: var(--text-secondary); font-size: .92rem; display: flex; align-items: center; justify-content: center; gap: 1.25rem; flex-wrap: wrap; }
     .palavra-meta i { color: var(--brand-gold); }
+    .palavra-views { display: inline-flex; align-items: center; gap: .4rem; }
+    .palavra-views i { color: #e5545f; animation: viewsPulse 2.2s ease-in-out infinite; }
+    .palavra-views .views-label { opacity: .8; }
+    @@keyframes viewsPulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.18); }
+    }
 
     .palavra-detalhe-cover {
         max-width: 960px;
@@ -271,6 +278,9 @@
         <div class="palavra-meta">
             <span><i class="fas fa-user me-1"></i>@Model.AutorNome</span>
             <span><i class="fas fa-calendar me-1"></i>@dataFormatada</span>
+            <span class="palavra-views" title="Pessoas que já leram esta palavra">
+                <i class="fas fa-heart"></i>@Model.Visualizacoes.ToString("N0", new System.Globalization.CultureInfo("pt-BR"))
+            </span>
         </div>
     </div>
 </div>

@@ -14,5 +14,6 @@ namespace BatistaFloramar.Domain.Entities
         public bool Publicado { get; set; } = false;
         public DateTime DataPublicacao { get; set; } = DateTime.Today;
         public DateTime CriadoEm { get; set; } = DateTime.UtcNow;
+        public int Visualizacoes { get; set; } = 0;
     }
 }

@@ -44,6 +44,9 @@
 
     .palavra-card-title { color: var(--text-primary); font-size: 1.1rem; font-weight: 700; margin: .5rem 0; line-height: 1.35; }
 
+    .pcard-views { display: inline-flex; align-items: center; gap: .3rem; }
+    .pcard-views i { color: #e5545f; }
+
     .palavra-share-row {
         display: flex;
         align-items: center;
@@ -141,7 +144,12 @@
                                     <span class="text-secondary small">@p.DataPublicacao.ToString("dd/MM/yyyy")</span>
                                 </div>
                                 <p class="palavra-card-title">@p.Titulo</p>
-                                <p class="text-secondary small mb-0"><i class="fas fa-user me-1 text-gold"></i>@p.AutorNome</p>
+                                <p class="text-secondary small mb-0 d-flex align-items-center gap-3 flex-wrap">
+                                    <span><i class="fas fa-user me-1 text-gold"></i>@p.AutorNome</span>
+                                    <span class="pcard-views" title="Pessoas que já leram">
+                                        <i class="fas fa-heart"></i>@p.Visualizacoes.ToString("N0", new System.Globalization.CultureInfo("pt-BR"))
+                                    </span>
+                                </p>
                             </a>
                             <div class="palavra-share-row">
                                 <span class="text-secondary" style="font-size:.75rem;">Compartilhar:</span>

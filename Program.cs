@@ -251,6 +251,9 @@ _ = Task.Run(async () =>
             ALTER TABLE ""PalavrasDoPastor"" ADD COLUMN IF NOT EXISTS ""Slug"" VARCHAR(320);
         ");
         await db.Database.ExecuteSqlRawAsync(@"
+            ALTER TABLE ""PalavrasDoPastor"" ADD COLUMN IF NOT EXISTS ""Visualizacoes"" INTEGER NOT NULL DEFAULT 0;
+        ");
+        await db.Database.ExecuteSqlRawAsync(@"
             ALTER TABLE ""SeriesMensagens"" ADD COLUMN IF NOT EXISTS ""Slug"" VARCHAR(220);
         ");
         await db.Database.ExecuteSqlRawAsync(@"
