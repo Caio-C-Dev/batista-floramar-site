@@ -44,22 +44,48 @@ namespace BatistaFloramar.Application.Services
             if (_cache.TryGetValue<BibleVerseDto>(cacheKey, out var cached) && cached != null)
                 return cached;
 
-            BibleVerseDto resultado;
+            BibleVerseDto? resultado = null;
+
+            // 1ª fonte: abibliadigital (NVI)
             try
             {
-                resultado = await BuscarDaApiAsync(refDoDia) ?? FallbackLocal(refDoDia);
+                resultado = await BuscarDaApiAsync(refDoDia);
             }
             catch (Exception ex)
             {
-                _log.LogWarning(ex, "Falha ao buscar versículo {Ref} da abibliadigital — usando fallback", refDoDia);
-                resultado = FallbackLocal(refDoDia);
+                _log.LogWarning(ex, "Falha ao buscar versículo {Ref} da abibliadigital", refDoDia);
             }
 
-            // Cacheia até meia-noite BR (próxima troca)
-            var amanhaMeiaNoiteBR = hojeBR.AddDays(1);
-            var ttl = amanhaMeiaNoiteBR - DateTime.UtcNow.AddHours(-3);
-            if (ttl < TimeSpan.FromMinutes(5)) ttl = TimeSpan.FromHours(24);
-            _cache.Set(cacheKey, resultado, ttl);
+            // 2ª fonte: bible-api.com (Almeida, domínio público) — usada quando a 1ª falha/está fora
+            if (resultado == null)
+            {
+                try
+                {
+                    resultado = await BuscarDaBibleApiAsync(refDoDia);
+                }
+                catch (Exception ex)
+                {
+                    _log.LogWarning(ex, "Falha ao buscar versículo {Ref} da bible-api", refDoDia);
+                }
+            }
+
+            // Último recurso: texto genérico com referência correta
+            var ehFallbackGenerico = resultado == null;
+            resultado ??= FallbackLocal(refDoDia);
+
+            if (ehFallbackGenerico)
+            {
+                // Ambas as APIs falharam — cacheia curto p/ tentar de novo em breve
+                _cache.Set(cacheKey, resultado, TimeSpan.FromMinutes(10));
+            }
+            else
+            {
+                // Cacheia até meia-noite BR (próxima troca)
+                var amanhaMeiaNoiteBR = hojeBR.AddDays(1);
+                var ttl = amanhaMeiaNoiteBR - DateTime.UtcNow.AddHours(-3);
+                if (ttl < TimeSpan.FromMinutes(5)) ttl = TimeSpan.FromHours(24);
+                _cache.Set(cacheKey, resultado, ttl);
+            }
 
             return resultado;
         }
@@ -104,6 +130,72 @@ namespace BatistaFloramar.Application.Services
                 Referencia = $"{livro} {chapter}:{verseNum} (NVI)"
             };
         }
+
+        private async Task<BibleVerseDto?> BuscarDaBibleApiAsync(VerseRef r)
+        {
+            if (!BibleApiBookIds.TryGetValue(r.Abbrev, out var bookId))
+            {
+                _log.LogInformation("Sem mapeamento bible-api para {Abbrev}", r.Abbrev);
+                return null;
+            }
+
+            // Endpoint retorna o capítulo inteiro; selecionamos o versículo desejado.
+            var url = $"https://bible-api.com/data/almeida/{bookId}/{r.Chapter}";
+            using var req = new HttpRequestMessage(HttpMethod.Get, url);
+            req.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            _http.Timeout = TimeSpan.FromSeconds(8);
+
+            using var resp = await _http.SendAsync(req);
+            if (!resp.IsSuccessStatusCode)
+            {
+                _log.LogInformation("bible-api retornou {Status} para {Url}", (int)resp.StatusCode, url);
+                return null;
+            }
+
+            await using var stream = await resp.Content.ReadAsStreamAsync();
+            using var doc = await JsonDocument.ParseAsync(stream);
+
+            if (!doc.RootElement.TryGetProperty("verses", out var verses) || verses.ValueKind != JsonValueKind.Array)
+                return null;
+
+            foreach (var v in verses.EnumerateArray())
+            {
+                var num = v.TryGetProperty("verse", out var vn) ? vn.GetInt32() : 0;
+                if (num != r.Verse) continue;
+
+                var texto = v.TryGetProperty("text", out var vt) ? (vt.GetString() ?? "") : "";
+                texto = texto.Trim();
+                if (string.IsNullOrWhiteSpace(texto))
+                    return null;
+
+                return new BibleVerseDto
+                {
+                    Texto      = texto,
+                    Livro      = r.Book,
+                    Referencia = $"{r.Book} {r.Chapter}:{r.Verse} (Almeida)"
+                };
+            }
+
+            return null;
+        }
+
+        // Mapeia a abreviação (padrão abibliadigital) para o book_id da bible-api (USFM).
+        private static readonly Dictionary<string, string> BibleApiBookIds = new()
+        {
+            ["gn"]  = "GEN", ["ex"]  = "EXO", ["lv"]  = "LEV", ["nm"]  = "NUM", ["dt"]  = "DEU",
+            ["js"]  = "JOS", ["jz"]  = "JDG", ["rt"]  = "RUT", ["1sm"] = "1SA", ["2sm"] = "2SA",
+            ["1rs"] = "1KI", ["2rs"] = "2KI", ["1cr"] = "1CH", ["2cr"] = "2CH", ["ed"]  = "EZR",
+            ["ne"]  = "NEH", ["et"]  = "EST", ["job"] = "JOB", ["sl"]  = "PSA", ["pv"]  = "PRO",
+            ["ec"]  = "ECC", ["ct"]  = "SNG", ["is"]  = "ISA", ["jr"]  = "JER", ["lm"]  = "LAM",
+            ["ez"]  = "EZK", ["dn"]  = "DAN", ["os"]  = "HOS", ["jl"]  = "JOL", ["am"]  = "AMO",
+            ["jn"]  = "JON", ["mq"]  = "MIC", ["na"]  = "NAM", ["hc"]  = "HAB", ["sf"]  = "ZEP",
+            ["zc"]  = "ZEC", ["ml"]  = "MAL",
+            ["mt"]  = "MAT", ["mc"]  = "MRK", ["lc"]  = "LUK", ["jo"]  = "JHN", ["at"]  = "ACT",
+            ["rm"]  = "ROM", ["1co"] = "1CO", ["2co"] = "2CO", ["gl"]  = "GAL", ["ef"]  = "EPH",
+            ["fp"]  = "PHP", ["cl"]  = "COL", ["1ts"] = "1TH", ["2ts"] = "2TH", ["1tm"] = "1TI",
+            ["2tm"] = "2TI", ["tt"]  = "TIT", ["hb"]  = "HEB", ["tg"]  = "JAS", ["1pe"] = "1PE",
+            ["2pe"] = "2PE", ["1jo"] = "1JN", ["jd"]  = "JUD", ["ap"]  = "REV",
+        };
 
         private static DateTime HojeBrasilia()
         {
