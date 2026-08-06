@@ -25,6 +25,9 @@ namespace BatistaFloramar.Application.Services
 
         private const string VersaoApi = "nvi";
 
+        // Alguns provedores (ex.: bible-api via Cloudflare) rejeitam requisições sem User-Agent.
+        private const string UserAgent = "BatistaFloramar/1.0 (+https://www.batistafloramar.com.br)";
+
         public BibleService(HttpClient http, IMemoryCache cache, IConfiguration config, ILogger<BibleService> log)
         {
             _http = http;
@@ -100,9 +103,10 @@ namespace BatistaFloramar.Application.Services
             if (!string.IsNullOrWhiteSpace(token))
                 req.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
             req.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            _http.Timeout = TimeSpan.FromSeconds(8);
+            req.Headers.UserAgent.ParseAdd(UserAgent);
 
-            using var resp = await _http.SendAsync(req);
+            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(8));
+            using var resp = await _http.SendAsync(req, cts.Token);
             if (!resp.IsSuccessStatusCode)
             {
                 _log.LogInformation("abibliadigital retornou {Status} para {Url}", (int)resp.StatusCode, url);
@@ -143,9 +147,10 @@ namespace BatistaFloramar.Application.Services
             var url = $"https://bible-api.com/data/almeida/{bookId}/{r.Chapter}";
             using var req = new HttpRequestMessage(HttpMethod.Get, url);
             req.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            _http.Timeout = TimeSpan.FromSeconds(8);
+            req.Headers.UserAgent.ParseAdd(UserAgent);
 
-            using var resp = await _http.SendAsync(req);
+            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(8));
+            using var resp = await _http.SendAsync(req, cts.Token);
             if (!resp.IsSuccessStatusCode)
             {
                 _log.LogInformation("bible-api retornou {Status} para {Url}", (int)resp.StatusCode, url);
