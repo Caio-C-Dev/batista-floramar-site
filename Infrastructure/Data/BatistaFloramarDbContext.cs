@@ -32,6 +32,7 @@ namespace BatistaFloramar.Infrastructure.Data
         public DbSet<PresencaAulaBatismo> PresencasAulaBatismo => Set<PresencaAulaBatismo>();
         public DbSet<BatizadoHistorico> BatizadosHistorico => Set<BatizadoHistorico>();
         public DbSet<Produto> Produtos => Set<Produto>();
+        public DbSet<MateriaSeminario> MateriasSeminario => Set<MateriaSeminario>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -283,6 +284,15 @@ namespace BatistaFloramar.Infrastructure.Data
                 e.Property(x => x.Descricao).HasMaxLength(2000).IsRequired();
                 e.Property(x => x.Preco).HasColumnType("decimal(18,2)").IsRequired();
                 e.Property(x => x.Imagem).HasMaxLength(500);
+            });
+
+            modelBuilder.Entity<MateriaSeminario>(e =>
+            {
+                e.ToTable("MateriasSeminario");
+                e.HasKey(x => x.Id);
+                e.Property(x => x.Nome).HasMaxLength(200).IsRequired();
+                e.Property(x => x.Descricao).HasMaxLength(1000);
+                e.Property(x => x.Professor).HasMaxLength(150);
             });
         }
     }

@@ -1,0 +1,91 @@
+@model List<BatistaFloramar.Domain.Entities.MateriaSeminario>
+@{
+    Layout = "_AdminLayout";
+    ViewBag.Title = "Seminário Teológico";
+    ViewBag.AdminSection = "seminario";
+}
+
+@section TopbarActions {
+    <a href="@Url.Action("Nova")" class="btn-admin btn-admin-success">
+        <i class="fas fa-plus"></i> Nova Matéria
+    </a>
+}
+
+@if (!Model.Any())
+{
+    <div class="admin-card empty-state">
+        <i class="fas fa-graduation-cap"></i>
+        <p>Nenhuma matéria cadastrada na grade curricular ainda.</p>
+        <a href="@Url.Action("Nova")" class="btn-admin btn-admin-success">
+            <i class="fas fa-plus"></i> Cadastrar primeira matéria
+        </a>
+    </div>
+}
+else
+{
+    @foreach (var grupo in Model.GroupBy(m => new { m.Ano, m.Semestre }).OrderBy(g => g.Key.Ano).ThenBy(g => g.Key.Semestre))
+    {
+        <div class="admin-card mb-4">
+            <h2 style="font-size:1rem;color:var(--admin-accent);margin:0 0 1rem;letter-spacing:.04em;text-transform:uppercase;">
+                <i class="fas fa-layer-group me-2"></i>@(grupo.Key.Ano)º Ano — @(grupo.Key.Semestre)º Semestre
+                <span style="color:var(--admin-text-muted);font-weight:400;text-transform:none;letter-spacing:0;font-size:.85rem;">
+                    (@grupo.Count() matéria@(grupo.Count() > 1 ? "s" : "") • @grupo.Sum(m => m.CargaHoraria)h)
+                </span>
+            </h2>
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Ordem</th>
+                        <th>Matéria</th>
+                        <th>Descrição</th>
+                        <th>Professor</th>
+                        <th>Carga</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var materia in grupo.OrderBy(m => m.Ordem))
+                    {
+                        <tr style="@(!materia.Ativo ? "opacity:0.55;" : "")">
+                            <td style="color:var(--admin-text-muted);">@materia.Ordem</td>
+                            <td><strong style="color:var(--admin-text);">@materia.Nome</strong></td>
+                            <td style="color:var(--admin-text-muted);font-size:.85rem;max-width:260px;">
+                                @(materia.Descricao != null && materia.Descricao.Length > 80 ? materia.Descricao.Substring(0, 80) + "…" : materia.Descricao)
+                            </td>
+                            <td style="color:var(--admin-text-muted);font-size:.85rem;">@materia.Professor</td>
+                            <td style="color:var(--admin-accent);font-weight:600;white-space:nowrap;">
+                                @(materia.CargaHoraria > 0 ? materia.CargaHoraria + "h" : "—")
+                            </td>
+                            <td>
+                                <form method="post" action="@Url.Action("ToggleAtivo")" style="display:inline;">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@materia.Id" />
+                                    <button type="submit"
+                                            style="background:@(materia.Ativo ? "rgba(37,162,90,.2)" : "rgba(120,120,120,.2)");color:@(materia.Ativo ? "#25a25a" : "#888");border:1px solid @(materia.Ativo ? "rgba(37,162,90,.4)" : "rgba(120,120,120,.3)");border-radius:20px;padding:.2rem .7rem;font-size:.75rem;font-weight:700;cursor:pointer;letter-spacing:.04em;">
+                                        @(materia.Ativo ? "Ativa" : "Inativa")
+                                    </button>
+                                </form>
+                            </td>
+                            <td>
+                                <div class="d-flex gap-2">
+                                    <a href="@Url.Action("Editar", new { id = materia.Id })" class="btn-admin" style="padding:.3rem .75rem;font-size:.8rem;">
+                                        <i class="fas fa-pen"></i>
+                                    </a>
+                                    <form method="post" action="@Url.Action("Excluir")"
+                                          onsubmit="return confirm('Remover a matéria «@Html.Raw(materia.Nome.Replace("'","\'"))»?')">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@materia.Id" />
+                                        <button type="submit" class="btn-admin" style="padding:.3rem .75rem;font-size:.8rem;background:rgba(200,50,50,.15);color:#e06060;border-color:rgba(200,50,50,.3);">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+}

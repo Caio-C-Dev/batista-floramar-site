@@ -1,0 +1,432 @@
+@model List<BatistaFloramar.Domain.Entities.MateriaSeminario>
+@{
+    Layout = "_Layout";
+    ViewBag.Title = "Seminário Teológico em BH | Curso de Teologia | Batista Floramar";
+    ViewBag.FullWidth = true;
+
+    var anoAtual = DateTime.Now.Year;
+    // Turma nova sempre no começo do ano — depois de março, o convite já é para o ano seguinte.
+    var proximaTurma = DateTime.Now.Month >= 4 ? anoAtual + 1 : anoAtual;
+
+    var modulos = new[]
+    {
+        new { Ano = 1, Semestre = 1, Titulo = "1º Ano — 1º Semestre", Sub = "Fundamentos: a Bíblia e como interpretá-la" },
+        new { Ano = 1, Semestre = 2, Titulo = "1º Ano — 2º Semestre", Sub = "Panorama do NT, doutrina de Deus e história da igreja" },
+        new { Ano = 2, Semestre = 1, Titulo = "2º Ano — 1º Semestre", Sub = "Cristo, salvação, pregação e línguas originais" },
+        new { Ano = 2, Semestre = 2, Titulo = "2º Ano — 2º Semestre", Sub = "Igreja, ética, liderança e missões" }
+    };
+
+    var cargaTotal = Model.Sum(m => m.CargaHoraria);
+    // WhatsApp do pastor — contato do Seminário Teológico
+    const string whatsPastor = "5531985560773";
+    var whatsInscricao = $"https://wa.me/{whatsPastor}?text="
+        + Uri.EscapeDataString($"Olá, Pastor! Gostaria de me inscrever no Seminário Teológico da Comunidade Batista Floramar (turma {proximaTurma}). Pode me passar as informações?");
+    var whatsDuvida = $"https://wa.me/{whatsPastor}?text="
+        + Uri.EscapeDataString("Olá, Pastor! Tenho uma dúvida sobre o Seminário Teológico da igreja.");
+}
+
+<script type="application/ld+json">
+{
+  "@@context": "https://schema.org",
+  "@@type": "Course",
+  "name": "Seminário Teológico – Comunidade Batista Floramar",
+  "description": "Curso de teologia de 2 anos com certificado, oferecido pela Comunidade Batista Floramar em Belo Horizonte. Aulas toda segunda-feira às 19h30, presencial ou online com gravação disponível.",
+  "url": "https://www.batistafloramar.com.br/Seminario",
+  "inLanguage": "pt-BR",
+  "provider": { "@@id": "https://www.batistafloramar.com.br/#church" },
+  "educationalCredentialAwarded": "Certificado de conclusão do Seminário Teológico",
+  "timeRequired": "P2Y",
+  "isAccessibleForFree": true,
+  "hasCourseInstance": {
+    "@@type": "CourseInstance",
+    "courseMode": ["Onsite", "Online"],
+    "courseWorkload": "PT2H",
+    "courseSchedule": {
+      "@@type": "Schedule",
+      "repeatFrequency": "P1W",
+      "byDay": "https://schema.org/Monday",
+      "startTime": "19:30",
+      "duration": "PT2H"
+    },
+    "location": {
+      "@@type": "Place",
+      "name": "Comunidade Batista Floramar",
+      "address": {
+        "@@type": "PostalAddress",
+        "streetAddress": "Rua José Lima de Almeida, 59",
+        "addressLocality": "Belo Horizonte",
+        "addressRegion": "MG",
+        "postalCode": "31710-140",
+        "addressCountry": "BR"
+      }
+    }
+  },
+  "breadcrumb": {
+    "@@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@@type": "ListItem", "position": 1, "name": "Início", "item": "https://www.batistafloramar.com.br/" },
+      { "@@type": "ListItem", "position": 2, "name": "Seminário Teológico", "item": "https://www.batistafloramar.com.br/Seminario" }
+    ]
+  }
+}
+</script>
+
+<style>
+    .sem-hero {
+        background: radial-gradient(ellipse at top, var(--bg-tertiary) 0%, var(--bg-primary) 60%);
+        padding: 5.5rem 0 4rem;
+        text-align: center;
+        border-bottom: 1px solid var(--brand-gold-border);
+        position: relative;
+        overflow: hidden;
+    }
+    .sem-hero::before {
+        content: '';
+        position: absolute; inset: 0;
+        background: radial-gradient(ellipse 60% 50% at 50% 100%, var(--brand-gold-light) 0%, transparent 70%);
+    }
+    .sem-hero > .container { position: relative; }
+    .sem-hero h1 { font-size: clamp(2rem,5vw,3.2rem); font-weight: 800; color: var(--text-primary); margin-bottom: 1rem; }
+    .sem-hero p.lead-text { color: var(--text-secondary); max-width: 680px; margin: 0 auto 2rem; font-size: 1.1rem; }
+
+    .sem-turma-pill {
+        display: inline-flex; align-items: center; gap: .5rem;
+        background: var(--brand-gold-light); border: 1px solid var(--brand-gold-border);
+        color: var(--brand-gold); font-weight: 700; font-size: .85rem;
+        padding: .4rem 1rem; border-radius: 20px; margin-bottom: 1.25rem;
+    }
+
+    .sem-section { padding: 4.5rem 0; }
+    .sem-section.alt { background: var(--bg-secondary); }
+
+    /* Faixa de fatos rápidos */
+    .sem-facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 1rem; }
+    .sem-fact {
+        background: var(--bg-tertiary);
+        border: 1px solid rgba(255,255,255,.07);
+        border-radius: calc(var(--radius) * 1.5);
+        padding: 1.6rem 1.2rem; text-align: center;
+        transition: transform var(--transition-smooth), border-color var(--transition-smooth);
+    }
+    .sem-fact:hover { transform: translateY(-4px); border-color: var(--brand-gold-border); }
+    .sem-fact i { font-size: 1.5rem; color: var(--brand-gold); display: block; margin-bottom: .6rem; }
+    .sem-fact strong { display: block; color: var(--text-primary); font-size: 1.05rem; font-weight: 700; }
+    .sem-fact span { color: var(--text-secondary); font-size: .85rem; }
+
+    /* Grade curricular */
+    .sem-modulo {
+        background: var(--bg-tertiary);
+        border: 1px solid rgba(255,255,255,.07);
+        border-radius: calc(var(--radius) * 1.5);
+        overflow: hidden;
+        height: 100%;
+        transition: border-color var(--transition-smooth);
+    }
+    .sem-modulo:hover { border-color: var(--brand-gold-border); }
+    .sem-modulo-head {
+        padding: 1.3rem 1.5rem;
+        background: var(--brand-gold-light);
+        border-bottom: 1px solid var(--brand-gold-border);
+    }
+    .sem-modulo-head h3 { color: var(--text-primary); font-size: 1.1rem; font-weight: 800; margin: 0 0 .2rem; }
+    .sem-modulo-head p { color: var(--text-secondary); font-size: .85rem; margin: 0; }
+    .sem-materias { list-style: none; margin: 0; padding: .5rem 0; }
+    .sem-materia {
+        display: flex; gap: .9rem; align-items: flex-start;
+        padding: .9rem 1.5rem;
+        border-bottom: 1px solid rgba(255,255,255,.05);
+    }
+    .sem-materia:last-child { border-bottom: none; }
+    .sem-materia-num {
+        flex-shrink: 0; width: 26px; height: 26px; margin-top: .1rem;
+        border-radius: 50%;
+        background: var(--brand-gold-light); border: 1px solid var(--brand-gold-border);
+        color: var(--brand-gold); font-size: .75rem; font-weight: 800;
+        display: flex; align-items: center; justify-content: center;
+    }
+    .sem-materia-nome { color: var(--text-primary); font-weight: 700; font-size: .96rem; display: block; }
+    .sem-materia-desc { color: var(--text-secondary); font-size: .84rem; margin: .2rem 0 0; }
+    .sem-materia-meta { color: var(--brand-gold); font-size: .76rem; font-weight: 700; margin-top: .3rem; display: block; }
+
+    /* Como funciona */
+    .sem-modo {
+        background: var(--bg-tertiary);
+        border: 1px solid rgba(255,255,255,.07);
+        border-radius: calc(var(--radius) * 1.5);
+        padding: 2rem; height: 100%;
+        transition: border-color var(--transition-smooth), transform var(--transition-smooth);
+    }
+    .sem-modo:hover { border-color: var(--brand-gold-border); transform: translateY(-4px); }
+    .sem-modo-icon {
+        width: 60px; height: 60px; margin-bottom: 1rem;
+        background: var(--brand-gold-light); border: 1px solid var(--brand-gold-border);
+        border-radius: 50%; display: flex; align-items: center; justify-content: center;
+        font-size: 1.4rem; color: var(--brand-gold);
+    }
+    .sem-modo h3 { color: var(--text-primary); font-weight: 700; font-size: 1.15rem; margin-bottom: .5rem; }
+    .sem-modo p { color: var(--text-secondary); margin: 0; }
+
+    /* Certificado */
+    .sem-cert {
+        background: var(--brand-gold-light);
+        border: 1px solid var(--brand-gold-border);
+        border-radius: calc(var(--radius) * 1.5);
+        padding: 3rem 2rem; text-align: center;
+        max-width: 760px; margin: 0 auto;
+    }
+    .sem-cert i { font-size: 2.5rem; color: var(--brand-gold); display: block; margin-bottom: 1rem; }
+    .sem-cert h3 { color: var(--text-primary); font-weight: 700; margin-bottom: .75rem; }
+    .sem-cert p { color: var(--text-secondary); margin: 0 auto; max-width: 560px; }
+
+    /* FAQ */
+    .sem-faq { max-width: 760px; margin: 0 auto; }
+    .sem-faq details {
+        background: var(--bg-tertiary);
+        border: 1px solid rgba(255,255,255,.07);
+        border-radius: var(--radius);
+        padding: 1rem 1.25rem; margin-bottom: .75rem;
+    }
+    .sem-faq details[open] { border-color: var(--brand-gold-border); }
+    .sem-faq summary {
+        color: var(--text-primary); font-weight: 700; font-size: .98rem;
+        cursor: pointer; list-style: none; display: flex; justify-content: space-between; gap: 1rem;
+    }
+    .sem-faq summary::-webkit-details-marker { display: none; }
+    .sem-faq summary::after { content: '+'; color: var(--brand-gold); font-size: 1.3rem; line-height: 1; }
+    .sem-faq details[open] summary::after { content: '−'; }
+    .sem-faq p { color: var(--text-secondary); font-size: .9rem; margin: .75rem 0 0; }
+
+    .sem-cta {
+        background: var(--bg-secondary);
+        border-top: 1px solid var(--brand-gold-border);
+        padding: 5rem 0; text-align: center;
+    }
+    .sem-cta h2 { color: var(--text-primary); font-weight: 700; font-size: clamp(1.5rem,3vw,2rem); margin-bottom: .75rem; }
+    .sem-cta p { color: var(--text-secondary); max-width: 560px; margin: 0 auto 2rem; }
+</style>
+
+<!-- Hero -->
+<div class="sem-hero">
+    <div class="container">
+        <span class="section-eyebrow">Formação Teológica</span>
+        <h1>Seminário Teológico</h1>
+        <p class="lead-text">
+            Dois anos de estudo sério e acessível das Escrituras, para quem quer conhecer a Palavra
+            com profundidade — leigos, vocacionados, líderes e ministros.
+        </p>
+        <span class="sem-turma-pill">
+            <i class="fas fa-calendar-check"></i> Nova turma começa em @proximaTurma
+        </span>
+        <div class="d-flex flex-wrap justify-content-center gap-3">
+            <a href="@whatsInscricao" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-lg">
+                <i class="fab fa-whatsapp me-2"></i>Quero me inscrever
+            </a>
+            <a href="#grade" class="btn btn-outline-hero btn-lg">
+                <i class="fas fa-list-ul me-2"></i>Ver grade curricular
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Fatos rápidos -->
+<div class="sem-section">
+    <div class="container">
+        <div class="sem-facts scroll-reveal">
+            <div class="sem-fact">
+                <i class="fas fa-clock"></i>
+                <strong>Segunda, 19h30</strong>
+                <span>Aula semanal</span>
+            </div>
+            <div class="sem-fact">
+                <i class="fas fa-hourglass-half"></i>
+                <strong>2 anos</strong>
+                <span>4 semestres @(cargaTotal > 0 ? $"• {cargaTotal}h no total" : "")</span>
+            </div>
+            <div class="sem-fact">
+                <i class="fas fa-laptop"></i>
+                <strong>Presencial ou online</strong>
+                <span>Aulas online ficam gravadas</span>
+            </div>
+            <div class="sem-fact">
+                <i class="fas fa-certificate"></i>
+                <strong>Certificado</strong>
+                <span>Emitido ao concluir o curso</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Para quem é -->
+<div class="sem-section alt">
+    <div class="container">
+        <div class="row g-4 align-items-center">
+            <div class="col-lg-6 scroll-reveal">
+                <span class="section-eyebrow">Para quem é</span>
+                <h2 class="section-heading">Feito para a igreja inteira</h2>
+                <p class="text-secondary">
+                    O Seminário Teológico da Comunidade Batista Floramar não é só para quem vai pastorear.
+                    Ele existe para que cada membro conheça o que crê e por que crê — com base na Palavra,
+                    sem atalhos e sem complicação desnecessária.
+                </p>
+                <ul class="list-unstyled text-secondary mt-3 mb-0">
+                    <li class="mb-2"><i class="fas fa-check text-gold me-2"></i>Membros que querem estudar a Bíblia com profundidade</li>
+                    <li class="mb-2"><i class="fas fa-check text-gold me-2"></i>Líderes de célula, professores e obreiros</li>
+                    <li class="mb-2"><i class="fas fa-check text-gold me-2"></i>Vocacionados ao ministério pastoral e missionário</li>
+                    <li class="mb-0"><i class="fas fa-check text-gold me-2"></i>Quem serve em algum ministério e quer se preparar melhor</li>
+                </ul>
+            </div>
+            <div class="col-lg-6 scroll-reveal delay-1">
+                <div class="row g-3">
+                    <div class="col-sm-6">
+                        <div class="sem-modo">
+                            <div class="sem-modo-icon"><i class="fas fa-church"></i></div>
+                            <h3>Presencial</h3>
+                            <p>Toda segunda-feira, às 19h30, na sede da igreja — Rua José Lima de Almeida, 59, Floramar.</p>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="sem-modo">
+                            <div class="sem-modo-icon"><i class="fas fa-video"></i></div>
+                            <h3>Online</h3>
+                            <p>Acompanhe ao vivo de onde estiver. Todas as aulas ficam gravadas para assistir depois.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Grade curricular -->
+<div class="sem-section" id="grade">
+    <div class="container">
+        <div class="text-center mb-5 scroll-reveal">
+            <span class="section-eyebrow">O que você vai estudar</span>
+            <h2 class="section-heading">Grade Curricular</h2>
+            <p class="text-secondary" style="max-width:620px;margin:0 auto;">
+                O curso é dividido em quatro semestres, do fundamento bíblico até a prática ministerial.
+            </p>
+        </div>
+
+        @if (!Model.Any())
+        {
+            <div class="text-center text-secondary">
+                <i class="fas fa-book-open fa-2x text-gold mb-3 d-block"></i>
+                <p class="mb-0">A grade curricular está sendo atualizada. Fale conosco no WhatsApp para receber os detalhes.</p>
+            </div>
+        }
+        else
+        {
+            <div class="row g-4">
+                @foreach (var mod in modulos)
+                {
+                    var materias = Model
+                        .Where(m => m.Ano == mod.Ano && m.Semestre == mod.Semestre)
+                        .ToList();
+                    if (!materias.Any()) { continue; }
+
+                    <div class="col-lg-6 scroll-reveal">
+                        <div class="sem-modulo">
+                            <div class="sem-modulo-head">
+                                <h3>@mod.Titulo</h3>
+                                <p>@mod.Sub</p>
+                            </div>
+                            <ul class="sem-materias">
+                                @{ var i = 1; }
+                                @foreach (var materia in materias)
+                                {
+                                    <li class="sem-materia">
+                                        <span class="sem-materia-num">@i</span>
+                                        <div>
+                                            <span class="sem-materia-nome">@materia.Nome</span>
+                                            @if (!string.IsNullOrWhiteSpace(materia.Descricao))
+                                            {
+                                                <p class="sem-materia-desc">@materia.Descricao</p>
+                                            }
+                                            @if (materia.CargaHoraria > 0 || !string.IsNullOrWhiteSpace(materia.Professor))
+                                            {
+                                                <span class="sem-materia-meta">
+                                                    @if (materia.CargaHoraria > 0)
+                                                    {
+                                                        <text><i class="fas fa-clock me-1"></i>@materia.CargaHoraria h</text>
+                                                    }
+                                                    @if (!string.IsNullOrWhiteSpace(materia.Professor))
+                                                    {
+                                                        <text><i class="fas fa-user ms-2 me-1"></i>@materia.Professor</text>
+                                                    }
+                                                </span>
+                                            }
+                                        </div>
+                                    </li>
+                                    i++;
+                                }
+                            </ul>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Certificado -->
+<div class="sem-section alt">
+    <div class="container">
+        <div class="sem-cert scroll-reveal">
+            <i class="fas fa-award"></i>
+            <h3>Certificado de conclusão</h3>
+            <p>
+                Ao completar os dois anos, com presença e trabalhos em dia, você recebe o certificado
+                do Seminário Teológico da Comunidade Batista Floramar.
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- FAQ -->
+<div class="sem-section">
+    <div class="container">
+        <div class="text-center mb-5 scroll-reveal">
+            <span class="section-eyebrow">Dúvidas frequentes</span>
+            <h2 class="section-heading">Antes de se inscrever</h2>
+        </div>
+        <div class="sem-faq scroll-reveal">
+            <details open>
+                <summary>Quando começa a próxima turma?</summary>
+                <p>Uma turma nova começa todo início de ano. A próxima entra em @proximaTurma — faça sua inscrição pelo WhatsApp para garantir sua vaga.</p>
+            </details>
+            <details>
+                <summary>Preciso ser membro da igreja?</summary>
+                <p>Não. O seminário é aberto a qualquer pessoa interessada em estudar as Escrituras com seriedade, seja membro da Comunidade Batista Floramar ou não.</p>
+            </details>
+            <details>
+                <summary>E se eu perder uma aula?</summary>
+                <p>As aulas são gravadas e disponibilizadas para os alunos. Você assiste depois, no seu tempo, sem perder o conteúdo.</p>
+            </details>
+            <details>
+                <summary>Como funciona a modalidade online?</summary>
+                <p>Você acompanha a aula de segunda-feira à distância e tem acesso à gravação. O material é o mesmo da turma presencial.</p>
+            </details>
+            <details>
+                <summary>Onde e a que horas são as aulas?</summary>
+                <p>As aulas acontecem toda segunda-feira, começando às 19h30, na sede da igreja no bairro Floramar, em Belo Horizonte.</p>
+            </details>
+        </div>
+    </div>
+</div>
+
+<!-- CTA -->
+<div class="sem-cta">
+    <div class="container">
+        <h2>Quer fazer parte da turma de @proximaTurma?</h2>
+        <p>Fale com a gente pelo WhatsApp. A equipe do seminário responde com todos os detalhes de matrícula, material e início das aulas.</p>
+        <div class="d-flex flex-wrap justify-content-center gap-3">
+            <a href="@whatsInscricao" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-lg">
+                <i class="fab fa-whatsapp me-2"></i>Fazer minha inscrição
+            </a>
+            <a href="@whatsDuvida" target="_blank" rel="noopener noreferrer" class="btn btn-outline-hero btn-lg">
+                <i class="fas fa-question-circle me-2"></i>Tirar uma dúvida
+            </a>
+        </div>
+    </div>
+</div>

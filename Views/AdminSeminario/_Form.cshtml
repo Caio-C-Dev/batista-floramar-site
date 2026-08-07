@@ -1,0 +1,76 @@
+@model BatistaFloramar.Domain.Entities.MateriaSeminario
+
+<div class="mb-4">
+    <label class="form-label">Nome da Matéria *</label>
+    <input type="text" name="Nome" value="@Model.Nome" class="form-control"
+           placeholder="Ex: Teologia Sistemática I — Deus e Revelação" required />
+    @if (ViewData.ModelState["Nome"]?.Errors.Count > 0)
+    {
+        <div class="text-danger small mt-1">@ViewData.ModelState["Nome"]!.Errors[0].ErrorMessage</div>
+    }
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <label class="form-label">Ano *</label>
+        <select name="Ano" class="form-control" required>
+            <option value="1" selected="@(Model.Ano == 1)">1º Ano</option>
+            <option value="2" selected="@(Model.Ano == 2)">2º Ano</option>
+        </select>
+        @if (ViewData.ModelState["Ano"]?.Errors.Count > 0)
+        {
+            <div class="text-danger small mt-1">@ViewData.ModelState["Ano"]!.Errors[0].ErrorMessage</div>
+        }
+    </div>
+    <div class="col-md-3">
+        <label class="form-label">Semestre *</label>
+        <select name="Semestre" class="form-control" required>
+            <option value="1" selected="@(Model.Semestre == 1)">1º Semestre</option>
+            <option value="2" selected="@(Model.Semestre == 2)">2º Semestre</option>
+        </select>
+        @if (ViewData.ModelState["Semestre"]?.Errors.Count > 0)
+        {
+            <div class="text-danger small mt-1">@ViewData.ModelState["Semestre"]!.Errors[0].ErrorMessage</div>
+        }
+    </div>
+    <div class="col-md-3">
+        <label class="form-label">Carga horária</label>
+        <input type="number" name="CargaHoraria" value="@Model.CargaHoraria" class="form-control" min="0" />
+        <div class="form-text" style="color:var(--admin-text-muted);">Em horas. 0 = não exibir.</div>
+    </div>
+    <div class="col-md-3">
+        <label class="form-label">Ordem</label>
+        <input type="number" name="Ordem" value="@Model.Ordem" class="form-control" min="0" />
+        <div class="form-text" style="color:var(--admin-text-muted);">Posição dentro do semestre.</div>
+    </div>
+</div>
+
+<div class="mb-4">
+    <label class="form-label">Professor</label>
+    <input type="text" name="Professor" value="@Model.Professor" class="form-control"
+           placeholder="Ex: Pr. Rodrigo N. Ferreira" />
+</div>
+
+<div class="mb-4">
+    <label class="form-label">Descrição</label>
+    <textarea name="Descricao" rows="3" class="form-control"
+              placeholder="O que o aluno vai estudar nesta matéria...">@Model.Descricao</textarea>
+</div>
+
+<div class="form-check mb-4">
+    <input type="checkbox" name="Ativo" value="true" id="ativo"
+           class="form-check-input" @(Model.Ativo ? "checked" : "") />
+    <input type="hidden" name="Ativo" value="false" />
+    <label class="form-check-label" for="ativo" style="color:var(--admin-text);">
+        Exibir na grade curricular do site
+    </label>
+</div>
+
+<div class="d-flex gap-3">
+    <button type="submit" class="btn-admin btn-admin-success">
+        <i class="fas fa-save me-1"></i> Salvar
+    </button>
+    <a href="@Url.Action("Index")" class="btn-admin btn-admin-outline" style="color:var(--admin-text);">
+        Cancelar
+    </a>
+</div>

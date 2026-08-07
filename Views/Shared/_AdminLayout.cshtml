@@ -64,6 +64,11 @@
                 <i class="fas fa-calendar-week"></i>
                 <span>Agenda Semanal</span>
             </a>
+            <a href="@Url.Action("Index", "AdminSeminario")"
+               class="@(ViewBag.AdminSection == "seminario" ? "active" : "")">
+                <i class="fas fa-graduation-cap"></i>
+                <span>Seminário</span>
+            </a>
             <a href="@Url.Action("Index", "AdminBatismo")"
                class="@(ViewBag.AdminSection == "batismo" ? "active" : "")">
                 <i class="fas fa-water"></i>

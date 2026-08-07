@@ -17,6 +17,7 @@ namespace BatistaFloramar.Infrastructure.Data
             await SeedPodcastsAsync(db);
             await SeedMinisterioFotosAsync(db);
             await SeedEventosSemanaisAsync(db);
+            await SeedMateriasSeminarioAsync(db);
             await BackfillSlugsAsync(db);
         }
 
@@ -209,6 +210,48 @@ namespace BatistaFloramar.Infrastructure.Data
                 new EventoSemanal { DiaSemana = "Sábado",   Titulo = "Futebol",               Horario = "17h30", Descricao = "Confraternização e integração através do esporte.",                                                 Ativo = true, Ordem = 3 },
                 new EventoSemanal { DiaSemana = "Domingo",  Titulo = "Culto da Manhã",        Horario = "10h",   Descricao = "Culto de adoração e aprofundamento na pregação expositiva.",                                        Ativo = true, Ordem = 1 },
                 new EventoSemanal { DiaSemana = "Domingo",  Titulo = "Culto da Noite",        Horario = "18h",   Descricao = "Culto de adoração e aprofundamento na pregação expositiva — com intérprete de libras presencial.", Ativo = true, Ordem = 2 }
+            );
+            await db.SaveChangesAsync();
+        }
+
+        private static async Task SeedMateriasSeminarioAsync(BatistaFloramarDbContext db)
+        {
+            // Grade inicial — só popula se a tabela estiver vazia. Depois disso a
+            // manutenção é feita pelo painel /AdminSeminario, sem sobrescrever edições.
+            try
+            {
+                if (await db.MateriasSeminario.AnyAsync()) return;
+            }
+            catch
+            {
+                // Tabela ainda não existe (migration pendente) — ignora silenciosamente.
+                return;
+            }
+
+            db.MateriasSeminario.AddRange(
+                // ── 1º ano — 1º semestre ──────────────────────────────────────────
+                new MateriaSeminario { Ano = 1, Semestre = 1, Ordem = 1, CargaHoraria = 32, Nome = "Bibliologia",                 Descricao = "Origem, inspiração, cânon e transmissão das Escrituras. Por que confiamos na Bíblia." },
+                new MateriaSeminario { Ano = 1, Semestre = 1, Ordem = 2, CargaHoraria = 32, Nome = "Panorama do Antigo Testamento", Descricao = "Visão geral dos livros do AT, contexto histórico e o fio da redenção." },
+                new MateriaSeminario { Ano = 1, Semestre = 1, Ordem = 3, CargaHoraria = 24, Nome = "Hermenêutica Bíblica",        Descricao = "Princípios de interpretação: gêneros literários, contexto e aplicação fiel do texto." },
+                new MateriaSeminario { Ano = 1, Semestre = 1, Ordem = 4, CargaHoraria = 24, Nome = "Vida Devocional e Espiritualidade Cristã", Descricao = "Disciplinas espirituais, oração, meditação na Palavra e caráter do servo." },
+
+                // ── 1º ano — 2º semestre ──────────────────────────────────────────
+                new MateriaSeminario { Ano = 1, Semestre = 2, Ordem = 1, CargaHoraria = 32, Nome = "Panorama do Novo Testamento", Descricao = "Evangelhos, Atos, epístolas e Apocalipse: contexto, mensagem e unidade." },
+                new MateriaSeminario { Ano = 1, Semestre = 2, Ordem = 2, CargaHoraria = 32, Nome = "Teologia Sistemática I — Deus e Revelação", Descricao = "Doutrina de Deus, Trindade, atributos divinos e revelação geral e especial." },
+                new MateriaSeminario { Ano = 1, Semestre = 2, Ordem = 3, CargaHoraria = 24, Nome = "História da Igreja I — Patrística à Idade Média", Descricao = "Da igreja primitiva aos concílios e à formação da cristandade medieval." },
+                new MateriaSeminario { Ano = 1, Semestre = 2, Ordem = 4, CargaHoraria = 24, Nome = "Evangelismo e Discipulado",   Descricao = "A Grande Comissão na prática: comunicar o Evangelho e formar discípulos." },
+
+                // ── 2º ano — 1º semestre ──────────────────────────────────────────
+                new MateriaSeminario { Ano = 2, Semestre = 1, Ordem = 1, CargaHoraria = 32, Nome = "Teologia Sistemática II — Cristo e Salvação", Descricao = "Cristologia e soteriologia: pessoa e obra de Cristo, graça, fé e justificação." },
+                new MateriaSeminario { Ano = 2, Semestre = 1, Ordem = 2, CargaHoraria = 32, Nome = "Homilética",                  Descricao = "Preparação e entrega de sermões expositivos: do texto ao púlpito." },
+                new MateriaSeminario { Ano = 2, Semestre = 1, Ordem = 3, CargaHoraria = 24, Nome = "História da Igreja II — Reforma aos Dias Atuais", Descricao = "Reforma Protestante, movimento batista, avivamentos e igreja contemporânea." },
+                new MateriaSeminario { Ano = 2, Semestre = 1, Ordem = 4, CargaHoraria = 24, Nome = "Introdução ao Grego do Novo Testamento", Descricao = "Alfabeto, vocabulário básico e uso de ferramentas para leitura do texto original." },
+
+                // ── 2º ano — 2º semestre ──────────────────────────────────────────
+                new MateriaSeminario { Ano = 2, Semestre = 2, Ordem = 1, CargaHoraria = 32, Nome = "Teologia Sistemática III — Igreja, Espírito Santo e Últimas Coisas", Descricao = "Pneumatologia, eclesiologia e escatologia à luz das Escrituras." },
+                new MateriaSeminario { Ano = 2, Semestre = 2, Ordem = 2, CargaHoraria = 24, Nome = "Ética Cristã e Aconselhamento Bíblico", Descricao = "Decisões éticas, cuidado pastoral e aconselhamento fundamentado na Palavra." },
+                new MateriaSeminario { Ano = 2, Semestre = 2, Ordem = 3, CargaHoraria = 24, Nome = "Liderança e Administração Eclesiástica", Descricao = "Governo da igreja local, gestão de ministérios e formação de equipes." },
+                new MateriaSeminario { Ano = 2, Semestre = 2, Ordem = 4, CargaHoraria = 24, Nome = "Missões e Plantação de Igrejas", Descricao = "Teologia de missões, contextualização cultural e implantação de novas igrejas." }
             );
             await db.SaveChangesAsync();
         }

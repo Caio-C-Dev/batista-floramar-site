@@ -339,6 +339,20 @@ _ = Task.Run(async () =>
             CREATE UNIQUE INDEX IF NOT EXISTS ""IX_Produtos_Slug"" ON ""Produtos"" (""Slug"");
         ");
         await db.Database.ExecuteSqlRawAsync(@"
+            CREATE TABLE IF NOT EXISTS ""MateriasSeminario"" (
+                ""Id"" SERIAL PRIMARY KEY,
+                ""Nome"" VARCHAR(200) NOT NULL,
+                ""Descricao"" VARCHAR(1000),
+                ""Ano"" INTEGER NOT NULL DEFAULT 1,
+                ""Semestre"" INTEGER NOT NULL DEFAULT 1,
+                ""Professor"" VARCHAR(150),
+                ""CargaHoraria"" INTEGER NOT NULL DEFAULT 0,
+                ""Ordem"" INTEGER NOT NULL DEFAULT 0,
+                ""Ativo"" BOOLEAN NOT NULL DEFAULT TRUE,
+                ""CriadoEm"" TIMESTAMP NOT NULL DEFAULT NOW()
+            )
+        ");
+        await db.Database.ExecuteSqlRawAsync(@"
             CREATE TABLE IF NOT EXISTS ""BatizadosHistorico"" (
                 ""Id"" SERIAL PRIMARY KEY,
                 ""Nome"" VARCHAR(150) NOT NULL,

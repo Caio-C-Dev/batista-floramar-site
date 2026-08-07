@@ -1,0 +1,13 @@
+@model BatistaFloramar.Domain.Entities.MateriaSeminario
+@{
+    Layout = "_AdminLayout";
+    ViewBag.Title = "Nova Matéria";
+    ViewBag.AdminSection = "seminario";
+}
+
+<div class="admin-card" style="max-width:720px;">
+    <form method="post" action="@Url.Action("Nova")">
+        @Html.AntiForgeryToken()
+        @await Html.PartialAsync("_Form", Model)
+    </form>
+</div>

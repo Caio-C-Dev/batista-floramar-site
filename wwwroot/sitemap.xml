@@ -55,6 +55,12 @@
     <priority>0.82</priority>
   </url>
   <url>
+    <loc>https://www.batistafloramar.com.br/Seminario</loc>
+    <lastmod>2026-08-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
     <loc>https://www.batistafloramar.com.br/Galeria</loc>
     <lastmod>2026-04-19</lastmod>
     <changefreq>weekly</changefreq>
